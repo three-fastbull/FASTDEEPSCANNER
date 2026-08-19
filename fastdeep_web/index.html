@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FastDeep Scanner</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">FastDeep Intelligence Platform</p>
+      <h1>Scanner หุ้น + VI + กราฟ</h1>
+      <p class="data-source-note" id="dataSourceNote">Data Source: loading...</p>
+    </div>
+    <div class="status-pill" id="scanStatus">Ready</div>
+  </header>
+
+  <main class="app-shell">
+    <section class="control-band" aria-label="Scanner controls">
+      <label>
+        ตลาด
+        <select id="marketSelect">
+          <option value="ALL">ALL</option>
+          <option value="US">US</option>
+          <option value="TH">TH</option>
+          <option value="CN">CN</option>
+        </select>
+      </label>
+      <label>
+        Universe
+        <select id="universeSelect">
+          <option value="ALL">ALL</option>
+          <option value="SP500">S&P 500</option>
+          <option value="NASDAQ100">Nasdaq-100</option>
+          <option value="CHINA50">China 50</option>
+          <option value="SET_SAMPLE">หุ้นไทย</option>
+          <option value="SET50">SET50</option>
+          <option value="SET100">SET100</option>
+          <option value="MAI">MAI</option>
+        </select>
+      </label>
+      <label>
+        Timeframe
+        <select id="timeframeSelect">
+          <option value="D">D</option>
+          <option value="W">W</option>
+          <option value="M">M</option>
+        </select>
+      </label>
+      <label>
+        คะแนนขั้นต่ำ
+        <input id="scoreRange" type="range" min="45" max="85" value="55">
+        <span id="scoreValue">55</span>
+      </label>
+      <div class="pattern-controls" aria-label="Pattern filters">
+        <label><input type="checkbox" value="breakout" checked> Breakout</label>
+        <label><input type="checkbox" value="retest" checked> Retest</label>
+        <label><input type="checkbox" value="cup_handle" checked> Cup & Handle</label>
+        <label><input type="checkbox" value="double_bottom" checked> Double Bottom</label>
+        <label><input type="checkbox" value="head_shoulders" checked> Head & Shoulders</label>
+      </div>
+      <button id="scanButton" class="primary-button">Scan</button>
+      <a id="csvButton" class="ghost-button" href="/api/export.csv">CSV</a>
+    </section>
+
+    <section class="metrics-row" aria-label="Scanner summary">
+      <div class="metric">
+        <span>หุ้นเข้าเงื่อนไข</span>
+        <strong id="metricCount">0</strong>
+      </div>
+      <div class="metric">
+        <span>คะแนนสูงสุด</span>
+        <strong id="metricBest">0</strong>
+      </div>
+      <div class="metric">
+        <span>A / A+</span>
+        <strong id="metricA">0</strong>
+      </div>
+      <div class="metric">
+        <span>ตลาดเด่น</span>
+        <strong id="metricMarket">-</strong>
+      </div>
+    </section>
+
+    <section class="image-match-panel" aria-label="Chart image matching">
+      <div class="image-tools">
+        <div>
+          <h2>แนบรูปกราฟเพื่อหา asset คล้ายกัน</h2>
+          <p>ระบบจะอ่านทรงกราฟจากรูป แล้วเทียบกับหุ้นใน Universe ที่เลือกอยู่</p>
+        </div>
+        <input id="chartImageInput" class="file-input" type="file" accept="image/*">
+        <button id="imageScanButton" class="primary-button">Scan รูปกราฟ</button>
+      </div>
+      <div class="image-preview-area">
+        <img id="chartImagePreview" alt="ตัวอย่างรูปกราฟที่แนบ">
+        <div>
+          <h3>ผลลัพธ์รูปที่คล้าย</h3>
+          <div id="imageMatches" class="image-matches">
+            <p>ยังไม่ได้แนบรูป</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="table-panel">
+        <div class="panel-head">
+          <h2>ผลสแกน</h2>
+          <span id="generatedAt">-</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>หุ้น</th>
+                <th>Pattern</th>
+                <th>Grade</th>
+                <th>Score</th>
+                <th>พื้นฐาน</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="detail-panel">
+        <div class="panel-head">
+          <div>
+            <h2 id="detailTitle">เลือกหุ้นจากผลสแกน</h2>
+            <p id="detailSubtitle">ระบบจะเปิดกราฟและ valuation check ให้</p>
+          </div>
+          <span class="grade-badge" id="detailGrade">-</span>
+        </div>
+        <canvas id="priceChart" width="720" height="320"></canvas>
+        <div class="action-row">
+          <a id="tradingViewButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">TradingView</a>
+          <a id="reportButton" class="primary-button" href="#" target="_blank" rel="noreferrer">PDF Report</a>
+        </div>
+        <div class="split-grid">
+          <section>
+            <h3>Risk Plan</h3>
+            <dl id="riskPlan"></dl>
+          </section>
+          <section>
+            <h3>Fundamental</h3>
+            <dl id="fundamentalBox"></dl>
+          </section>
+        </div>
+        <section>
+          <h3>AI Agent Notes</h3>
+          <div id="agentNotes" class="agent-list"></div>
+        </section>
+        <section>
+          <h3>Warnings</h3>
+          <ul id="warningList" class="warning-list"></ul>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    Research workflow only. Not financial advice.
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

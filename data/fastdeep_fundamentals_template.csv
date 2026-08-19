@@ -1,0 +1,3 @@
+symbol,name,market,sector,roe,roa,debt_to_equity,revenue_growth,profit_growth,gross_margin,net_margin,pe,pbv,dividend_yield,analyst_upside_pct,liquidity_score,moat,ai_trend,notes
+ADVANC.BK,Advanced Info Service,TH,Digital Infrastructure,32,12.5,1.35,8,10,33,18,21,7.9,3.7,12,91,strong,beneficiary,Telecom cash flow and data demand
+NVDA,NVIDIA,US,Semiconductors,76,42,0.31,58,84,73,49,34,28,0,23,96,wide,leader,AI compute platform leader

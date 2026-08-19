@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+storage/
+.env
+.env.*
+tmp/
+
+# Regenerated market data
+data/fastdeep_prices.csv
+data/fastdeep_prices_source.json
+
+# Separate Gold OI project assets (not part of FastDeep Scanner)
+oi_trading_system/
+tradingview/
+data/gold_*.csv
+data/sample_market.csv
+data/sample_oi_zones.csv
+BLANK_WEB.html
+OPEN_BLANK_WEB.bat
+README.md
+TRIGGER_ZONE_PRO_V1.md
+config.example.json
+FASTDEEP_SCANNER.url
+ระบบเทรดใหม่.txt
