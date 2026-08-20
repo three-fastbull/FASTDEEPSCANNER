@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
 
 from .data_io import data_source_label, load_market_data
+from .financials import FinancialDataError, fetch_financials
 from .models import ScanCriteria
 from .report import build_report_html
 from .scanner import scan_market
@@ -105,6 +106,29 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                 ],
             }
             self._send_json(payload)
+            return
+
+        if parsed.path == "/api/universe":
+            from .data_io import load_universe_metadata
+
+            universe = load_universe_metadata()
+            self._send_json(
+                {
+                    "symbols": [
+                        {"symbol": symbol, **metadata}
+                        for symbol, metadata in sorted(universe.items())
+                    ]
+                }
+            )
+            return
+
+        if parsed.path == "/api/financials":
+            symbol = query.get("symbol", [""])[0]
+            refresh = query.get("refresh", ["0"])[0].lower() in {"1", "true", "yes"}
+            try:
+                self._send_json(fetch_financials(symbol, refresh=refresh))
+            except FinancialDataError as exc:
+                self._send_json({"error": str(exc)}, 422)
             return
 
         if parsed.path == "/api/image-index":

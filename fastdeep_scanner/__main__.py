@@ -8,6 +8,7 @@ from .models import ScanCriteria
 from .report import build_report_html
 from .scanner import scan_market
 from .data_io import load_market_data
+from .financials import cache_universe_financials
 from .server import run_server
 from .static_export import export_static_dashboard
 from .yahoo_prices import update_prices_from_yahoo
@@ -75,6 +76,20 @@ def update_prices_command(args: argparse.Namespace) -> None:
             print(f"  - {item}")
 
 
+def update_financials_command(args: argparse.Namespace) -> None:
+    summary = cache_universe_financials(
+        args.universe,
+        cache_dir=args.cache_dir,
+        pause_seconds=args.pause,
+        refresh=args.refresh,
+    )
+    print(f"cached financial statements: {len(summary['succeeded'])}/{summary['symbols']}")
+    if summary["failed"]:
+        print("- failed:")
+        for item in summary["failed"]:
+            print(f"  - {item}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="FastDeep stock scanner MVP")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -125,6 +140,16 @@ def build_parser() -> argparse.ArgumentParser:
     update_prices.add_argument("--interval", default="1d")
     update_prices.add_argument("--pause", type=float, default=0.05)
     update_prices.set_defaults(func=update_prices_command)
+
+    update_financials = subparsers.add_parser(
+        "update-financials",
+        help="Download and cache annual and quarterly financial statements for the universe",
+    )
+    update_financials.add_argument("--universe", default="data/fastdeep_universe.csv")
+    update_financials.add_argument("--cache-dir", default="data/financial_cache")
+    update_financials.add_argument("--pause", type=float, default=0.35)
+    update_financials.add_argument("--refresh", action="store_true")
+    update_financials.set_defaults(func=update_financials_command)
 
     return parser
 

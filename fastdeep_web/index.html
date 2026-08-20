@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FastDeep Scanner</title>
+  <title>FastDeep Intelligence Platform</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -16,7 +16,13 @@
     <div class="status-pill" id="scanStatus">Ready</div>
   </header>
 
-  <main class="app-shell">
+  <nav class="app-navigation" aria-label="FastDeep views">
+    <button class="nav-tab is-active" type="button" data-view-target="scannerView">Scanner</button>
+    <button class="nav-tab" type="button" data-view-target="financialsView">งบการเงิน 5 ปี</button>
+    <button class="nav-tab" type="button" data-view-target="viView">VI Thesis</button>
+  </nav>
+
+  <main id="scannerView" class="app-shell app-view">
     <section class="control-band" aria-label="Scanner controls">
       <label>
         ตลาด
@@ -161,10 +167,122 @@
     </section>
   </main>
 
+  <main id="financialsView" class="app-shell app-view is-hidden">
+    <section class="financial-toolbar" aria-label="Financial statement controls">
+      <label class="symbol-search">
+        ค้นหาหุ้น
+        <input id="financialSymbolInput" list="financialSymbolOptions" value="AAPL" placeholder="เช่น AAPL, NVDA, DOHOME.BK">
+        <datalist id="financialSymbolOptions"></datalist>
+      </label>
+      <button id="financialLoadButton" class="primary-button" type="button">ดูงบการเงิน</button>
+      <button id="financialRefreshButton" class="icon-command" type="button" title="ดึงข้อมูลใหม่">&#8635;</button>
+      <p id="financialStatus" class="financial-status">เลือกหุ้นเพื่อดูงบการเงินย้อนหลัง</p>
+    </section>
+
+    <section class="financial-heading" aria-live="polite">
+      <div>
+        <p class="eyebrow">Financial Intelligence</p>
+        <h2 id="financialTitle">งบการเงินย้อนหลัง 5 ปี</h2>
+        <p id="financialSubtitle">ข้อมูลจะโหลดเมื่อเลือกหุ้น</p>
+      </div>
+      <div class="financial-asof">
+        <span>หน่วย</span>
+        <strong id="financialUnit">-</strong>
+      </div>
+    </section>
+
+    <section id="financialKpis" class="financial-kpis" aria-label="Financial highlights"></section>
+
+    <section class="financial-table-panel">
+      <div class="panel-head">
+        <div>
+          <h2>ผลประกอบการสำคัญ</h2>
+          <p>กดที่ปีเพื่อดูรายละเอียด Q1-Q4 ของปีนั้น</p>
+        </div>
+        <span id="financialSource" class="data-source-note">-</span>
+      </div>
+      <div class="table-scroll financial-table-scroll">
+        <table class="financial-table">
+          <thead id="annualFinancialHead"></thead>
+          <tbody id="annualFinancialBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="quarterly-panel">
+      <div class="panel-head">
+        <div>
+          <h2 id="quarterlyTitle">รายไตรมาส</h2>
+          <p id="quarterlySubtitle">เลือกปีจากตารางด้านบน</p>
+        </div>
+        <span id="quarterlyPeriodNote" class="quarterly-note">-</span>
+      </div>
+      <div class="table-scroll financial-table-scroll">
+        <table class="financial-table quarterly-table">
+          <thead id="quarterlyFinancialHead"></thead>
+          <tbody id="quarterlyFinancialBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <main id="viView" class="app-shell app-view is-hidden">
+    <section class="vi-heading">
+      <div>
+        <p class="eyebrow">Value Investing Dashboard</p>
+        <h2 id="viTitle">VI Thesis และ Financial Quality</h2>
+        <p id="viSubtitle">เลือกหุ้นจากแท็บงบการเงินก่อน</p>
+      </div>
+      <div id="viScore" class="vi-score">-</div>
+    </section>
+
+    <section class="thesis-inputs" aria-label="Thesis targets">
+      <div class="section-caption">
+        <h2>Thesis เป้าหมาย</h2>
+        <p>ปรับเป้าหมายของคุณ แล้วระบบเทียบกับเส้นทางจริงจากงบการเงิน</p>
+      </div>
+      <label>รายได้ CAGR เป้าหมาย (%)<input id="targetRevenueCagr" type="number" min="1" max="80" step="1" value="10"></label>
+      <label>กำไรสุทธิ CAGR เป้าหมาย (%)<input id="targetProfitCagr" type="number" min="1" max="100" step="1" value="12"></label>
+      <label>ROE ขั้นต่ำ (%)<input id="targetRoe" type="number" min="1" max="80" step="1" value="15"></label>
+      <label>D/E สูงสุด (เท่า)<input id="targetDebtEquity" type="number" min="0.1" max="10" step="0.1" value="1.5"></label>
+    </section>
+
+    <section id="thesisProgress" class="thesis-progress" aria-label="Thesis progress"></section>
+
+    <section class="vi-grid">
+      <section class="vi-panel">
+        <div class="panel-head">
+          <div>
+            <h2>VI Quality Check</h2>
+            <p>อ่านการเติบโต คุณภาพกำไร และความแข็งแรงของงบดุล</p>
+          </div>
+        </div>
+        <div id="viChecks" class="vi-checks"></div>
+      </section>
+      <section class="vi-panel">
+        <div class="panel-head">
+          <div>
+            <h2>การเติบโตรายปี</h2>
+            <p>การเปลี่ยนแปลงเทียบกับปีก่อนหน้า</p>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="growth-table">
+            <thead>
+              <tr><th>ปี</th><th>รายได้</th><th>กำไรสุทธิ</th><th>Net Margin</th><th>ROE</th><th>D/E</th></tr>
+            </thead>
+            <tbody id="viYearlyBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
   <footer>
     Research workflow only. Not financial advice.
   </footer>
 
   <script src="/app.js"></script>
+  <script src="/financial.js"></script>
 </body>
 </html>

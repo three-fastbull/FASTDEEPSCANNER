@@ -42,6 +42,21 @@ FastDeep Scanner v1 คือ MVP สำหรับ workflow ที่เริ
 http://127.0.0.1:8765
 ```
 
+## Financial Intelligence
+
+หน้าเว็บ live มี 2 dashboard เพิ่มเติม:
+
+1. `งบการเงิน 5 ปี` แสดงงบกำไรขาดทุน งบดุล กระแสเงินสด และอัตราส่วนเป็นภาษาไทย กดปีเพื่อดู Q1-Q4 ของปีนั้น
+2. `VI Thesis` ให้ตั้งเป้าหมาย Revenue CAGR, Net Profit CAGR, ROE และ D/E แล้วเทียบความคืบหน้าจากงบจริง
+
+งบจะโหลดเมื่อเลือกหุ้นและเก็บ cache ไว้ 24 ชั่วโมง จึงใช้ได้กับทุก symbol ใน universe โดยไม่ต้องรอดาวน์โหลดทั้งตลาดก่อนเปิดหน้าเว็บ:
+
+```powershell
+& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-financials --universe data/fastdeep_universe.csv
+```
+
+แหล่งข้อมูลเริ่มต้นคือ Yahoo Finance fundamentals timeseries ซึ่งครอบคลุม US, China และ Thailand แต่โดยทั่วไปเปิดให้รายปีเต็ม 4 ปีและงบรายไตรมาสล่าสุดประมาณ 5 งวดเท่านั้น หน้า dashboard จะแสดงเฉพาะงวดที่ผู้ให้บริการส่งกลับและไม่สร้างตัวเลขย้อนหลังขึ้นเอง
+
 ## Image Match
 
 ในหน้าเว็บจะมีส่วน `แนบรูปกราฟเพื่อหา asset คล้ายกัน`

@@ -8,6 +8,7 @@ tmp/
 # Regenerated market data
 data/fastdeep_prices.csv
 data/fastdeep_prices_source.json
+data/financial_cache/
 
 # Separate Gold OI project assets (not part of FastDeep Scanner)
 oi_trading_system/
