@@ -9,7 +9,5 @@ if errorlevel 1 (
   exit /b 1
 )
 echo.
-echo Building FastDeep Scanner page...
-"C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m fastdeep_scanner export-static --out storage\fastdeep_static_dashboard.html
-echo Opening FastDeep Scanner...
-start "" "%~dp0storage\fastdeep_static_dashboard.html"
+echo Opening FastDeep Scanner live dashboard...
+call "%~dp0OPEN_FASTDEEP_SCANNER.bat"
