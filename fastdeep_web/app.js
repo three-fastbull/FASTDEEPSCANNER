@@ -5,6 +5,7 @@ const state = {
   imageIndex: null,
   dataHealth: null,
 };
+const MAX_VISIBLE_RESULTS = 50;
 
 const elements = {
   scanStatus: document.getElementById("scanStatus"),
@@ -259,13 +260,14 @@ function renderDataHealth(health, financialHealth = null) {
   state.dataHealth = health || null;
   if (!health) return;
   const latest = health.latest_candle_date || "-";
+  const scannerAsOf = health.scanner_as_of_date || latest;
   const coverage = health.symbols_requested
     ? `${health.symbols_succeeded}/${health.symbols_requested}`
     : "-";
   const financialCoverage = financialHealth
     ? ` | งบยืนยัน ${financialHealth.fresh_symbols}/${financialHealth.symbols_requested}`
     : "";
-  elements.dataHealth.textContent = `${health.message} | แท่งล่าสุด ${latest} | Coverage ${coverage}${financialCoverage}`;
+  elements.dataHealth.textContent = `${health.message} | EOD ที่ใช้สแกน ${scannerAsOf} | Feed ล่าสุด ${latest} | Coverage ${coverage}${financialCoverage}`;
   elements.dataHealth.dataset.state = health.state || "unknown";
   elements.csvButton.classList.toggle("is-disabled", !health.can_publish);
   elements.csvButton.setAttribute("aria-disabled", String(!health.can_publish));
@@ -326,7 +328,7 @@ function renderMetrics(results) {
 
 function renderTable(results) {
   elements.resultsBody.innerHTML = "";
-  for (const result of results) {
+  for (const result of results.slice(0, MAX_VISIBLE_RESULTS)) {
     const topPattern = result.patterns[0];
     const row = document.createElement("tr");
     row.dataset.symbol = result.symbol;
@@ -520,7 +522,9 @@ async function runScan() {
   state.results = payload.results;
   renderMetrics(payload.results);
   renderTable(payload.results);
-  elements.generatedAt.textContent = payload.generated_at ? new Date(payload.generated_at).toLocaleString() : "-";
+  const generatedAt = payload.generated_at ? new Date(payload.generated_at).toLocaleString() : "-";
+  const shown = Math.min(payload.results.length, MAX_VISIBLE_RESULTS);
+  elements.generatedAt.textContent = `${generatedAt} | แสดง ${shown}/${payload.results.length}`;
   setStatus("Ready");
   if (payload.results.length) {
     await loadSymbol(payload.results[0].symbol);

@@ -65,6 +65,8 @@ def detect_breakout(candles: list[StockCandle], timeframe: str = "D") -> Pattern
         return None
     if close <= ema50:
         return None
+    if vol_ratio < 1.15:
+        return None
     trend_bonus = 8 if close > ema200 else 2
     volume_bonus = min(16, max(0, (vol_ratio - 1.0) * 18))
     score = min(95, 58 + breakout_pct * 1.6 + trend_bonus + volume_bonus)

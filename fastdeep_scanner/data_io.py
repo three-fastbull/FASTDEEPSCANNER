@@ -5,7 +5,7 @@ import json
 import os
 import time
 from dataclasses import replace
-from datetime import datetime
+from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -82,6 +82,15 @@ def _cached_price_csv(path_text: str, modified_ns: int) -> dict[str, list[StockC
 def load_price_csv(path: str | Path) -> dict[str, list[StockCandle]]:
     source = Path(path).resolve()
     return _cached_price_csv(str(source), source.stat().st_mtime_ns)
+
+
+def completed_eod_candles(
+    candles: list[StockCandle],
+    as_of_date: date | None = None,
+) -> list[StockCandle]:
+    """Exclude the current calendar day so this daily scanner never scores an intraday bar."""
+    cutoff = as_of_date or date.today()
+    return [candle for candle in candles if candle.date < cutoff]
 
 
 def load_fundamentals_csv(path: str | Path) -> dict[str, FundamentalSnapshot]:

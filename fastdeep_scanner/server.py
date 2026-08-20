@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
 
 from .data_health import financial_data_health, price_data_health
-from .data_io import data_source_label, load_market_data
+from .data_io import completed_eod_candles, data_source_label, load_market_data
 from .financials import FinancialDataError, fetch_financials
 from .models import ScanCriteria
 from .report import build_report_html
@@ -27,7 +27,7 @@ def _criteria_from_query(query: dict[str, list[str]]) -> ScanCriteria:
     patterns = tuple(item for item in pattern_value.split(",") if item) or ScanCriteria().patterns
     market = query.get("market", ["ALL"])[0] or "ALL"
     universe = query.get("universe", ["ALL"])[0] or "ALL"
-    min_score = float(query.get("min_score", ["55"])[0] or 55)
+    min_score = float(query.get("min_score", ["70"])[0] or 70)
     min_liquidity = float(query.get("min_liquidity", ["40"])[0] or 40)
     try:
         timeframe = normalize_timeframe(query.get("timeframe", ["D"])[0] or "D")
@@ -167,7 +167,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                         + quote(_tradingview_symbol(symbol, fundamentals[symbol].market)),
                         "series": [
                             {"date": candle.date.isoformat(), "close": round(candle.close, 6)}
-                            for candle in candles[-180:]
+                            for candle in completed_eod_candles(candles)[-180:]
                         ],
                     }
                     for symbol, candles in candles_by_symbol.items()
@@ -191,7 +191,10 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             self._send_json(
                 {
                     "result": result.to_dict(),
-                    "candles": [candle.to_dict() for candle in candles_by_symbol[symbol][-180:]],
+                    "candles": [
+                        candle.to_dict()
+                        for candle in completed_eod_candles(candles_by_symbol[symbol])[-180:]
+                    ],
                     "fundamental": snapshot.to_dict(),
                     "tradingview_url": f"https://www.tradingview.com/chart/?symbol={tv_symbol}",
                     "data_health": price_data_health(),
@@ -245,7 +248,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                 return
             body = build_report_html(
                 result,
-                aggregate_candles(candles_by_symbol[symbol], criteria.timeframe),
+                aggregate_candles(completed_eod_candles(candles_by_symbol[symbol]), criteria.timeframe),
                 fundamentals[symbol],
                 data_health=price_data_health(),
             ).encode("utf-8")

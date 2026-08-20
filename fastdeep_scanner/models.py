@@ -154,9 +154,8 @@ class ScanCriteria:
         "retest",
         "cup_handle",
         "double_bottom",
-        "head_shoulders",
     )
-    min_score: float = 55.0
+    min_score: float = 70.0
     min_liquidity: float = 40.0
     timeframe: str = "D"
 

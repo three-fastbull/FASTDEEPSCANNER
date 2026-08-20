@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import os
 from datetime import UTC, datetime
 
-from .data_io import load_market_data
+from .data_io import completed_eod_candles, load_market_data
 from .fundamentals import (
     business_insight,
     business_score,
@@ -211,7 +212,8 @@ def scan_market(
         snapshot = fundamentals.get(symbol)
         if snapshot is None:
             continue
-        result = _scan_symbol(candles, snapshot, criteria)
+        scan_candles = candles if os.environ.get("FASTDEEP_USE_SAMPLE_DATA") == "1" else completed_eod_candles(candles)
+        result = _scan_symbol(scan_candles, snapshot, criteria)
         if result is not None:
             results.append(result)
     return sorted(results, key=lambda item: item.final_score, reverse=True)

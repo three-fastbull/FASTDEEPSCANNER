@@ -36,7 +36,7 @@ def scan_command(args: argparse.Namespace) -> None:
         market_data_path=args.market_data,
         fundamentals_path=args.fundamentals,
     )
-    print(json.dumps([result.to_dict() for result in results], ensure_ascii=False, indent=2))
+    print(json.dumps([result.to_dict() for result in results], ensure_ascii=True, indent=2))
 
 
 def report_command(args: argparse.Namespace) -> None:
@@ -141,7 +141,7 @@ def build_parser() -> argparse.ArgumentParser:
     scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
     scan.add_argument("--universe", default="ALL")
     scan.add_argument("--patterns", default="")
-    scan.add_argument("--min-score", type=float, default=55)
+    scan.add_argument("--min-score", type=float, default=70)
     scan.add_argument("--min-liquidity", type=float, default=40)
     scan.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     scan.add_argument("--market-data")
@@ -154,7 +154,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
     report.add_argument("--universe", default="ALL")
     report.add_argument("--patterns", default="")
-    report.add_argument("--min-score", type=float, default=55)
+    report.add_argument("--min-score", type=float, default=70)
     report.add_argument("--min-liquidity", type=float, default=40)
     report.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     report.add_argument("--market-data")
@@ -171,7 +171,7 @@ def build_parser() -> argparse.ArgumentParser:
     static.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
     static.add_argument("--universe", default="ALL")
     static.add_argument("--patterns", default="")
-    static.add_argument("--min-score", type=float, default=55)
+    static.add_argument("--min-score", type=float, default=70)
     static.add_argument("--min-liquidity", type=float, default=40)
     static.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     static.set_defaults(func=export_static_command)
@@ -207,7 +207,7 @@ def build_parser() -> argparse.ArgumentParser:
     daily_scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
     daily_scan.add_argument("--universe", default="ALL")
     daily_scan.add_argument("--patterns", default="")
-    daily_scan.add_argument("--min-score", type=float, default=55)
+    daily_scan.add_argument("--min-score", type=float, default=70)
     daily_scan.add_argument("--min-liquidity", type=float, default=40)
     daily_scan.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     daily_scan.set_defaults(func=daily_scan_command)
@@ -217,7 +217,7 @@ def build_parser() -> argparse.ArgumentParser:
     backtest.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
     backtest.add_argument("--universe", default="ALL")
     backtest.add_argument("--patterns", default="breakout,retest,cup_handle,double_bottom,head_shoulders")
-    backtest.add_argument("--min-score", type=float, default=55)
+    backtest.add_argument("--min-score", type=float, default=70)
     backtest.add_argument("--min-liquidity", type=float, default=40)
     backtest.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     backtest.add_argument("--holding-bars", type=int, default=20)

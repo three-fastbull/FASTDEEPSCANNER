@@ -105,6 +105,7 @@ def price_data_health(
         "source": metadata.get("source") or "CSV",
         "updated_at": metadata.get("updated_at"),
         "latest_candle_date": latest,
+        "scanner_as_of_date": expected.isoformat(),
         "expected_eod_date": expected.isoformat(),
         "symbols_requested": requested,
         "symbols_succeeded": symbol_count,
