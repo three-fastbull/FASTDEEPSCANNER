@@ -6,6 +6,8 @@ storage/*
 !storage/fastdeep_event_study_*.json
 .env
 .env.*
+# เก็บตัวอย่างไว้ให้เห็นว่าต้องตั้งค่าอะไรบ้าง โดยไม่มีค่าจริงอยู่ในนั้น
+!.env.example
 tmp/
 
 # Regenerated market data

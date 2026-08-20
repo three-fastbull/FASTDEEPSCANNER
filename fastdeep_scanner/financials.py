@@ -229,6 +229,20 @@ def _ratio(numerator: float | None, denominator: float | None, multiplier: float
     return numerator / denominator * multiplier
 
 
+# ส่วนของผู้ถือหุ้นที่ติดลบหรือเล็กจนแทบเป็นศูนย์ทำให้ ROE และ D/E ระเบิด
+# บริษัทที่ซื้อหุ้นคืนหนักจนทุนติดลบเคยได้ ROE 15,367% และ D/E -18 ซึ่งจะผ่าน
+# เกณฑ์คุณภาพทั้งที่ควรตก จึงไม่ประกาศอัตราส่วนกลุ่มนี้เมื่อฐานไม่มีความหมาย
+MINIMUM_EQUITY_TO_ASSETS = 0.01
+
+
+def _equity_base_is_usable(equity: float | None, assets: float | None) -> bool:
+    if equity is None or equity <= 0:
+        return False
+    if assets and equity / assets < MINIMUM_EQUITY_TO_ASSETS:
+        return False
+    return True
+
+
 def _add_ratios(periods: list[dict[str, Any]]) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for index, period in enumerate(periods):
@@ -245,17 +259,32 @@ def _add_ratios(periods: list[dict[str, Any]]) -> list[dict[str, Any]]:
         gross_profit = _value(metrics, "gross_profit")
         total_debt = _value(metrics, "total_debt")
         free_cash_flow = _value(metrics, "free_cash_flow")
+
+        roe_usable = _equity_base_is_usable(average_equity, average_assets)
+        de_usable = _equity_base_is_usable(equity, assets)
+        notes: dict[str, str] = {}
+        if not roe_usable and average_equity is not None:
+            notes["roe"] = (
+                "ส่วนของผู้ถือหุ้นติดลบหรือเล็กเกินกว่าจะใช้เป็นฐานคำนวณ ROE ได้อย่างมีความหมาย"
+            )
+        if not de_usable and equity is not None:
+            notes["debt_to_equity"] = (
+                "ส่วนของผู้ถือหุ้นติดลบหรือเล็กเกินไป จึงไม่ประกาศอัตราหนี้สินต่อทุน"
+            )
+
         output.append(
             {
                 **period,
                 "ratios": {
-                    "roe": _ratio(net_income, average_equity),
+                    "roe": _ratio(net_income, average_equity) if roe_usable else None,
                     "roa": _ratio(net_income, average_assets),
                     "net_margin": _ratio(net_income, revenue),
                     "gross_margin": _ratio(gross_profit, revenue),
-                    "debt_to_equity": _ratio(total_debt, equity, multiplier=1.0),
+                    "debt_to_equity": _ratio(total_debt, equity, multiplier=1.0) if de_usable else None,
                     "fcf_margin": _ratio(free_cash_flow, revenue),
                 },
+                "ratio_notes": notes,
+                "negative_equity": equity is not None and equity <= 0,
             }
         )
     return output

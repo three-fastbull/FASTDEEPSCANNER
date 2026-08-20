@@ -327,3 +327,77 @@ class TrendSummaryTest(unittest.TestCase):
         profit = self._summary(financials)["net_income"]["trend"]
         self.assertEqual(profit["kind"], "turn")
         self.assertIn("พลิกจากติดลบเป็นบวก", profit["label"])
+
+
+class NegativeEquityTest(unittest.TestCase):
+    """ทุนติดลบเคยทำให้ ROE พุ่งเป็นหมื่นเปอร์เซ็นต์แล้วผ่านด่านคุณภาพ"""
+
+    def _statements(self) -> dict:
+        from fastdeep_scanner.financials import _add_ratios
+
+        periods = [
+            {
+                "period_end": f"{year}-12-31",
+                "metrics": {
+                    "total_revenue": 60000.0,
+                    "gross_profit": 42000.0,
+                    "operating_income": 12000.0,
+                    "pretax_income": 10000.0,
+                    "tax_provision": 2000.0,
+                    "net_income": 4226.0,
+                    "basic_eps": 2.40,
+                    "total_assets": 134000.0,
+                    "stockholders_equity": equity,
+                    "total_debt": 60000.0,
+                    "operating_cash_flow": 18000.0,
+                    "free_cash_flow": 16000.0,
+                },
+            }
+            for year, equity in ((2022, 17254.0), (2023, 10360.0), (2024, 3325.0), (2025, -3270.0))
+        ]
+        return {"currency": "USD", "annual": _add_ratios(periods)}
+
+    def test_ratios_are_withheld_when_equity_is_negative(self) -> None:
+        annual = self._statements()["annual"]
+        latest = annual[-1]
+        self.assertTrue(latest["negative_equity"])
+        self.assertIsNone(latest["ratios"]["roe"])
+        self.assertIsNone(latest["ratios"]["debt_to_equity"])
+        self.assertIn("ติดลบ", latest["ratio_notes"]["roe"])
+        # อัตราส่วนที่ไม่ได้อิงส่วนของผู้ถือหุ้นยังใช้ได้ตามปกติ
+        self.assertIsNotNone(latest["ratios"]["net_margin"])
+        self.assertIsNotNone(latest["ratios"]["roa"])
+
+    def test_negative_equity_fails_the_quality_stage(self) -> None:
+        profile = build_stock_profile("TEST", self._statements(), _candles(180.0), _snapshot(), {}, RATES)
+        quality = profile["stages"][1]
+        self.assertFalse(quality["passed"])
+        self.assertTrue(quality["negative_equity"])
+        roe = next(item for item in quality["criteria"] if "ROE" in item["label"])
+        debt = next(item for item in quality["criteria"] if "Debt" in item["label"])
+        self.assertEqual(roe["state"], "fail")
+        self.assertEqual(debt["state"], "fail")
+        self.assertIn("ติดลบ", roe["note"])
+        self.assertEqual(profile["verdict"]["key"], "avoid")
+
+    def test_a_thin_but_positive_equity_base_is_also_refused(self) -> None:
+        from fastdeep_scanner.financials import _add_ratios
+
+        # ทุนเหลือไม่ถึง 1% ของสินทรัพย์ ตัวหารเล็กจนอัตราส่วนไร้ความหมาย
+        periods = [
+            {
+                "period_end": f"{year}-12-31",
+                "metrics": {
+                    "total_revenue": 50000.0,
+                    "net_income": 3000.0,
+                    "total_assets": 100000.0,
+                    "stockholders_equity": 500.0,
+                    "total_debt": 40000.0,
+                },
+            }
+            for year in (2024, 2025)
+        ]
+        latest = _add_ratios(periods)[-1]
+        self.assertIsNone(latest["ratios"]["roe"])
+        self.assertIsNone(latest["ratios"]["debt_to_equity"])
+        self.assertFalse(latest["negative_equity"])

@@ -11,12 +11,17 @@ from pathlib import Path
 from typing import Any
 
 
+from .local_config import get_setting
+
+
 SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 SEC_COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-DEFAULT_USER_AGENT = (
-    "FastDeep Intelligence Platform three-fastbull@users.noreply.github.com"
-)
-DEFAULT_CONTACT = "three-fastbull@users.noreply.github.com"
+# SEC ต้องการอีเมลที่ติดต่อกลับได้จริงในทุก request และปฏิเสธที่อยู่ประเภท
+# noreply ด้วย 403 ทันที ค่าติดต่อจึงเก็บไว้ใน .env ของเครื่อง ไม่ฝังในซอร์ส
+SEC_CONTACT_SETTING = "FASTDEEP_SEC_CONTACT"
+SEC_USER_AGENT_SETTING = "FASTDEEP_SEC_USER_AGENT"
+APPLICATION_NAME = "FastDeep Intelligence Platform"
+UNREACHABLE_EMAIL_DOMAINS = ("noreply", "no-reply", "example.com", "localhost")
 ANNUAL_FORMS = {"10-K", "10-K/A", "20-F", "20-F/A", "40-F", "40-F/A"}
 QUARTERLY_FORMS = {"10-Q", "10-Q/A"}
 
@@ -125,12 +130,32 @@ CUMULATIVE_QUARTER_METRICS = {"operating_cash_flow", "capital_expenditure"}
 INTERNAL_METRICS = {"_debt_current", "_debt_noncurrent", "_short_term_borrowings"}
 
 
-def _sec_user_agent() -> str:
-    return os.environ.get("FASTDEEP_SEC_USER_AGENT", DEFAULT_USER_AGENT).strip() or DEFAULT_USER_AGENT
-
-
 def _sec_contact() -> str:
-    return os.environ.get("FASTDEEP_SEC_CONTACT", DEFAULT_CONTACT).strip() or DEFAULT_CONTACT
+    return get_setting(SEC_CONTACT_SETTING)
+
+
+def _sec_user_agent() -> str:
+    """``ชื่อแอป อีเมลติดต่อ`` ตามรูปแบบที่ SEC กำหนด
+
+    ถ้ายังไม่ได้ตั้งค่า ให้หยุดพร้อมบอกวิธีแก้ ดีกว่าปล่อยให้ยิงไปโดน 403
+    ทั้งชุดแล้วเข้าใจว่าเป็นปัญหาเครือข่าย
+    """
+    configured = get_setting(SEC_USER_AGENT_SETTING)
+    if configured:
+        return configured
+    contact = _sec_contact()
+    if not contact:
+        raise SecEdgarError(
+            f"ยังไม่ได้ตั้งอีเมลติดต่อสำหรับ SEC EDGAR ให้เพิ่มบรรทัด {SEC_CONTACT_SETTING}=อีเมลของคุณ "
+            "ในไฟล์ .env ที่รากโปรเจกต์ SEC บังคับให้ทุก request ระบุอีเมลที่ติดต่อกลับได้จริง"
+        )
+    lowered = contact.lower()
+    if any(marker in lowered for marker in UNREACHABLE_EMAIL_DOMAINS):
+        raise SecEdgarError(
+            f"SEC EDGAR ปฏิเสธอีเมลที่ติดต่อกลับไม่ได้ ({contact}) "
+            f"ให้ตั้ง {SEC_CONTACT_SETTING} ในไฟล์ .env เป็นอีเมลจริงที่เปิดอ่านได้"
+        )
+    return f"{APPLICATION_NAME} {contact}"
 
 
 def _download_json(url: str, timeout: int = 30) -> dict[str, Any]:
@@ -149,8 +174,9 @@ def _download_json(url: str, timeout: int = 30) -> dict[str, Any]:
     except urllib.error.HTTPError as exc:
         if exc.code == 403:
             raise SecEdgarError(
-                "SEC EDGAR ตอบ 403 และปฏิเสธเครือข่าย/User-Agent นี้ "
-                "โปรดตรวจ FASTDEEP_SEC_CONTACT หรือลองใหม่เมื่อ SEC ปลดการจำกัด"
+                f"SEC EDGAR ตอบ 403 และปฏิเสธอีเมลที่ประกาศไว้ ({_sec_contact() or 'ยังไม่ได้ตั้งค่า'}) "
+                f"ให้ตั้ง {SEC_CONTACT_SETTING} ในไฟล์ .env เป็นอีเมลจริงที่ติดต่อกลับได้ "
+                "SEC บล็อกที่อยู่ประเภท noreply ทันที"
             ) from exc
         if exc.code == 429:
             raise SecEdgarError("SEC EDGAR จำกัดความถี่ชั่วคราว (429) โปรดลองใหม่ภายหลัง") from exc

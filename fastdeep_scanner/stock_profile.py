@@ -480,13 +480,19 @@ def _stage_quality(annual: list[dict[str, Any]]) -> dict[str, Any]:
     known_cash_years = sum(1 for value in cash_flow if value is not None)
     de_latest = debt_to_equity[-1] if debt_to_equity else None
 
+    # ทุนติดลบทำให้ ROE และ D/E ไม่มีความหมาย ต้องบอกเหตุผลแทนการขึ้นว่าไม่มีข้อมูลเฉย ๆ
+    latest_period = annual[-1] if annual else {}
+    negative_equity = bool(latest_period.get("negative_equity"))
+    ratio_notes = latest_period.get("ratio_notes") or {}
+    equity_warning = "ส่วนของผู้ถือหุ้นติดลบ ธุรกิจนี้มีหนี้สินมากกว่าสินทรัพย์ตามบัญชี"
+
     criteria = [
         _criterion(
             "ROE - ผลตอบแทนต่อส่วนของผู้ถือหุ้น",
-            None if roe_latest is None else roe_latest >= ROE_TARGET,
-            "ไม่มีข้อมูล" if roe_latest is None else f"{roe_latest:.1f}%",
+            False if negative_equity else (None if roe_latest is None else roe_latest >= ROE_TARGET),
+            ratio_notes.get("roe") or ("ไม่มีข้อมูล" if roe_latest is None else f"{roe_latest:.1f}%"),
             f"มากกว่า {ROE_TARGET:.0f}% ขึ้นไป",
-            "วัดว่าบริษัทเอาเงินของผู้ถือหุ้นไปสร้างผลตอบแทนได้เก่งแค่ไหน",
+            equity_warning if negative_equity else "วัดว่าบริษัทเอาเงินของผู้ถือหุ้นไปสร้างผลตอบแทนได้เก่งแค่ไหน",
         ),
         _criterion(
             "ROIC - ผลตอบแทนต่อเงินลงทุนรวม",
@@ -504,10 +510,10 @@ def _stage_quality(annual: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         _criterion(
             "Debt to Equity - หนี้สินต่อทุน",
-            None if de_latest is None else de_latest <= DEBT_TO_EQUITY_TARGET,
-            "ไม่มีข้อมูล" if de_latest is None else f"{de_latest:.2f} เท่า",
+            False if negative_equity else (None if de_latest is None else de_latest <= DEBT_TO_EQUITY_TARGET),
+            ratio_notes.get("debt_to_equity") or ("ไม่มีข้อมูล" if de_latest is None else f"{de_latest:.2f} เท่า"),
             f"ไม่เกิน {DEBT_TO_EQUITY_TARGET:.1f} เท่า",
-            "หนี้น้อยแปลว่าบริษัทยืนหยัดผ่านช่วงเศรษฐกิจแย่ได้โดยไม่ต้องเพิ่มทุน",
+            equity_warning if negative_equity else "หนี้น้อยแปลว่าบริษัทยืนหยัดผ่านช่วงเศรษฐกิจแย่ได้โดยไม่ต้องเพิ่มทุน",
         ),
     ]
     return {
@@ -519,6 +525,7 @@ def _stage_quality(annual: list[dict[str, Any]]) -> dict[str, Any]:
         "criteria": criteria,
         "passed": all(item["passed"] for item in criteria),
         "metrics": {"roe": roe_latest, "roic": roic_latest, "debt_to_equity": de_latest},
+        "negative_equity": negative_equity,
     }
 
 
