@@ -67,7 +67,9 @@ http://127.0.0.1:8765
 & '.\Install-FastDeepDailyTask.ps1'
 ```
 
-งานนี้อัปเดตราคา, สร้าง `storage/fastdeep_daily_scan_summary.json` และทุกวันอาทิตย์จะ refresh งบทั้ง universe เพิ่มเติม
+งานนี้อัปเดตราคาและสร้าง `storage/fastdeep_daily_scan_summary.json` งบจะ refresh เมื่อเลือกหุ้นในหน้า Financial Intelligence; ระบบจะแสดง coverage ของงบที่ยืนยันแล้วเสมอ
+
+หมายเหตุ: public endpoint ของ Yahoo Finance จำกัดความเร็วเมื่อ refresh งบหลายร้อยตัวพร้อมกัน จึงไม่ใช้เป็น batch scheduler สำหรับงานสถาบัน หากต้องการงบครบ universe แบบมี SLA ให้ต่อผู้ให้บริการข้อมูลที่ได้รับอนุญาตก่อน แล้วใช้ adapter เดียวกับ Financial Intelligence
 
 ในรายละเอียดหุ้น มี workflow สั้น ๆ สำหรับบันทึก `Watch`, `Research`, `Approved`, `Owned` หรือ `Exit` พร้อมโน้ตการตัดสินใจ ข้อมูลอยู่ใน `storage/fastdeep_research_journal.json` เพื่อให้ทีมทบทวนเหตุผลย้อนหลังได้
 

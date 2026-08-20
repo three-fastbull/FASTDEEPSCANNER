@@ -18,10 +18,7 @@ try {
     & $python -m fastdeep_scanner update-prices --universe data\fastdeep_universe.csv --out data\fastdeep_prices.csv --range 5y --interval 1d --pause 0.05 --min-success-ratio 0.97 --workers 6 --request-timeout 12 2>&1 | ForEach-Object { Write-DailyLog "prices: $_" }
     if ($LASTEXITCODE -ne 0) { throw "Price update failed with exit code $LASTEXITCODE" }
 
-    if ((Get-Date).DayOfWeek -eq [System.DayOfWeek]::Sunday) {
-        & $python -m fastdeep_scanner update-financials --universe data\fastdeep_universe.csv --pause 0.15 --workers 4 --request-timeout 8 2>&1 | ForEach-Object { Write-DailyLog "financials: $_" }
-        if ($LASTEXITCODE -ne 0) { throw "Weekly financial refresh failed with exit code $LASTEXITCODE" }
-    }
+    Write-DailyLog "Financial statements refresh on demand when an analyst selects a symbol. Bulk Yahoo refresh is intentionally disabled because the public endpoint throttles large jobs."
 
     & $python -m fastdeep_scanner daily-scan --out storage\fastdeep_daily_scan_summary.json --timeframe D 2>&1 | ForEach-Object { Write-DailyLog "scan: $_" }
     if ($LASTEXITCODE -ne 0) { throw "Daily scan failed with exit code $LASTEXITCODE" }
