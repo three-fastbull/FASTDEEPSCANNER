@@ -13,6 +13,7 @@ DEFAULT_PRICE_PATH = ROOT / "data" / "fastdeep_prices.csv"
 DEFAULT_STATUS_PATH = ROOT / "data" / "fastdeep_price_update_status.json"
 DEFAULT_FINANCIAL_CACHE_DIR = ROOT / "data" / "financial_cache"
 DEFAULT_FINANCIAL_STATUS_PATH = ROOT / "data" / "fastdeep_financial_update_status.json"
+DEFAULT_FINANCIAL_COVERAGE_PATH = ROOT / "data" / "fastdeep_financial_coverage.json"
 
 
 def expected_eod_date(today: date | None = None) -> date:
@@ -167,17 +168,34 @@ def financial_data_health(
     cache_dir: str | Path = DEFAULT_FINANCIAL_CACHE_DIR,
     *,
     status_path: str | Path = DEFAULT_FINANCIAL_STATUS_PATH,
+    coverage_path: str | Path = DEFAULT_FINANCIAL_COVERAGE_PATH,
 ) -> dict[str, Any]:
     cache_dir = Path(cache_dir)
     status = _read_json(Path(status_path))
+    coverage = _read_json(Path(coverage_path))
     files = list(cache_dir.glob("*.json")) if cache_dir.exists() else []
     fresh_cutoff = datetime.now().timestamp() - 8 * 24 * 3600
     fresh = sum(path.stat().st_mtime >= fresh_cutoff for path in files)
+    requested = int(coverage.get("symbols_requested") or status.get("symbols_requested") or 697)
+    cached = int(coverage.get("cached_symbols") or len(files))
     return {
         "state": status.get("state") or ("ready" if files else "missing"),
-        "cached_symbols": len(files),
+        "cached_symbols": cached,
         "fresh_symbols": fresh,
-        "symbols_requested": int(status.get("symbols_requested") or 697),
+        "symbols_requested": requested,
         "failed_count": int(status.get("failed_count") or 0),
         "updated_at": status.get("updated_at"),
+        "symbols_processed": int(status.get("symbols_processed") or 0),
+        "symbols_pending": int(status.get("symbols_pending") or 0),
+        "retry_attempt": int(status.get("retry_attempt") or 0),
+        "last_symbol": status.get("last_symbol"),
+        "coverage_updated_at": coverage.get("generated_at"),
+        "cached_coverage_pct": coverage.get("cached_coverage_pct"),
+        "annual_5y_symbols": int(coverage.get("annual_5y_symbols") or 0),
+        "annual_5y_coverage_pct": coverage.get("annual_5y_coverage_pct"),
+        "complete_symbols": int(coverage.get("complete_symbols") or 0),
+        "complete_coverage_pct": coverage.get("complete_coverage_pct"),
+        "partial_symbols": int(coverage.get("partial_symbols") or 0),
+        "missing_symbols": int(coverage.get("missing_symbols") or max(0, requested - cached)),
+        "by_market": coverage.get("by_market") or {},
     }

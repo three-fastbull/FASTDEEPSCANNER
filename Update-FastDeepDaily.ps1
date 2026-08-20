@@ -24,7 +24,13 @@ try {
     & $python -m fastdeep_scanner update-fx --out data\fastdeep_fx_rates.json 2>&1 | ForEach-Object { Write-DailyLog "fx: $_" }
     if ($LASTEXITCODE -ne 0) { Write-DailyLog "fx: refresh failed, keeping previous rates" }
 
-    Write-DailyLog "Financial statements refresh on demand when an analyst selects a symbol. Bulk Yahoo refresh is intentionally disabled because the public endpoint throttles large jobs."
+    # Statements change less often than prices. Resume missing/stale symbols once
+    # a week with a global request limiter, then audit true 5y/Q1-Q4 coverage.
+    if ((Get-Date).DayOfWeek -eq [DayOfWeek]::Saturday) {
+        & $python -m fastdeep_scanner update-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --pause 0.75 --workers 1 --request-timeout 20 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financials: $_" }
+        if ($LASTEXITCODE -ne 0) { Write-DailyLog "financials: refresh incomplete, keeping verified cache" }
+    }
+    & $python -m fastdeep_scanner audit-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financial audit: $_" }
 
     & $python -m fastdeep_scanner daily-scan --out storage\fastdeep_daily_scan_summary.json --timeframe D 2>&1 | ForEach-Object { Write-DailyLog "scan: $_" }
     if ($LASTEXITCODE -ne 0) { throw "Daily scan failed with exit code $LASTEXITCODE" }

@@ -156,7 +156,13 @@
       window.dispatchEvent(new CustomEvent("fastdeep:financials-verified", {
         detail: { symbol: payload.symbol },
       }));
-      status(`${payload.symbol} พร้อมใช้งาน (${payload.cache_status === "cached" ? "ใช้ข้อมูลที่บันทึกไว้" : "อัปเดตแล้ว"})`, "ready");
+      const quality = payload.data_quality || {};
+      const qualityLabel = quality.status_label || "ยังไม่ได้ตรวจความครบถ้วน";
+      const cacheLabel = payload.cache_status === "cached" ? "ใช้ข้อมูลที่บันทึกไว้" : "อัปเดตแล้ว";
+      status(
+        `${payload.symbol}: ${qualityLabel} (${cacheLabel})${quality.gaps?.length ? ` — ${quality.gaps.join(" · ")}` : ""}`,
+        quality.status === "complete" ? "ready" : "partial",
+      );
     } catch (error) {
       if (requestId !== state.financialRequestId) return;
       status(error.message || "ไม่สามารถโหลดงบการเงินได้", "error");

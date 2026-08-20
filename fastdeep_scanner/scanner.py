@@ -27,6 +27,7 @@ from .valuation import derive_valuation
 
 VERIFICATION_LABELS = {
     "technical": "ตรวจแล้วเฉพาะกราฟ",
+    "financial_partial": "มีงบยืนยันแล้ว แต่ประวัติยังไม่ครบ 5 ปี + Q1-Q4",
     "financial": "ตรวจกราฟและงบการเงิน",
     "valuation": "ตรวจกราฟ งบ และมูลค่า",
     "full": "ตรวจครบทุกด้านรวมคุณภาพธุรกิจ",
@@ -50,6 +51,7 @@ def _decision(
     warnings: list[str],
     has_bearish: bool,
     fundamentals_verified: bool,
+    financial_history_complete: bool,
     valuation_verified: bool,
     research_verified: bool,
     evidence_tradeable: bool,
@@ -58,6 +60,8 @@ def _decision(
         return "Reject long / watch breakdown"
     if not fundamentals_verified:
         return "รอตรวจงบการเงิน"
+    if not financial_history_complete:
+        return "งบยืนยันแล้ว แต่ประวัติยังไม่ครบ 5 ปี"
     if not valuation_verified:
         return "รอประเมินมูลค่า"
     if not research_verified:
@@ -143,7 +147,10 @@ def _decision_summary(
     reporting = snapshot.reporting_currency or ""
 
     if snapshot.fundamentals_verified:
-        financial_state = "งบยืนยันแล้ว" if fin_score >= 55 else "งบยืนยันแล้วแต่คุณภาพอ่อน"
+        if not snapshot.financial_history_complete:
+            financial_state = "งบยืนยันแล้ว แต่ประวัติยังไม่ครบ 5 ปี"
+        else:
+            financial_state = "งบยืนยันแล้ว" if fin_score >= 55 else "งบยืนยันแล้วแต่คุณภาพอ่อน"
         financial_detail = (
             f"ROE {snapshot.roe:.1f}% · D/E {snapshot.debt_to_equity:.2f} เท่า · "
             f"รายได้โต {snapshot.revenue_growth:.1f}% · งวด {snapshot.as_of or '-'} "
@@ -160,7 +167,9 @@ def _decision_summary(
             "detail": f"{pattern_label} · คะแนนเทคนิค {tech_score:.1f} · Timeframe {timeframe}",
         },
         "financials": {
-            "verified": snapshot.fundamentals_verified,
+            "verified": snapshot.fundamentals_verified and snapshot.financial_history_complete,
+            "data_verified": snapshot.fundamentals_verified,
+            "history_complete": snapshot.financial_history_complete,
             "label": financial_state,
             "detail": financial_detail,
         },
@@ -258,15 +267,23 @@ def _scan_symbol(
     # leg never contributes a zero that silently drags the score down. The cap
     # then keeps an unchecked chart from outranking a fully researched name -
     # without it a pure pattern hit scored 100 and sat at the top of the table.
-    if snapshot.fundamentals_verified and snapshot.valuation_verified and snapshot.research_verified:
+    if (
+        snapshot.fundamentals_verified
+        and snapshot.financial_history_complete
+        and snapshot.valuation_verified
+        and snapshot.research_verified
+    ):
         final_score = tech_score * 0.38 + fin_score * 0.27 + val_score * 0.20 + biz_score * 0.15
         verification_level, score_cap = "full", 100.0
-    elif snapshot.fundamentals_verified and snapshot.valuation_verified:
+    elif snapshot.fundamentals_verified and snapshot.financial_history_complete and snapshot.valuation_verified:
         final_score = tech_score * 0.46 + fin_score * 0.32 + val_score * 0.22
         verification_level, score_cap = "valuation", 90.0
-    elif snapshot.fundamentals_verified:
+    elif snapshot.fundamentals_verified and snapshot.financial_history_complete:
         final_score = tech_score * 0.60 + fin_score * 0.40
         verification_level, score_cap = "financial", 82.0
+    elif snapshot.fundamentals_verified:
+        final_score = tech_score * 0.65 + fin_score * 0.35
+        verification_level, score_cap = "financial_partial", 78.0
     else:
         final_score = tech_score
         verification_level, score_cap = "technical", 72.0
@@ -283,6 +300,8 @@ def _scan_symbol(
         warnings.append("คุณภาพพื้นฐานยังไม่ยืนยันภาพทางเทคนิค")
     if not snapshot.fundamentals_verified:
         warnings.append("ยังไม่ได้ตรวจงบการเงิน ผลนี้เป็นสัญญาณทางเทคนิคเท่านั้น")
+    elif not snapshot.financial_history_complete:
+        warnings.append("งบที่ยืนยันแล้วมีประวัติไม่ครบ 5 ปีพร้อม Q1-Q4 จึงยังใช้อนุมัติ Candidate ไม่ได้")
     if not snapshot.valuation_verified:
         warnings.append(snapshot.valuation_note or "ยังประเมินมูลค่าไม่ได้")
     if not snapshot.research_verified:
@@ -307,7 +326,10 @@ def _scan_symbol(
         return None
 
     fully_verified = (
-        snapshot.fundamentals_verified and snapshot.valuation_verified and snapshot.research_verified
+        snapshot.fundamentals_verified
+        and snapshot.financial_history_complete
+        and snapshot.valuation_verified
+        and snapshot.research_verified
     )
     risk_plan = build_risk_plan(daily_candles, patterns)
     base_insights = [
@@ -345,6 +367,7 @@ def _scan_symbol(
             warnings,
             has_bearish,
             snapshot.fundamentals_verified,
+            snapshot.financial_history_complete,
             snapshot.valuation_verified,
             snapshot.research_verified,
             bool(evidence.get("tradeable")),
@@ -354,6 +377,7 @@ def _scan_symbol(
         insights=base_insights,
         warnings=warnings,
         fundamentals_verified=snapshot.fundamentals_verified,
+        financial_history_complete=snapshot.financial_history_complete,
         research_verified=snapshot.research_verified,
         valuation_verified=snapshot.valuation_verified,
         research_status=snapshot.research_status,

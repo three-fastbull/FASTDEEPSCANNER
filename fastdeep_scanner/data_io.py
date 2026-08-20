@@ -208,6 +208,26 @@ def _shares_outstanding(metrics: dict[str, Any]) -> float | None:
     return shares if shares > 0 else None
 
 
+def _financial_history_status(payload: dict[str, Any]) -> str:
+    quality = payload.get("data_quality") or {}
+    if quality.get("status"):
+        return str(quality["status"])
+    annual_years = {
+        str(period.get("period_end") or "")[:4]
+        for period in (payload.get("annual") or [])[-5:]
+        if period.get("period_end")
+    }
+    full_quarter_years = {
+        str(year)
+        for year, periods in (payload.get("quarterly_by_year") or {}).items()
+        if {str(item.get("quarter") or "") for item in periods or []}
+        >= {"Q1", "Q2", "Q3", "Q4"}
+    }
+    if len(annual_years) >= 5 and len(annual_years & full_quarter_years) >= 5:
+        return "complete"
+    return "partial" if annual_years else "missing"
+
+
 def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> FundamentalSnapshot:
     path = _financial_cache_path(snapshot.symbol)
     if not path.exists() or time.time() - path.stat().st_mtime > 8 * 24 * 3600:
@@ -220,6 +240,7 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
         metrics = latest.get("metrics") or {}
         previous_metrics = previous.get("metrics") or {}
         ratios = latest.get("ratios") or {}
+        history_status = _financial_history_status(payload)
         revenue = _safe_number(metrics.get("total_revenue"))
         net_income = _safe_number(metrics.get("net_income"))
         eps = _safe_number(metrics.get("basic_eps"))
@@ -244,6 +265,8 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
             reporting_currency=str(payload.get("currency") or "").upper(),
             notes="financials_verified",
             fundamentals_verified=True,
+            financial_history_complete=history_status == "complete",
+            financial_history_status=history_status,
             source=str(payload.get("source") or "Financial statements cache"),
             as_of=str(latest.get("period_end") or ""),
         )

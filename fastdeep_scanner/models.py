@@ -64,6 +64,8 @@ class FundamentalSnapshot:
     research_status: str = "Watch"
     turnover_usd: float = 0.0
     liquidity_note: str = ""
+    financial_history_complete: bool = False
+    financial_history_status: str = "missing"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -102,6 +104,8 @@ class FundamentalSnapshot:
             "research_status": self.research_status,
             "turnover_usd": self.turnover_usd,
             "liquidity_note": self.liquidity_note,
+            "financial_history_complete": self.financial_history_complete,
+            "financial_history_status": self.financial_history_status,
         }
 
 
@@ -205,6 +209,7 @@ class ScanResult:
     insights: list[AgentInsight]
     warnings: list[str] = field(default_factory=list)
     fundamentals_verified: bool = False
+    financial_history_complete: bool = False
     research_verified: bool = False
     valuation_verified: bool = False
     research_status: str = "Watch"
@@ -242,6 +247,7 @@ class ScanResult:
             "insights": [insight.to_dict() for insight in self.insights],
             "warnings": self.warnings,
             "fundamentals_verified": self.fundamentals_verified,
+            "financial_history_complete": self.financial_history_complete,
             "research_verified": self.research_verified,
             "valuation_verified": self.valuation_verified,
             "research_status": self.research_status,

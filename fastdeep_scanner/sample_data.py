@@ -140,6 +140,8 @@ def fundamentals_by_symbol() -> dict[str, FundamentalSnapshot]:
             reporting_currency=currency,
             trading_currency=currency,
             fundamentals_verified=True,
+            financial_history_complete=True,
+            financial_history_status="complete",
             research_verified=True,
             as_of="2025-12-31",
             source="Sample dataset",

@@ -17,6 +17,7 @@ from fastdeep_scanner.research_journal import get_research, save_research
 from fastdeep_scanner.timeframes import aggregate_candles
 from fastdeep_scanner.trade_journal import close_trade, journal_summary, open_trade
 from fastdeep_scanner.valuation import derive_valuation
+from fastdeep_scanner.scanner import _decision
 
 
 RATES = {"THB": 32.0, "HKD": 7.8, "CNY": 7.2}
@@ -192,6 +193,19 @@ class ResearchJournalTest(unittest.TestCase):
 
 
 class EvidenceGateTest(unittest.TestCase):
+    def test_partial_financial_history_cannot_be_a_candidate(self) -> None:
+        decision = _decision(
+            95.0,
+            [],
+            False,
+            True,
+            False,
+            True,
+            True,
+            True,
+        )
+        self.assertEqual(decision, "งบยืนยันแล้ว แต่ประวัติยังไม่ครบ 5 ปี")
+
     def _write_study(self, directory: Path, return_edge: float, signals: int) -> None:
         payload = {
             "horizons": [20],

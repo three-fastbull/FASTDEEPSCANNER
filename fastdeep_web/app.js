@@ -307,10 +307,27 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
     ));
   }
   if (financialHealth) {
+    if (financialHealth.state === "running") {
+      facts.push(healthFact(
+        "กำลังอัปเดตงบ ",
+        `${financialHealth.symbols_processed || 0}/${financialHealth.symbols_requested}`,
+        "warn",
+      ));
+    }
     facts.push(healthFact(
-      "งบการเงินที่ยืนยันแล้ว ",
-      `${financialHealth.fresh_symbols}/${financialHealth.symbols_requested}`,
-      financialHealth.fresh_symbols > financialHealth.symbols_requested * 0.5 ? "ok" : "warn",
+      "หุ้นที่มีข้อมูลงบ ",
+      `${financialHealth.cached_symbols}/${financialHealth.symbols_requested}`,
+      financialHealth.cached_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
+    ));
+    facts.push(healthFact(
+      "งบรายปีครบ 5 ปี ",
+      `${financialHealth.annual_5y_symbols || 0}/${financialHealth.symbols_requested}`,
+      financialHealth.annual_5y_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
+    ));
+    facts.push(healthFact(
+      "ครบ 5 ปี + Q1-Q4 ",
+      `${financialHealth.complete_symbols || 0}/${financialHealth.symbols_requested}`,
+      financialHealth.complete_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
     ));
   }
   if (fx) {

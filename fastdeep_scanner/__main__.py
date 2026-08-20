@@ -11,7 +11,7 @@ from .scanner import scan_market
 from .data_io import load_market_data
 from .data_health import price_data_health
 from .backtest import run_event_study
-from .financials import cache_universe_financials
+from .financials import audit_financial_cache, cache_universe_financials
 from .server import run_server
 from .static_export import export_static_dashboard
 from .yahoo_prices import update_prices_from_yahoo
@@ -98,12 +98,36 @@ def update_financials_command(args: argparse.Namespace) -> None:
         refresh=args.refresh,
         max_workers=args.workers,
         request_timeout=args.request_timeout,
+        cache_max_age_hours=args.cache_max_age_hours,
+        max_retries=args.retries,
+        coverage_path=args.coverage_out,
     )
     print(f"cached financial statements: {len(summary['succeeded'])}/{summary['symbols']}")
+    coverage = summary["coverage"]
+    print(
+        "coverage: "
+        f"cached {coverage['cached_symbols']}/{coverage['symbols_requested']}, "
+        f"annual 5y {coverage['annual_5y_symbols']}, "
+        f"5y + Q1-Q4 {coverage['complete_symbols']}"
+    )
     if summary["failed"]:
         print("- failed:")
         for item in summary["failed"]:
             print(f"  - {item}")
+
+
+def audit_financials_command(args: argparse.Namespace) -> None:
+    report = audit_financial_cache(
+        args.universe,
+        cache_dir=args.cache_dir,
+        output_path=args.out,
+    )
+    print(
+        f"financial coverage: cached {report['cached_symbols']}/{report['symbols_requested']}, "
+        f"annual 5y {report['annual_5y_symbols']}, "
+        f"5y + Q1-Q4 {report['complete_symbols']}, "
+        f"missing {report['missing_symbols']}"
+    )
 
 
 def daily_scan_command(args: argparse.Namespace) -> None:
@@ -215,11 +239,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
     update_financials.add_argument("--universe", default="data/fastdeep_universe.csv")
     update_financials.add_argument("--cache-dir", default="data/financial_cache")
-    update_financials.add_argument("--pause", type=float, default=0.35)
+    update_financials.add_argument("--pause", type=float, default=0.75)
     update_financials.add_argument("--refresh", action="store_true")
-    update_financials.add_argument("--workers", type=int, default=4)
-    update_financials.add_argument("--request-timeout", type=int, default=8)
+    update_financials.add_argument("--workers", type=int, default=1)
+    update_financials.add_argument("--request-timeout", type=int, default=20)
+    update_financials.add_argument("--cache-max-age-hours", type=int, default=168)
+    update_financials.add_argument("--retries", type=int, default=2)
+    update_financials.add_argument("--coverage-out", default="data/fastdeep_financial_coverage.json")
     update_financials.set_defaults(func=update_financials_command)
+
+    audit_financials = subparsers.add_parser(
+        "audit-financials",
+        help="Audit real 5-year and Q1-Q4 coverage without downloading data",
+    )
+    audit_financials.add_argument("--universe", default="data/fastdeep_universe.csv")
+    audit_financials.add_argument("--cache-dir", default="data/financial_cache")
+    audit_financials.add_argument("--out", default="data/fastdeep_financial_coverage.json")
+    audit_financials.set_defaults(func=audit_financials_command)
 
     daily_scan = subparsers.add_parser("daily-scan", help="Write the daily EOD scan summary as JSON")
     daily_scan.add_argument("--out", default="storage/fastdeep_daily_scan_summary.json")

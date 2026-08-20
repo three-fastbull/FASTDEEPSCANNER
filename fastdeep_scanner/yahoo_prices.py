@@ -220,11 +220,25 @@ def update_prices_from_yahoo(
                 retrying=len(retry_symbols),
                 output=str(output),
             )
+            retry_completed = 0
             for symbol in retry_symbols:
                 try:
                     rows.extend(fetch_symbol_prices(symbol, range_value, interval, timeout=max(20, request_timeout)))
                 except Exception as exc:  # noqa: BLE001
                     failed.append(f"{symbol}: {exc}")
+                retry_completed += 1
+                if retry_completed % 5 == 0 or retry_completed == len(retry_symbols):
+                    _write_status(
+                        status_path,
+                        "running",
+                        symbols_requested=len(symbols),
+                        symbols_processed=processed,
+                        symbols_succeeded=processed - len(retry_symbols) + retry_completed - len(failed),
+                        failed_count=len(failed),
+                        retrying=len(retry_symbols),
+                        retry_processed=retry_completed,
+                        output=str(output),
+                    )
                 time.sleep(max(0.2, pause_seconds))
 
         succeeded = len(symbols) - len(failed)

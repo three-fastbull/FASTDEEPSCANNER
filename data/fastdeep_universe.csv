@@ -337,7 +337,7 @@ DUK,Duke Energy,US,Utilities,SP500
 DVA,DaVita,US,Health Care,SP500
 DVN,Devon Energy,US,Energy,SP500
 DXCM,Dexcom,US,Health Care,NASDAQ100|SP500
-EA,Electronic Arts,US,Communication Services,NASDAQ100|SP500
+FERG,Ferguson Enterprises,US,Industrials,SP500
 EBAY,eBay Inc.,US,Consumer Discretionary,SP500
 ECL,Ecolab,US,Materials,SP500
 ED,Consolidated Edison,US,Utilities,SP500
@@ -589,7 +589,7 @@ ROST,Ross Stores,US,Consumer Discretionary,NASDAQ100|SP500
 RSG,Republic Services,US,Industrials,SP500
 RTX,RTX Corporation,US,Industrials,SP500
 RVTY,Revvity,US,Health Care,SP500
-SATS,EchoStar,US,Communication Services,SP500
+ECHO,EchoStar,US,Communication Services,SP500
 SBAC,SBA Communications,US,Real Estate,SP500
 SBUX,Starbucks,US,Consumer Discretionary,NASDAQ100|SP500
 SCHW,Charles Schwab Corporation,US,Financials,SP500

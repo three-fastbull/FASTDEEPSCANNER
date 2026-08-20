@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -18,6 +19,7 @@ from .yahoo_prices import load_universe
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CACHE_DIR = ROOT / "data" / "financial_cache"
 DEFAULT_UPDATE_STATUS = ROOT / "data" / "fastdeep_financial_update_status.json"
+DEFAULT_COVERAGE_REPORT = ROOT / "data" / "fastdeep_financial_coverage.json"
 YAHOO_TIMESERIES_URL = "https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries"
 
 
@@ -115,6 +117,14 @@ METRIC_UNITS: dict[str, str] = {
     "basic_eps": "per_share",
 }
 
+CORE_ANNUAL_METRICS = (
+    "total_revenue",
+    "net_income",
+    "total_assets",
+    "total_liabilities",
+    "stockholders_equity",
+)
+
 FLOW_METRICS = {
     "total_revenue",
     "cost_of_revenue",
@@ -148,6 +158,13 @@ def _write_update_status(path: Path, state: str, **details: object) -> None:
         json.dumps({"state": state, "updated_at": datetime.now(UTC).isoformat(), **details}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    temporary.replace(path)
+
+
+def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+    temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     temporary.replace(path)
 
 
@@ -298,7 +315,7 @@ def _growth(current: float | None, previous: float | None) -> float | None:
 
 
 def _cagr(current: float | None, first: float | None, years: int) -> float | None:
-    if current is None or first is None or first <= 0 or years <= 0:
+    if current is None or first is None or current <= 0 or first <= 0 or years <= 0:
         return None
     return ((current / first) ** (1 / years) - 1) * 100
 
@@ -452,6 +469,146 @@ def _with_currency_presentation(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
+    """Measure statement coverage without treating a cache file as complete data."""
+    payload = payload or {}
+    annual = sorted(payload.get("annual") or [], key=lambda item: str(item.get("period_end") or ""))
+    annual = [item for item in annual if item.get("period_end")]
+    annual_five = annual[-5:]
+    annual_years = [str(item["period_end"])[:4] for item in annual_five]
+
+    metric_slots = len(annual_five) * len(CORE_ANNUAL_METRICS)
+    metric_values = sum(
+        1
+        for period in annual_five
+        for metric in CORE_ANNUAL_METRICS
+        if _safe_number((period.get("metrics") or {}).get(metric)) is not None
+    )
+    metric_coverage = metric_values / metric_slots * 100 if metric_slots else 0.0
+
+    quarterly_by_year = payload.get("quarterly_by_year") or {}
+    quarter_periods = 0
+    full_quarter_years: list[str] = []
+    for year, periods in quarterly_by_year.items():
+        quarters = {str(item.get("quarter") or "") for item in periods or []}
+        quarter_periods += len(quarters & {"Q1", "Q2", "Q3", "Q4"})
+        if {"Q1", "Q2", "Q3", "Q4"}.issubset(quarters):
+            full_quarter_years.append(str(year))
+
+    annual_complete = len(annual_five) >= 5 and metric_coverage >= 80.0
+    quarterly_complete = len(set(annual_years) & set(full_quarter_years)) >= 5
+    if annual_complete and quarterly_complete:
+        status = "complete"
+        label = "ครบ 5 ปีและ Q1-Q4"
+    elif annual_complete:
+        status = "annual_complete"
+        label = "รายปีครบ 5 ปี แต่ไตรมาสยังไม่ครบ"
+    elif annual:
+        status = "partial"
+        label = "ข้อมูลงบบางส่วน"
+    else:
+        status = "missing"
+        label = "ยังไม่มีข้อมูลงบ"
+
+    gaps: list[str] = []
+    if len(annual_five) < 5:
+        gaps.append(f"ขาดงบรายปี {5 - len(annual_five)} งวด")
+    if metric_coverage < 80.0:
+        gaps.append(f"หัวข้อหลักครบ {metric_coverage:.0f}%")
+    missing_quarter_years = [year for year in annual_years if year not in full_quarter_years]
+    if missing_quarter_years:
+        gaps.append(f"Q1-Q4 ไม่ครบ {len(missing_quarter_years)} ปี")
+
+    return {
+        "status": status,
+        "status_label": label,
+        "annual_periods": len(annual_five),
+        "annual_target": 5,
+        "annual_years": annual_years,
+        "annual_complete": annual_complete,
+        "core_metric_coverage_pct": round(metric_coverage, 1),
+        "quarter_periods": quarter_periods,
+        "full_quarter_years": sorted(full_quarter_years),
+        "quarterly_target_years": 5,
+        "quarterly_complete": quarterly_complete,
+        "latest_period": str(annual_five[-1]["period_end"]) if annual_five else None,
+        "gaps": gaps,
+    }
+
+
+def audit_financial_cache(
+    universe_path: str | Path,
+    *,
+    cache_dir: str | Path = DEFAULT_CACHE_DIR,
+    output_path: str | Path = DEFAULT_COVERAGE_REPORT,
+) -> dict[str, Any]:
+    metadata = load_universe_metadata(universe_path)
+    cache_dir = Path(cache_dir)
+    items: list[dict[str, Any]] = []
+    by_market: dict[str, dict[str, int]] = {}
+
+    for symbol, details in metadata.items():
+        path = _cache_path(symbol, cache_dir)
+        payload: dict[str, Any] | None = None
+        error = ""
+        if path.exists():
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                error = str(exc)
+        quality = assess_financial_payload(payload)
+        market = str(details.get("market") or payload and payload.get("market") or "Unknown")
+        market_counts = by_market.setdefault(
+            market,
+            {"symbols": 0, "cached": 0, "annual_5y": 0, "complete": 0, "partial": 0, "missing": 0},
+        )
+        market_counts["symbols"] += 1
+        if payload:
+            market_counts["cached"] += 1
+        if quality["annual_complete"]:
+            market_counts["annual_5y"] += 1
+        if quality["status"] == "complete":
+            market_counts["complete"] += 1
+        elif quality["status"] in {"annual_complete", "partial"}:
+            market_counts["partial"] += 1
+        else:
+            market_counts["missing"] += 1
+        items.append(
+            {
+                "symbol": symbol,
+                "name": details.get("name") or symbol,
+                "market": market,
+                "source": (payload or {}).get("source"),
+                "fetched_at": (payload or {}).get("fetched_at"),
+                "cache_error": error or None,
+                **quality,
+            }
+        )
+
+    report = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "symbols_requested": len(items),
+        "cached_symbols": sum(item["status"] != "missing" for item in items),
+        "annual_5y_symbols": sum(bool(item["annual_complete"]) for item in items),
+        "complete_symbols": sum(item["status"] == "complete" for item in items),
+        "partial_symbols": sum(item["status"] in {"annual_complete", "partial"} for item in items),
+        "missing_symbols": sum(item["status"] == "missing" for item in items),
+        "by_market": by_market,
+        "items": items,
+    }
+    report["cached_coverage_pct"] = round(
+        report["cached_symbols"] / len(items) * 100, 1
+    ) if items else 0.0
+    report["annual_5y_coverage_pct"] = round(
+        report["annual_5y_symbols"] / len(items) * 100, 1
+    ) if items else 0.0
+    report["complete_coverage_pct"] = round(
+        report["complete_symbols"] / len(items) * 100, 1
+    ) if items else 0.0
+    _write_json_atomic(Path(output_path), report)
+    return report
+
+
 def fetch_financials(
     symbol: str,
     *,
@@ -470,6 +627,7 @@ def fetch_financials(
         cached = _read_cache(cache_file, max_age_hours)
         if cached:
             cached["cache_status"] = "cached"
+            cached["data_quality"] = assess_financial_payload(cached)
             return _with_currency_presentation(cached)
 
     try:
@@ -502,9 +660,10 @@ def fetch_financials(
         "ratio_labels": RATIO_LABELS,
         "vi_summary": _vi_summary(annual),
     }
+    output["data_quality"] = assess_financial_payload(output)
     output = _with_currency_presentation(output)
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+    _write_json_atomic(cache_file, output)
     return output
 
 
@@ -512,74 +671,123 @@ def cache_universe_financials(
     universe_path: str | Path,
     *,
     cache_dir: str | Path = DEFAULT_CACHE_DIR,
-    pause_seconds: float = 0.35,
+    pause_seconds: float = 0.75,
     refresh: bool = False,
-    max_workers: int = 4,
-    request_timeout: int = 8,
+    max_workers: int = 1,
+    request_timeout: int = 20,
+    cache_max_age_hours: int = 24 * 7,
+    max_retries: int = 2,
+    coverage_path: str | Path = DEFAULT_COVERAGE_REPORT,
 ) -> dict[str, Any]:
     symbols = load_universe(universe_path)
     cache_dir = Path(cache_dir)
     status_path = cache_dir.parent / DEFAULT_UPDATE_STATUS.name
-    succeeded: list[str] = []
-    failed: list[str] = []
-    _write_update_status(status_path, "running", symbols_requested=len(symbols))
+    cached_before = [
+        symbol
+        for symbol in symbols
+        if not refresh and _read_cache(_cache_path(symbol, cache_dir), cache_max_age_hours)
+    ]
+    cached_set = set(cached_before)
+    pending = [symbol for symbol in symbols if symbol not in cached_set]
+    succeeded: set[str] = set(cached_before)
+    errors: dict[str, str] = {}
+    _write_update_status(
+        status_path,
+        "running",
+        symbols_requested=len(symbols),
+        symbols_cached_before=len(cached_before),
+        symbols_pending=len(pending),
+        symbols_processed=len(cached_before),
+        symbols_succeeded=len(succeeded),
+        failed_count=0,
+    )
+
+    rate_lock = threading.Lock()
+    next_request_at = [0.0]
+
+    def wait_for_request_slot(multiplier: float = 1.0) -> None:
+        interval = max(0.0, pause_seconds * multiplier)
+        with rate_lock:
+            now = time.monotonic()
+            wait_seconds = max(0.0, next_request_at[0] - now)
+            if wait_seconds:
+                time.sleep(wait_seconds)
+            next_request_at[0] = time.monotonic() + interval
+
     def cache_symbol(symbol: str) -> tuple[str, str | None]:
+        wait_for_request_slot()
         try:
             fetch_financials(
                 symbol,
-                refresh=refresh,
+                refresh=True,
                 cache_dir=cache_dir,
                 request_timeout=request_timeout,
             )
             return symbol, None
-        except FinancialDataError as exc:
+        except Exception as exc:  # noqa: BLE001
             return symbol, str(exc)
 
     try:
-        completed = 0
-        with ThreadPoolExecutor(max_workers=max(1, max_workers)) as executor:
-            futures = [executor.submit(cache_symbol, symbol) for symbol in symbols]
-            for future in as_completed(futures):
-                symbol, error = future.result()
-                completed += 1
-                if error:
-                    failed.append(f"{symbol}: {error}")
-                else:
-                    succeeded.append(symbol)
-                if completed % 5 == 0 or completed == len(symbols):
-                    _write_update_status(
-                        status_path,
-                        "running",
-                        symbols_requested=len(symbols),
-                        symbols_processed=completed,
-                        symbols_succeeded=len(succeeded),
-                        failed_count=len(failed),
-                    )
-                if pause_seconds:
-                    time.sleep(pause_seconds)
-        retry_symbols = [item.split(":", 1)[0] for item in failed]
-        if retry_symbols:
-            failed = []
-            for symbol in retry_symbols:
-                try:
-                    fetch_financials(
-                        symbol,
-                        refresh=refresh,
-                        cache_dir=cache_dir,
-                        request_timeout=max(16, request_timeout),
-                    )
-                    succeeded.append(symbol)
-                except FinancialDataError as exc:
-                    failed.append(f"{symbol}: {exc}")
-                time.sleep(max(0.2, pause_seconds))
+        attempt_symbols = pending
+        for attempt in range(max(0, max_retries) + 1):
+            if not attempt_symbols:
+                break
+            round_errors: dict[str, str] = {}
+            completed_in_round = 0
+            with ThreadPoolExecutor(max_workers=max(1, max_workers)) as executor:
+                futures = [executor.submit(cache_symbol, symbol) for symbol in attempt_symbols]
+                for future in as_completed(futures):
+                    symbol, error = future.result()
+                    completed_in_round += 1
+                    if error:
+                        round_errors[symbol] = error
+                    else:
+                        succeeded.add(symbol)
+                        errors.pop(symbol, None)
+                    processed = len(cached_before) + len(succeeded - cached_set) + len(round_errors)
+                    if completed_in_round % 5 == 0 or completed_in_round == len(attempt_symbols):
+                        _write_update_status(
+                            status_path,
+                            "running",
+                            symbols_requested=len(symbols),
+                            symbols_cached_before=len(cached_before),
+                            symbols_pending=len(pending),
+                            symbols_processed=min(processed, len(symbols)),
+                            symbols_succeeded=len(succeeded),
+                            failed_count=len(round_errors),
+                            retry_attempt=attempt,
+                            last_symbol=symbol,
+                        )
+            errors = round_errors
+            attempt_symbols = list(round_errors)
+            if attempt_symbols and attempt < max_retries:
+                time.sleep(max(1.0, pause_seconds * (attempt + 2) * 4))
+
+        coverage = audit_financial_cache(
+            universe_path,
+            cache_dir=cache_dir,
+            output_path=coverage_path,
+        )
+        failed = [f"{symbol}: {message}" for symbol, message in sorted(errors.items())]
+        final_state = "complete" if not failed else "partial"
         _write_update_status(
             status_path,
-            "complete",
+            final_state,
             symbols_requested=len(symbols),
             symbols_succeeded=len(succeeded),
             failed_count=len(failed),
+            symbols_cached=coverage["cached_symbols"],
+            annual_5y_symbols=coverage["annual_5y_symbols"],
+            complete_symbols=coverage["complete_symbols"],
+            missing_symbols=coverage["missing_symbols"],
+            failed=failed[:100],
         )
-        return {"symbols": len(symbols), "succeeded": succeeded, "failed": failed}
+        return {
+            "symbols": len(symbols),
+            "succeeded": sorted(succeeded),
+            "failed": failed,
+            "coverage": coverage,
+        }
     except Exception as exc:
         _write_update_status(status_path, "failed", symbols_requested=len(symbols), error=str(exc))
         raise

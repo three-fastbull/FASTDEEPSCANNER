@@ -83,6 +83,14 @@ http://127.0.0.1:8765
 & 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-financials --universe data/fastdeep_universe.csv
 ```
 
+ตรวจ coverage จริงโดยไม่ดาวน์โหลดใหม่:
+
+```powershell
+& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner audit-financials
+```
+
+รายงาน `data/fastdeep_financial_coverage.json` แยก `มี cache`, `รายปีครบ 5 งวด` และ `ครบ 5 ปี + Q1-Q4` ออกจากกัน การมีไฟล์ cache ไม่ได้แปลว่างบครบตามเป้าหมาย หุ้นที่มีเพียง 4 ปีหรือไตรมาสบางส่วนยังเปิดดูได้ แต่หน้าเว็บจะระบุช่องว่างไว้ตรง ๆ
+
 ## Daily Data Operations
 
 `Launch-FastDeepScanner.ps1` จะตรวจโค้ดล่าสุดจาก GitHub และเริ่มอัปเดตราคา 5 ปีแบบ background โดยใช้ atomic publish: ข้อมูลชุดเก่าจะไม่ถูกเขียนทับจนกว่าจะดาวน์โหลดสำเร็จอย่างน้อย 97% ของ universe
@@ -93,7 +101,7 @@ http://127.0.0.1:8765
 & '.\Install-FastDeepDailyTask.ps1'
 ```
 
-งานนี้อัปเดตราคาและสร้าง `storage/fastdeep_daily_scan_summary.json` งบจะ refresh เมื่อเลือกหุ้นในหน้า Financial Intelligence; ระบบจะแสดง coverage ของงบที่ยืนยันแล้วเสมอ
+งานนี้อัปเดตราคาและสร้าง `storage/fastdeep_daily_scan_summary.json` งบจะ refresh เมื่อเลือกหุ้นในหน้า Financial Intelligence และ batch แบบ resume ทุกวันเสาร์ด้วย global rate limit; ทุกวันจะสร้างรายงาน coverage ใหม่เพื่อให้ Data Health ตรงกับไฟล์จริง
 
 หมายเหตุ: public endpoint ของ Yahoo Finance จำกัดความเร็วเมื่อ refresh งบหลายร้อยตัวพร้อมกัน จึงไม่ใช้เป็น batch scheduler สำหรับงานสถาบัน หากต้องการงบครบ universe แบบมี SLA ให้ต่อผู้ให้บริการข้อมูลที่ได้รับอนุญาตก่อน แล้วใช้ adapter เดียวกับ Financial Intelligence
 
@@ -187,7 +195,7 @@ Scanner อ่านไฟล์เหล่านี้ทุกครั้ง
 - สภาพคล่องคำนวณจากมูลค่าซื้อขายกลาง (median ของ `close x volume`) 60 วัน แปลงเป็น USD ก่อนให้คะแนน หุ้นที่ซื้อขายต่ำกว่า 1 ล้าน USD ต่อวันจะมีคำเตือนเรื่องขนาดไม้
 - จุดตัดขาดทุนใช้แนวรับจริง แต่ถูกล็อกไว้ในกรอบ 1.4 ถึง 3.0 ATR เพื่อไม่ให้ได้แผนที่ต้องรับความเสี่ยง 25% ต่อไม้ ถ้าความเสี่ยงยังเกิน 12% ระบบจะเตือนให้ลดขนาดไม้
 
-แหล่งข้อมูลเริ่มต้นคือ Yahoo Finance fundamentals timeseries ซึ่งครอบคลุม US, China และ Thailand แต่โดยทั่วไปเปิดให้รายปีเต็ม 4 ปีและงบรายไตรมาสล่าสุดประมาณ 5 งวดเท่านั้น หน้า dashboard จะแสดงเฉพาะงวดที่ผู้ให้บริการส่งกลับและไม่สร้างตัวเลขย้อนหลังขึ้นเอง
+แหล่งข้อมูลเริ่มต้นคือ Yahoo Finance fundamentals timeseries ซึ่งครอบคลุม US, China และ Thailand แต่โดยทั่วไปเปิดให้รายปีเต็ม 4 ปีและงบรายไตรมาสล่าสุดประมาณ 5-9 งวดเท่านั้น หน้า dashboard จะแสดงเฉพาะงวดที่ผู้ให้บริการส่งกลับและไม่สร้างตัวเลขย้อนหลังขึ้นเอง เป้าหมาย 5 ปีพร้อม Q1-Q4 ทุกปีจึงต้องมี provider adapter เพิ่ม: SEC EDGAR XBRL สำหรับหุ้นสหรัฐ และบริการที่มีสิทธิ์ใช้งาน/เผยแพร่สำหรับไทยและจีน
 
 ## Image Match
 
@@ -236,7 +244,7 @@ ADVANC.BK,Advanced Info Service,TH,Digital Infrastructure,32,12.5,1.35,8,10,33,1
 
 Phase 2 ที่ควรต่อ:
 
-- ต่อผู้ให้บริการงบการเงินที่มี SLA เพื่อดัน coverage จาก 258/697 ให้ครบ universe
+- ต่อผู้ให้บริการงบการเงินที่มี SLA เพื่อดัน coverage จากรายงาน `fastdeep_financial_coverage.json` ให้ครบ universe
 - ทดสอบ out-of-sample แยกช่วงเวลา เพื่อยืนยันว่า edge ของ retest/breakout ราย W และ M ไม่ได้มาจากช่วงตลาดเดียว
 - เพิ่ม Telegram alert
 - เพิ่ม ingestion เอกสาร 56-1 / 10-K เพื่อส่งต่อ NotebookLM

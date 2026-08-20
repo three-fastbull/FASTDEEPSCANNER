@@ -695,6 +695,10 @@ footer {
   color: #087443;
 }
 
+.financial-status[data-state="partial"] {
+  color: var(--amber);
+}
+
 .financial-status[data-state="error"] {
   color: #b42318;
 }
