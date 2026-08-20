@@ -6,6 +6,7 @@ import os
 import time
 from dataclasses import replace
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -49,11 +50,10 @@ def _symbol_from_filename(path: Path) -> str:
     return stem.replace("_BK", ".BK").replace("_", ".").upper()
 
 
-def load_price_csv(path: str | Path) -> dict[str, list[StockCandle]]:
+def _read_price_csv(path: Path) -> dict[str, list[StockCandle]]:
     grouped: dict[str, list[StockCandle]] = {}
-    path = Path(path)
     fallback_symbol = _symbol_from_filename(path)
-    with Path(path).open("r", newline="", encoding="utf-8-sig") as handle:
+    with path.open("r", newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         for row in reader:
             symbol = _value(row, "symbol", "ticker", "symbol_name", default=fallback_symbol).strip()
@@ -72,6 +72,16 @@ def load_price_csv(path: str | Path) -> dict[str, list[StockCandle]]:
     for symbol in list(grouped):
         grouped[symbol] = sorted(grouped[symbol], key=lambda item: item.date)
     return grouped
+
+
+@lru_cache(maxsize=4)
+def _cached_price_csv(path_text: str, modified_ns: int) -> dict[str, list[StockCandle]]:
+    return _read_price_csv(Path(path_text))
+
+
+def load_price_csv(path: str | Path) -> dict[str, list[StockCandle]]:
+    source = Path(path).resolve()
+    return _cached_price_csv(str(source), source.stat().st_mtime_ns)
 
 
 def load_fundamentals_csv(path: str | Path) -> dict[str, FundamentalSnapshot]:
