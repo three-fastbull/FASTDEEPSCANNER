@@ -38,11 +38,37 @@ const elements = {
   chartImagePreview: document.getElementById("chartImagePreview"),
   imageMatches: document.getElementById("imageMatches"),
   dataHealth: document.getElementById("dataHealth"),
+  dataHealthMessage: document.getElementById("dataHealthMessage"),
+  dataHealthFacts: document.getElementById("dataHealthFacts"),
+  decisionSummary: document.getElementById("decisionSummary"),
   researchStatus: document.getElementById("researchStatus"),
+  researchMoat: document.getElementById("researchMoat"),
+  researchTrend: document.getElementById("researchTrend"),
+  researchFairValue: document.getElementById("researchFairValue"),
+  researchThesis: document.getElementById("researchThesis"),
   researchNote: document.getElementById("researchNote"),
   researchSaveButton: document.getElementById("researchSaveButton"),
   researchSavedAt: document.getElementById("researchSavedAt"),
+  paperTradeButton: document.getElementById("paperTradeButton"),
+  paperTradeStatus: document.getElementById("paperTradeStatus"),
+  evidenceTimeframe: document.getElementById("evidenceTimeframe"),
+  evidenceMethod: document.getElementById("evidenceMethod"),
+  evidenceHead: document.getElementById("evidenceHead"),
+  evidenceBody: document.getElementById("evidenceBody"),
+  evidenceSubtitle: document.getElementById("evidenceSubtitle"),
+  journalKpis: document.getElementById("journalKpis"),
+  journalBody: document.getElementById("journalBody"),
+  journalScore: document.getElementById("journalScore"),
 };
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 function patternValues() {
   return [...document.querySelectorAll(".pattern-controls input:checked")].map((input) => input.value);
@@ -256,18 +282,44 @@ function setStatus(text) {
   elements.scanStatus.textContent = text;
 }
 
-function renderDataHealth(health, financialHealth = null) {
+function healthFact(label, value, tone = "") {
+  return `<span class="health-fact" data-tone="${tone}"><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`;
+}
+
+function renderDataHealth(health, financialHealth = null, payload = {}) {
   state.dataHealth = health || null;
   if (!health) return;
   const latest = health.latest_candle_date || "-";
   const scannerAsOf = health.scanner_as_of_date || latest;
-  const coverage = health.symbols_requested
-    ? `${health.symbols_succeeded}/${health.symbols_requested}`
-    : "-";
-  const financialCoverage = financialHealth
-    ? ` | งบยืนยัน ${financialHealth.fresh_symbols}/${financialHealth.symbols_requested}`
-    : "";
-  elements.dataHealth.textContent = `${health.message} | EOD ที่ใช้สแกน ${scannerAsOf} | Feed ล่าสุด ${latest} | Coverage ${coverage}${financialCoverage}`;
+  const freshness = payload.symbol_freshness;
+  const fx = payload.fx_health;
+  const facts = [
+    healthFact("EOD ที่ใช้สแกน ", scannerAsOf, health.can_publish ? "ok" : "bad"),
+    healthFact("แท่งล่าสุดในไฟล์ ", latest),
+    healthFact("ผู้ให้บริการ ", health.source || "-"),
+    healthFact("ดาวน์โหลดสำเร็จ ", `${health.symbols_succeeded}/${health.symbols_requested}`),
+  ];
+  if (freshness) {
+    facts.push(healthFact(
+      "หุ้นที่ราคาอัปเดตถึงวันสแกน ",
+      `${freshness.fresh}/${freshness.checked}${freshness.stale ? ` (ค้าง ${freshness.stale} ตัว)` : ""}`,
+      freshness.stale ? "warn" : "ok",
+    ));
+  }
+  if (financialHealth) {
+    facts.push(healthFact(
+      "งบการเงินที่ยืนยันแล้ว ",
+      `${financialHealth.fresh_symbols}/${financialHealth.symbols_requested}`,
+      financialHealth.fresh_symbols > financialHealth.symbols_requested * 0.5 ? "ok" : "warn",
+    ));
+  }
+  if (fx) {
+    facts.push(healthFact("อัตราแลกเปลี่ยน ", `${fx.rates} สกุล · ${fx.state}`, fx.state === "ready" ? "ok" : "warn"));
+  }
+  elements.dataHealthMessage.textContent = health.can_publish
+    ? `${health.message} — ส่งออกรายชื่อ Candidate ได้`
+    : `${health.message} — ปิดการส่งออก Candidate ไว้จนกว่าข้อมูลจะพร้อม`;
+  elements.dataHealthFacts.innerHTML = facts.join("");
   elements.dataHealth.dataset.state = health.state || "unknown";
   elements.csvButton.classList.toggle("is-disabled", !health.can_publish);
   elements.csvButton.setAttribute("aria-disabled", String(!health.can_publish));
@@ -279,6 +331,10 @@ async function loadResearch(symbol) {
   if (!response.ok || state.selectedSymbol !== symbol) return;
   const item = await response.json();
   elements.researchStatus.value = item.status || "Watch";
+  elements.researchMoat.value = item.moat || "";
+  elements.researchTrend.value = item.ai_trend || "";
+  elements.researchFairValue.value = item.fair_value ? String(item.fair_value) : "";
+  elements.researchThesis.value = item.thesis || "";
   elements.researchNote.value = item.note || "";
   elements.researchSavedAt.textContent = item.updated_at
     ? `บันทึก ${new Date(item.updated_at).toLocaleString("th-TH")}`
@@ -296,11 +352,17 @@ async function saveResearch() {
         symbol: state.selectedSymbol,
         status: elements.researchStatus.value,
         note: elements.researchNote.value,
+        moat: elements.researchMoat.value,
+        ai_trend: elements.researchTrend.value,
+        fair_value: elements.researchFairValue.value,
+        thesis: elements.researchThesis.value,
       }),
     });
     const item = await response.json();
     if (!response.ok) throw new Error(item.error || "บันทึกสถานะไม่ได้");
     elements.researchSavedAt.textContent = `บันทึก ${new Date(item.updated_at).toLocaleString("th-TH")}`;
+    // Business quality feeds the score, so the row has to be recomputed here.
+    await runScan();
   } catch (error) {
     elements.researchSavedAt.textContent = error.message || "บันทึกสถานะไม่ได้";
   } finally {
@@ -308,9 +370,16 @@ async function saveResearch() {
   }
 }
 
+const VERIFICATION_SHORT = {
+  technical: "กราฟ",
+  financial: "กราฟ+งบ",
+  valuation: "กราฟ+งบ+มูลค่า",
+  full: "ครบทุกด้าน",
+};
+
 function scoreClass(decision) {
   if (decision.includes("Candidate") || decision.includes("Watchlist")) return "good";
-  if (decision.includes("Reject")) return "bad";
+  if (decision.includes("Reject") || decision.includes("ไม่สด")) return "bad";
   return "warn";
 }
 
@@ -333,12 +402,12 @@ function renderTable(results) {
     const row = document.createElement("tr");
     row.dataset.symbol = result.symbol;
     row.innerHTML = `
-      <td class="symbol-cell"><strong>${result.symbol}</strong><span>${result.name}</span></td>
-      <td><span class="pattern-chip">${topPattern ? topPattern.label : "-"}</span></td>
-      <td><strong>${result.grade}</strong></td>
-      <td>${result.final_score.toFixed(1)}</td>
-      <td>${result.fundamentals_verified ? result.fundamental_score.toFixed(1) : "รอตรวจ"}</td>
-      <td class="decision ${scoreClass(result.decision)}">${result.decision}</td>
+      <td class="symbol-cell"><strong>${escapeHtml(result.symbol)}</strong><span>${escapeHtml(result.name)} · ${escapeHtml(result.currency || "")}</span></td>
+      <td><span class="pattern-chip">${topPattern ? escapeHtml(topPattern.label) : "-"}</span></td>
+      <td><strong>${escapeHtml(result.grade)}</strong></td>
+      <td>${result.final_score.toFixed(1)}<small class="cap-note">/${Math.round(result.score_cap)}</small></td>
+      <td class="verify-cell" data-level="${escapeHtml(result.verification_level)}">${escapeHtml(VERIFICATION_SHORT[result.verification_level] || "-")}</td>
+      <td class="decision ${scoreClass(result.decision)}">${escapeHtml(result.decision)}</td>
     `;
     row.addEventListener("click", () => loadSymbol(result.symbol));
     elements.resultsBody.appendChild(row);
@@ -438,6 +507,33 @@ function drawChart(candles, result) {
   ctx.fillText(`${result.symbol} ${result.last_price.toFixed(2)} | ${result.market_phase}`, pad.left, 18);
 }
 
+function decisionRow(title, label, detail, tone) {
+  return `<article class="decision-item" data-tone="${tone}">
+    <span>${escapeHtml(title)}</span>
+    <strong>${escapeHtml(label)}</strong>
+    <p>${escapeHtml(detail)}</p>
+  </article>`;
+}
+
+function renderDecisionSummary(result) {
+  const summary = result.decision_summary || {};
+  if (!summary.technical) {
+    elements.decisionSummary.innerHTML = '<p class="decision-empty">ยังไม่มีสรุปการตัดสินใจของหุ้นตัวนี้</p>';
+    return;
+  }
+  const freshness = result.price_is_fresh
+    ? ""
+    : `<p class="decision-alert">ราคาล่าสุดของหุ้นตัวนี้คือ ${escapeHtml(result.price_as_of)} ซึ่งไม่ใช่วัน EOD ที่ใช้สแกน</p>`;
+  elements.decisionSummary.innerHTML = `${freshness}
+    <div class="decision-grid">
+      ${decisionRow("Technical", summary.technical.label, summary.technical.detail, summary.technical.pass ? "ok" : "bad")}
+      ${decisionRow("งบการเงิน", summary.financials.label, summary.financials.detail, summary.financials.verified ? "ok" : "warn")}
+      ${decisionRow("มูลค่า", summary.valuation.label, summary.valuation.detail, summary.valuation.verified ? "ok" : "warn")}
+      ${decisionRow("ความเสี่ยง", summary.risk.label, summary.risk.detail, "neutral")}
+    </div>
+    <p class="decision-footer">สถานะงานวิจัย <b>${escapeHtml(summary.research_status || "Watch")}</b>${summary.thesis ? ` · ${escapeHtml(summary.thesis)}` : ""}</p>`;
+}
+
 function renderDetail(payload) {
   const { result, candles, fundamental, tradingview_url } = payload;
   state.selectedSymbol = result.symbol;
@@ -456,6 +552,7 @@ function renderDetail(payload) {
   elements.detailTitle.textContent = `${result.symbol} - ${result.name}`;
   elements.detailSubtitle.textContent = `${result.market} | ${result.sector} | TF ${result.timeframe} | ${result.decision}`;
   elements.detailGrade.textContent = result.grade;
+  renderDecisionSummary(result);
   drawChart(aggregateCandles(candles, elements.timeframeSelect.value), result);
   elements.tradingViewButton.href = tradingview_url;
   elements.reportButton.href = `/api/report?symbol=${encodeURIComponent(result.symbol)}&${state.criteriaQuery}`;
@@ -507,6 +604,121 @@ async function loadSymbol(symbol) {
   setStatus("Ready");
 }
 
+async function savePaperTrade() {
+  const result = state.results.find((item) => item.symbol === state.selectedSymbol);
+  if (!result) return;
+  elements.paperTradeButton.disabled = true;
+  try {
+    const response = await fetch("/api/trades", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        symbol: result.symbol,
+        entry: result.risk_plan.entry,
+        stop: result.risk_plan.stop,
+        targets: result.risk_plan.targets,
+        side: result.patterns.some((item) => item.side === "SELL") ? "SELL" : "BUY",
+        timeframe: result.timeframe,
+        pattern: result.patterns[0] ? result.patterns[0].name : "",
+        grade: result.grade,
+        currency: result.currency,
+        note: result.decision,
+      }),
+    });
+    const item = await response.json();
+    if (!response.ok) throw new Error(item.error || "บันทึก Paper Trade ไม่ได้");
+    elements.paperTradeStatus.textContent = `บันทึกแล้ว: ${item.trade.symbol} เข้า ${item.trade.entry} ตัดขาดทุน ${item.trade.stop}`;
+    loadJournal();
+  } catch (error) {
+    elements.paperTradeStatus.textContent = error.message;
+  } finally {
+    elements.paperTradeButton.disabled = false;
+  }
+}
+
+function horizonCell(stats, edge) {
+  if (!stats) return "<td>-</td>";
+  const edgeText = edge ? `${edge.return_edge_pp > 0 ? "+" : ""}${edge.return_edge_pp} pp` : "-";
+  const tone = edge && edge.return_edge_pp > 0 ? "ok" : "bad";
+  return `<td data-tone="${tone}">
+    <strong>${stats.average_return_pct_net}%</strong>
+    <small>ชนะ ${stats.hit_rate_pct}% · ย่อเฉลี่ย ${stats.average_max_drawdown_pct}%</small>
+    <small>ส่วนต่างจากค่าฐาน ${edgeText}</small>
+  </td>`;
+}
+
+async function loadEvidence() {
+  const timeframe = elements.evidenceTimeframe.value;
+  elements.evidenceBody.innerHTML = "<tr><td>กำลังโหลด...</td></tr>";
+  const response = await fetch(`/api/event-study?timeframe=${encodeURIComponent(timeframe)}`);
+  const payload = await response.json();
+  if (!response.ok) {
+    elements.evidenceMethod.textContent = payload.error || "โหลดผลย้อนหลังไม่สำเร็จ";
+    elements.evidenceHead.innerHTML = "";
+    elements.evidenceBody.innerHTML = "";
+    return;
+  }
+  const horizons = payload.horizons || [];
+  elements.evidenceMethod.textContent = `${payload.method} | หุ้น ${payload.symbols_scanned} ตัว · สัญญาณ ${payload.signals} ครั้ง · ค่าคอมมิชชันและ slippage ${payload.cost_bps} bps`;
+  elements.evidenceSubtitle.textContent = "ตัวเลขคือผลตอบแทนเฉลี่ยสุทธิหลังสัญญาณ เทียบกับการเข้าซื้อแบบสุ่มในหุ้นชุดเดียวกัน (ค่าฐาน)";
+  elements.evidenceHead.innerHTML = `<tr><th>Pattern</th><th>จำนวนสัญญาณ</th>${horizons.map((value) => `<th>ถือ ${value} แท่ง</th>`).join("")}</tr>`;
+  const baselineRow = `<tr class="baseline-row"><th>ค่าฐาน (เข้าซื้อแบบสุ่ม)</th><td>${payload.baseline.signals}</td>${horizons.map((value) => {
+    const stats = payload.baseline[`h${value}`];
+    return stats ? `<td><strong>${stats.average_return_pct_net}%</strong><small>ชนะ ${stats.hit_rate_pct}%</small></td>` : "<td>-</td>";
+  }).join("")}</tr>`;
+  const rows = (payload.by_pattern || []).map((row) => `<tr>
+    <th>${escapeHtml(row.pattern)}${row.reliable ? "" : " *"}</th>
+    <td>${row.signals}</td>
+    ${horizons.map((value) => horizonCell(row[`h${value}`], (row.edge_vs_baseline || {})[`h${value}`])).join("")}
+  </tr>`).join("");
+  elements.evidenceBody.innerHTML = baselineRow + rows;
+}
+
+async function loadJournal() {
+  const response = await fetch("/api/trades");
+  if (!response.ok) return;
+  const payload = await response.json();
+  const summary = payload.summary || {};
+  elements.journalScore.textContent = summary.hit_rate_pct === null || summary.hit_rate_pct === undefined
+    ? "-"
+    : `${summary.hit_rate_pct}%`;
+  elements.journalKpis.innerHTML = [
+    ["ไม้ที่ยังเปิดอยู่", summary.open_count ?? 0, "รายการ"],
+    ["ไม้ที่ปิดแล้ว", summary.closed_count ?? 0, "รายการ"],
+    ["ผลตอบแทนเฉลี่ยสุทธิ", summary.average_return_pct_net === null || summary.average_return_pct_net === undefined ? "-" : `${summary.average_return_pct_net}%`, `หักต้นทุน ${summary.cost_bps} bps`],
+    ["ค่าเฉลี่ย R", summary.average_r ?? "-", "กำไรต่อความเสี่ยง 1 หน่วย"],
+  ].map(([label, value, note]) => (
+    `<article class="financial-kpi"><span>${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong><small>${escapeHtml(note)}</small></article>`
+  )).join("");
+  elements.journalBody.innerHTML = (payload.trades || []).map((trade) => `<tr>
+    <th>${escapeHtml(trade.symbol)}<small>${escapeHtml(trade.pattern || "-")} · ${escapeHtml(trade.timeframe)}</small></th>
+    <td>${escapeHtml(trade.state)}</td>
+    <td>${trade.entry}</td>
+    <td>${trade.stop}</td>
+    <td>${trade.exit ?? "-"}</td>
+    <td>${trade.return_pct_net === null || trade.return_pct_net === undefined ? "-" : `${trade.return_pct_net}%`}</td>
+    <td>${trade.r_multiple ?? "-"}</td>
+    <td>${escapeHtml(trade.opened_on)}</td>
+    <td>${trade.state === "open" ? `<button class="ghost-button close-trade" type="button" data-id="${escapeHtml(trade.id)}">ปิดไม้</button>` : ""}</td>
+  </tr>`).join("");
+}
+
+async function closeTrade(id) {
+  const value = window.prompt("ราคาปิดของไม้นี้");
+  if (!value) return;
+  const response = await fetch("/api/trades/close", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, exit_price: value }),
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    window.alert(payload.error || "ปิดไม้ไม่สำเร็จ");
+    return;
+  }
+  loadJournal();
+}
+
 async function runScan() {
   setStatus("Scanning");
   const query = criteriaQuery();
@@ -518,7 +730,7 @@ async function runScan() {
   }
   const payload = await response.json();
   elements.dataSourceNote.textContent = `Data Source: ${payload.data_source || "unknown"}`;
-  renderDataHealth(payload.data_health, payload.financial_health);
+  renderDataHealth(payload.data_health, payload.financial_health, payload);
   state.results = payload.results;
   renderMetrics(payload.results);
   renderTable(payload.results);
@@ -535,6 +747,18 @@ elements.scoreRange.addEventListener("input", () => {
   elements.scoreValue.textContent = elements.scoreRange.value;
 });
 elements.scanButton.addEventListener("click", runScan);
+elements.paperTradeButton.addEventListener("click", savePaperTrade);
+elements.evidenceTimeframe.addEventListener("change", loadEvidence);
+elements.journalBody.addEventListener("click", (event) => {
+  const button = event.target.closest(".close-trade");
+  if (button) closeTrade(button.dataset.id);
+});
+document.querySelectorAll('[data-view-target="evidenceView"]').forEach((tab) => {
+  tab.addEventListener("click", loadEvidence);
+});
+document.querySelectorAll('[data-view-target="journalView"]').forEach((tab) => {
+  tab.addEventListener("click", loadJournal);
+});
 elements.researchSaveButton.addEventListener("click", saveResearch);
 window.addEventListener("fastdeep:financials-verified", (event) => {
   const symbol = event.detail?.symbol;

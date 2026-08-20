@@ -9,14 +9,20 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
 
-from .data_health import financial_data_health, price_data_health
+from .data_health import (
+    financial_data_health,
+    fx_health,
+    price_data_health,
+    symbol_freshness,
+)
 from .data_io import completed_eod_candles, data_source_label, load_market_data
 from .financials import FinancialDataError, fetch_financials
 from .models import ScanCriteria
 from .report import build_report_html
-from .research_journal import get_research, save_research
-from .scanner import scan_market
+from .research_journal import MOAT_VALUES, STATUSES, TREND_VALUES, get_research, save_research
+from .scanner import VERIFICATION_LABELS, scan_market
 from .timeframes import aggregate_candles, normalize_timeframe
+from .trade_journal import close_trade, journal_summary, list_trades, open_trade
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB_ROOT = ROOT / "fastdeep_web"
@@ -99,11 +105,20 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             criteria = _criteria_from_query(query)
             results = scan_market(criteria)
             health = price_data_health()
+            verification_counts: dict[str, int] = {key: 0 for key in VERIFICATION_LABELS}
+            for result in results:
+                verification_counts[result.verification_level] = (
+                    verification_counts.get(result.verification_level, 0) + 1
+                )
             payload = {
                 "generated_at": results[0].generated_at.isoformat() if results else "",
                 "data_source": data_source_label(),
                 "data_health": health,
                 "financial_health": financial_data_health(),
+                "symbol_freshness": symbol_freshness(),
+                "fx_health": fx_health(),
+                "verification_counts": verification_counts,
+                "verification_labels": VERIFICATION_LABELS,
                 "criteria": criteria.__dict__,
                 "results": [result.to_dict() for result in results],
                 "agents": [
@@ -120,7 +135,43 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/data-health":
-            self._send_json({"prices": price_data_health(), "financials": financial_data_health()})
+            self._send_json(
+                {
+                    "prices": price_data_health(),
+                    "financials": financial_data_health(),
+                    "symbols": symbol_freshness(),
+                    "fx": fx_health(),
+                }
+            )
+            return
+
+        if parsed.path == "/api/research-options":
+            self._send_json(
+                {
+                    "statuses": sorted(STATUSES),
+                    "moat": sorted(MOAT_VALUES),
+                    "ai_trend": sorted(TREND_VALUES),
+                }
+            )
+            return
+
+        if parsed.path == "/api/trades":
+            self._send_json({"trades": list_trades(), "summary": journal_summary()})
+            return
+
+        if parsed.path == "/api/event-study":
+            timeframe = (query.get("timeframe", ["D"])[0] or "D").upper()
+            study_path = ROOT / "storage" / f"fastdeep_event_study_{timeframe}.json"
+            if not study_path.exists():
+                self._send_json({"error": f"ยังไม่มีผล event study ของ timeframe {timeframe}"}, 404)
+                return
+            try:
+                study = json.loads(study_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                self._send_json({"error": str(exc)}, 500)
+                return
+            study.pop("events", None)
+            self._send_json(study)
             return
 
         if parsed.path == "/api/universe":
@@ -218,14 +269,24 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                 "name",
                 "market",
                 "sector",
+                "currency",
                 "last_price",
+                "price_as_of",
                 "grade",
                 "decision",
+                "verification_level",
                 "final_score",
+                "score_cap",
                 "technical_score",
                 "fundamental_score",
                 "business_score",
                 "valuation_score",
+                "reporting_currency",
+                "liquidity_score",
+                "turnover_usd",
+                "research_status",
+                "entry",
+                "stop",
                 "patterns",
             ]
             writer = csv.DictWriter(output, fieldnames=fieldnames)
@@ -233,6 +294,8 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             for result in results:
                 row = result.to_dict()
                 row["patterns"] = " | ".join(pattern.label for pattern in result.patterns)
+                row["entry"] = result.risk_plan.entry
+                row["stop"] = result.risk_plan.stop
                 writer.writerow({key: row.get(key, "") for key in fieldnames})
             self._send(200, output.getvalue().encode("utf-8-sig"), "text/csv; charset=utf-8")
             return
@@ -257,22 +320,62 @@ class FastDeepHandler(BaseHTTPRequestHandler):
 
         self._serve_static(parsed.path)
 
+    def _read_json_body(self) -> dict:
+        size = int(self.headers.get("Content-Length", "0"))
+        if size <= 0:
+            return {}
+        return json.loads(self.rfile.read(size).decode("utf-8"))
+
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path != "/api/research":
+        routes = {
+            "/api/research": self._post_research,
+            "/api/trades": self._post_trade,
+            "/api/trades/close": self._post_trade_close,
+        }
+        handler = routes.get(parsed.path)
+        if handler is None:
             self._send(404, b"Not found", "text/plain; charset=utf-8")
             return
         try:
-            size = int(self.headers.get("Content-Length", "0"))
-            payload = json.loads(self.rfile.read(size).decode("utf-8"))
-            item = save_research(
-                str(payload.get("symbol") or ""),
-                str(payload.get("status") or "Watch"),
-                str(payload.get("note") or ""),
-            )
-            self._send_json(item)
+            handler(self._read_json_body())
         except (ValueError, json.JSONDecodeError) as exc:
             self._send_json({"error": str(exc)}, 422)
+
+    def _post_research(self, payload: dict) -> None:
+        item = save_research(
+            str(payload.get("symbol") or ""),
+            str(payload.get("status") or "Watch"),
+            str(payload.get("note") or ""),
+            moat=str(payload.get("moat") or ""),
+            ai_trend=str(payload.get("ai_trend") or ""),
+            fair_value=payload.get("fair_value"),
+            thesis=str(payload.get("thesis") or ""),
+        )
+        self._send_json(item)
+
+    def _post_trade(self, payload: dict) -> None:
+        trade = open_trade(
+            str(payload.get("symbol") or ""),
+            entry=payload.get("entry"),
+            stop=payload.get("stop"),
+            targets=payload.get("targets") or [],
+            side=str(payload.get("side") or "BUY"),
+            timeframe=str(payload.get("timeframe") or "D"),
+            pattern=str(payload.get("pattern") or ""),
+            grade=str(payload.get("grade") or ""),
+            currency=str(payload.get("currency") or ""),
+            note=str(payload.get("note") or ""),
+        )
+        self._send_json({"trade": trade, "summary": journal_summary()})
+
+    def _post_trade_close(self, payload: dict) -> None:
+        trade = close_trade(
+            str(payload.get("id") or ""),
+            exit_price=payload.get("exit_price"),
+            note=str(payload.get("note") or ""),
+        )
+        self._send_json({"trade": trade, "summary": journal_summary()})
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8765) -> None:

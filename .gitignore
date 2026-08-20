@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
-storage/
+storage/*
+# The event studies gate which patterns may be called candidates, so the
+# summaries travel with the code instead of being regenerated per machine.
+!storage/fastdeep_event_study_*.json
 .env
 .env.*
 tmp/

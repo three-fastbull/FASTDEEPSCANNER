@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from .currency import currency_label, currency_name_th, trading_currency
 from .data_io import load_universe_metadata
 from .yahoo_prices import load_universe
 
@@ -105,6 +106,13 @@ METRIC_TYPES = {
     "operating_cash_flow": "OperatingCashFlow",
     "capital_expenditure": "CapitalExpenditure",
     "free_cash_flow": "FreeCashFlow",
+}
+
+# How each line has to be read on screen. Money lines are shown in millions of
+# the reporting currency; EPS is per share in that same currency and must never
+# be scaled the same way.
+METRIC_UNITS: dict[str, str] = {
+    "basic_eps": "per_share",
 }
 
 FLOW_METRICS = {
@@ -414,6 +422,36 @@ def _read_cache(path: Path, max_age_hours: int) -> dict[str, Any] | None:
         return None
 
 
+def _with_currency_presentation(payload: dict[str, Any]) -> dict[str, Any]:
+    """Attach the unit labels every number on screen is read against.
+
+    Applied on cache reads too, so statements saved before these fields existed
+    still display a currency instead of a bare number.
+    """
+    symbol = str(payload.get("symbol") or "")
+    currency = str(payload.get("currency") or "").upper()
+    source = "provider"
+    if not currency:
+        # Yahoo omits the currency on some listings. Falling back to the
+        # exchange is better than showing revenue with no unit at all.
+        currency = trading_currency(symbol, str(payload.get("market") or ""))
+        source = "exchange_default"
+    payload["currency"] = currency
+    payload["currency_name"] = currency_name_th(currency)
+    payload["currency_label"] = currency_label(currency)
+    payload.setdefault("currency_source", source)
+    payload["currency_note"] = (
+        f"ตัวเลขทุกบรรทัดเป็นสกุล {currency_label(currency)} ตามที่บริษัทยื่นงบ "
+        "ระบบไม่แปลงค่าเงินให้ จึงห้ามนำไปเทียบตรง ๆ กับบริษัทที่ยื่นงบคนละสกุล"
+    )
+    payload["unit"] = "ล้าน"
+    payload["unit_scale"] = 1_000_000
+    payload["unit_label"] = f"ล้าน {currency}"
+    payload["per_share_unit"] = f"{currency} ต่อหุ้น"
+    payload["metric_units"] = METRIC_UNITS
+    return payload
+
+
 def fetch_financials(
     symbol: str,
     *,
@@ -432,7 +470,7 @@ def fetch_financials(
         cached = _read_cache(cache_file, max_age_hours)
         if cached:
             cached["cache_status"] = "cached"
-            return cached
+            return _with_currency_presentation(cached)
 
     try:
         payload = _download_json(_financial_url(symbol), timeout=request_timeout)
@@ -446,12 +484,13 @@ def fetch_financials(
         raise FinancialDataError(f"ไม่พบงบการเงินของ {symbol} จาก Yahoo Finance")
 
     metadata = load_universe_metadata().get(symbol, {})
+    market = metadata.get("market") or "Unknown"
     output = {
         "symbol": symbol,
         "name": metadata.get("name") or symbol,
-        "market": metadata.get("market") or "Unknown",
+        "market": market,
         "sector": metadata.get("sector") or "Unknown",
-        "currency": annual_currency or quarterly_currency or "",
+        "currency": (annual_currency or quarterly_currency or "").upper(),
         "unit": "ล้าน",
         "source": "Yahoo Finance fundamentals timeseries",
         "fetched_at": datetime.now(UTC).isoformat(),
@@ -463,6 +502,7 @@ def fetch_financials(
         "ratio_labels": RATIO_LABELS,
         "vi_summary": _vi_summary(annual),
     }
+    output = _with_currency_presentation(output)
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_file.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
     return output

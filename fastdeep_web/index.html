@@ -12,7 +12,10 @@
       <p class="eyebrow">FastDeep Intelligence Platform</p>
       <h1>Scanner หุ้น + VI + กราฟ</h1>
       <p class="data-source-note" id="dataSourceNote">Data Source: loading...</p>
-      <p class="data-health" id="dataHealth" data-state="loading">กำลังตรวจสอบความพร้อมของข้อมูล...</p>
+      <div class="data-health" id="dataHealth" data-state="loading">
+        <strong id="dataHealthMessage">กำลังตรวจสอบความพร้อมของข้อมูล...</strong>
+        <div class="health-facts" id="dataHealthFacts"></div>
+      </div>
     </div>
     <div class="status-pill" id="scanStatus">Ready</div>
   </header>
@@ -21,6 +24,8 @@
     <button class="nav-tab is-active" type="button" data-view-target="scannerView">Scanner</button>
     <button class="nav-tab" type="button" data-view-target="financialsView">งบการเงิน 5 ปี</button>
     <button class="nav-tab" type="button" data-view-target="viView">VI Thesis</button>
+    <button class="nav-tab" type="button" data-view-target="evidenceView">หลักฐานย้อนหลัง</button>
+    <button class="nav-tab" type="button" data-view-target="journalView">Paper Trade</button>
   </nav>
 
   <main id="scannerView" class="app-shell app-view">
@@ -144,39 +149,74 @@
           </div>
           <span class="grade-badge" id="detailGrade">-</span>
         </div>
+        <section class="decision-summary" id="decisionSummary" aria-label="สรุปการตัดสินใจ">
+          <p class="decision-empty">เลือกหุ้นเพื่อดูสรุปการตัดสินใจ</p>
+        </section>
         <canvas id="priceChart" width="720" height="320"></canvas>
         <div class="action-row">
           <a id="tradingViewButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">TradingView</a>
           <a id="reportButton" class="primary-button" href="#" target="_blank" rel="noreferrer">PDF Report</a>
+          <button id="paperTradeButton" class="ghost-button" type="button">บันทึก Paper Trade</button>
         </div>
-        <section class="research-workflow" aria-label="Research workflow">
-          <label>สถานะ Research
-            <select id="researchStatus">
-              <option>Watch</option>
-              <option>Research</option>
-              <option>Approved</option>
-              <option>Owned</option>
-              <option>Exit</option>
-            </select>
-          </label>
-          <label>โน้ตการตัดสินใจ
-            <input id="researchNote" maxlength="1000" placeholder="เหตุผลที่เฝ้าดูหรืออนุมัติหุ้นนี้">
-          </label>
-          <button id="researchSaveButton" class="ghost-button" type="button">บันทึก</button>
-          <span id="researchSavedAt">ยังไม่ได้บันทึก</span>
-        </section>
-        <div class="split-grid">
-          <section>
-            <h3>Risk Plan</h3>
-            <dl id="riskPlan"></dl>
+        <p class="inline-status" id="paperTradeStatus"></p>
+        <details class="agent-disclosure" id="researchDisclosure">
+          <summary>บันทึกงานวิจัยและคุณภาพธุรกิจ</summary>
+          <section class="research-workflow" aria-label="Research workflow">
+            <label>สถานะ Research
+              <select id="researchStatus">
+                <option>Watch</option>
+                <option>Research</option>
+                <option>Approved</option>
+                <option>Owned</option>
+                <option>Exit</option>
+              </select>
+            </label>
+            <label>Moat
+              <select id="researchMoat">
+                <option value="">ยังไม่ประเมิน</option>
+                <option value="wide">wide</option>
+                <option value="strong">strong</option>
+                <option value="medium">medium</option>
+                <option value="niche">niche</option>
+                <option value="weak">weak</option>
+              </select>
+            </label>
+            <label>แนวโน้มธุรกิจ
+              <select id="researchTrend">
+                <option value="">ยังไม่ประเมิน</option>
+                <option value="leader">leader</option>
+                <option value="beneficiary">beneficiary</option>
+                <option value="automation">automation</option>
+                <option value="neutral">neutral</option>
+                <option value="laggard">laggard</option>
+              </select>
+            </label>
+            <label>มูลค่าที่เหมาะสม
+              <input id="researchFairValue" type="number" min="0" step="0.01" placeholder="ราคาต่อหุ้น">
+            </label>
+            <label class="wide-field">Thesis
+              <input id="researchThesis" maxlength="2000" placeholder="เหตุผลการลงทุนโดยย่อ">
+            </label>
+            <label class="wide-field">โน้ตการตัดสินใจ
+              <input id="researchNote" maxlength="1000" placeholder="เหตุผลที่เฝ้าดูหรืออนุมัติหุ้นนี้">
+            </label>
+            <button id="researchSaveButton" class="ghost-button" type="button">บันทึก</button>
+            <span id="researchSavedAt">ยังไม่ได้บันทึก</span>
           </section>
-          <section>
-            <h3>Fundamental</h3>
-            <dl id="fundamentalBox"></dl>
-          </section>
-        </div>
+          <p class="hint">ต้องกรอก Moat และแนวโน้มธุรกิจก่อน จึงจะเปลี่ยนสถานะเป็น Approved หรือ Owned ได้ และคะแนนจึงจะถอดคำนำหน้า T- ออก</p>
+        </details>
         <details class="agent-disclosure">
-          <summary>เหตุผลจากระบบและคำเตือน</summary>
+          <summary>ตัวเลขและเหตุผลแบบละเอียด</summary>
+          <div class="split-grid">
+            <section>
+              <h3>Risk Plan</h3>
+              <dl id="riskPlan"></dl>
+            </section>
+            <section>
+              <h3>Fundamental</h3>
+              <dl id="fundamentalBox"></dl>
+            </section>
+          </div>
           <h3>Analysis Notes</h3>
           <div id="agentNotes" class="agent-list"></div>
           <h3>Warnings</h3>
@@ -300,6 +340,62 @@
   <footer>
     Research workflow only. Not financial advice.
   </footer>
+
+  <main id="evidenceView" class="app-shell app-view is-hidden">
+    <section class="vi-heading">
+      <div>
+        <h2>หลักฐานย้อนหลังของแต่ละ Pattern</h2>
+        <p id="evidenceSubtitle">วัดผลตอบแทนหลังสัญญาณจริงในอดีต เทียบกับการเข้าซื้อแบบสุ่มในหุ้นชุดเดียวกัน</p>
+      </div>
+      <label>Timeframe
+        <select id="evidenceTimeframe">
+          <option value="D">D</option>
+          <option value="W">W</option>
+          <option value="M">M</option>
+        </select>
+      </label>
+    </section>
+    <p class="evidence-method" id="evidenceMethod"></p>
+    <section class="financial-table-panel">
+      <div class="table-scroll">
+        <table>
+          <thead id="evidenceHead"></thead>
+          <tbody id="evidenceBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <main id="journalView" class="app-shell app-view is-hidden">
+    <section class="vi-heading">
+      <div>
+        <h2>Paper Trade Journal</h2>
+        <p>บันทึกทุกไม้ที่ตัดสินใจจากระบบ เพื่อทบทวนผลจริงเทียบกับแผนที่วางไว้</p>
+      </div>
+      <div class="vi-score" id="journalScore">-</div>
+    </section>
+    <section class="financial-kpis" id="journalKpis"></section>
+    <section class="financial-table-panel">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>หุ้น</th>
+              <th>สถานะ</th>
+              <th>เข้า</th>
+              <th>ตัดขาดทุน</th>
+              <th>ออก</th>
+              <th>ผลสุทธิ</th>
+              <th>R</th>
+              <th>วันที่เปิด</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="journalBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
   <script src="/app.js"></script>
   <script src="/financial.js"></script>

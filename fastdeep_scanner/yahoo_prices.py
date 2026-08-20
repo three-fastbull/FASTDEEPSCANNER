@@ -286,3 +286,82 @@ def update_prices_from_yahoo(
             child.unlink(missing_ok=True)
         if lock_path.exists():
             lock_path.rmdir()
+
+
+FX_PAIR_SYMBOLS = {
+    "THB": "USDTHB=X",
+    "HKD": "USDHKD=X",
+    "CNY": "USDCNY=X",
+    "JPY": "USDJPY=X",
+    "EUR": "USDEUR=X",
+    "GBP": "USDGBP=X",
+    "SGD": "USDSGD=X",
+    "TWD": "USDTWD=X",
+    "KRW": "USDKRW=X",
+    "INR": "USDINR=X",
+    "AUD": "USDAUD=X",
+    "CAD": "USDCAD=X",
+    "CHF": "USDCHF=X",
+    "SEK": "USDSEK=X",
+    "NOK": "USDNOK=X",
+    "DKK": "USDDKK=X",
+    "BRL": "USDBRL=X",
+    "MXN": "USDMXN=X",
+    "ZAR": "USDZAR=X",
+}
+
+
+def update_fx_rates(
+    out_path: str | Path | None = None,
+    *,
+    timeout: int = 12,
+    pause_seconds: float = 0.15,
+) -> dict:
+    """Store units-per-USD for every reporting currency the universe can use.
+
+    Valuation refuses to mix a HKD price with a CNY statement, so these dated
+    rates are what allows a cross-currency P/E to be published at all.
+    """
+    out_path = Path(out_path) if out_path else ROOT / "data" / "fastdeep_fx_rates.json"
+    previous: dict = {}
+    if out_path.exists():
+        try:
+            previous = json.loads(out_path.read_text(encoding="utf-8")).get("rates", {})
+        except (OSError, json.JSONDecodeError):
+            previous = {}
+
+    rates: dict[str, float] = {}
+    failed: list[str] = []
+    for code, pair in FX_PAIR_SYMBOLS.items():
+        try:
+            payload = _download_json(_chart_url(pair, "5d", "1d"), timeout=timeout)
+            result = (payload.get("chart", {}).get("result") or [{}])[0]
+            closes = [
+                value
+                for value in ((result.get("indicators", {}).get("quote") or [{}])[0].get("close") or [])
+                if value is not None
+            ]
+            price = float(closes[-1]) if closes else float(result.get("meta", {}).get("regularMarketPrice") or 0)
+            if price > 0:
+                rates[code] = round(price, 6)
+            else:
+                failed.append(code)
+        except Exception:  # noqa: BLE001 - a single missing pair must not stop the run
+            failed.append(code)
+        if pause_seconds:
+            time.sleep(pause_seconds)
+
+    for code, value in previous.items():
+        rates.setdefault(code, value)
+
+    payload = {
+        "base": "USD",
+        "quote": "units of currency per 1 USD",
+        "source": "Yahoo Finance FX chart",
+        "updated_at": datetime.now(UTC).isoformat(),
+        "failed": failed,
+        "rates": rates,
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_write(out_path, json.dumps(payload, ensure_ascii=False, indent=2))
+    return payload

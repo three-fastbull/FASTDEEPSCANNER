@@ -636,8 +636,11 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
         ['ROE/ROA', `${pack.fundamental.roe.toFixed(1)}% / ${pack.fundamental.roa.toFixed(1)}%`],
         ['Debt', pack.fundamental.debt_to_equity.toFixed(2) + 'x'],
         ['Growth', `${pack.fundamental.revenue_growth.toFixed(1)}% / ${pack.fundamental.profit_growth.toFixed(1)}%`],
-        ['PE/PBV', `${pack.fundamental.pe.toFixed(1)} / ${pack.fundamental.pbv.toFixed(1)}`],
-        ['Upside', pack.fundamental.analyst_upside_pct.toFixed(1) + '%'],
+        ['PE/PBV', result.valuation_verified
+          ? `${pack.fundamental.pe.toFixed(1)} / ${pack.fundamental.pbv.toFixed(1)}`
+          : 'ยังประเมินมูลค่าไม่ได้'],
+        ['สกุลเงินของงบ', result.reporting_currency || 'ยังไม่ตรวจงบ'],
+        ['หลักฐานย้อนหลัง', (result.evidence && result.evidence.label) || '-'],
       ]);
       agents.innerHTML = result.insights.map(insight => `<article class="agent"><strong>${insight.agent} (${insight.score.toFixed(1)})</strong><p>${insight.summary}</p></article>`).join('');
     }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import date
 
 from .models import StockCandle
 
@@ -15,15 +16,30 @@ def normalize_timeframe(value: str) -> str:
     return timeframe
 
 
-def _period_key(candle: StockCandle, timeframe: str) -> tuple[int, int]:
+def period_key(value: date, timeframe: str) -> tuple[int, int]:
     if timeframe == "W":
-        iso = candle.date.isocalendar()
+        iso = value.isocalendar()
         return iso.year, iso.week
-    return candle.date.year, candle.date.month
+    return value.year, value.month
 
 
-def aggregate_candles(candles: Iterable[StockCandle], timeframe: str) -> list[StockCandle]:
-    """Aggregate daily OHLCV into complete chronological weekly or monthly bars."""
+def _period_key(candle: StockCandle, timeframe: str) -> tuple[int, int]:
+    return period_key(candle.date, timeframe)
+
+
+def aggregate_candles(
+    candles: Iterable[StockCandle],
+    timeframe: str,
+    *,
+    as_of: date | None = None,
+    drop_incomplete: bool = True,
+) -> list[StockCandle]:
+    """Aggregate daily OHLCV into weekly or monthly bars.
+
+    The final bar is dropped while its week or month is still trading, so a
+    three-day stub never gets scored as a finished weekly candle - the same rule
+    the daily scanner applies when it refuses to read today's intraday bar.
+    """
     timeframe = normalize_timeframe(timeframe)
     ordered = sorted(candles, key=lambda item: item.date)
     if timeframe == "D":
@@ -52,4 +68,9 @@ def aggregate_candles(candles: Iterable[StockCandle], timeframe: str) -> list[St
         )
     if current is not None:
         aggregated.append(current)
+
+    if drop_incomplete and aggregated:
+        reference = as_of or date.today()
+        if _period_key(aggregated[-1], timeframe) == period_key(reference, timeframe):
+            aggregated.pop()
     return aggregated

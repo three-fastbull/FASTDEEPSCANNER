@@ -115,6 +115,54 @@ def price_data_health(
     }
 
 
+def symbol_freshness(today: date | None = None, limit: int = 12) -> dict[str, Any]:
+    """Per-symbol staleness, which a file-level date cannot show.
+
+    A feed can report a fresh latest candle while individual names stopped
+    updating - halted, delisted, or simply dropped by the provider. Those names
+    would still be scanned against a months-old chart.
+    """
+    from .data_io import DEFAULT_PRICE_CSV, load_price_csv
+
+    if not DEFAULT_PRICE_CSV.exists():
+        return {"checked": 0, "fresh": 0, "stale": 0, "stale_symbols": [], "coverage_pct": 0.0}
+    expected = expected_eod_date(today)
+    candles_by_symbol = load_price_csv(DEFAULT_PRICE_CSV)
+    stale: list[dict[str, str]] = []
+    fresh = 0
+    for symbol, candles in candles_by_symbol.items():
+        if not candles:
+            continue
+        last = max(candle.date for candle in candles)
+        if last >= expected:
+            fresh += 1
+        else:
+            stale.append({"symbol": symbol, "last_candle_date": last.isoformat()})
+    stale.sort(key=lambda item: item["last_candle_date"])
+    checked = fresh + len(stale)
+    return {
+        "checked": checked,
+        "fresh": fresh,
+        "stale": len(stale),
+        "expected_eod_date": expected.isoformat(),
+        "coverage_pct": round(fresh / checked * 100, 1) if checked else 0.0,
+        "stale_symbols": stale[:limit],
+    }
+
+
+def fx_health(today: date | None = None) -> dict[str, Any]:
+    from .currency import fx_age_days, load_fx_rates
+
+    payload = load_fx_rates()
+    age = fx_age_days()
+    return {
+        "rates": len(payload.get("rates") or {}),
+        "updated_at": payload.get("updated_at"),
+        "age_days": round(age, 2) if age is not None else None,
+        "state": "missing" if not payload.get("rates") else ("stale" if (age or 0) > 7 else "ready"),
+    }
+
+
 def financial_data_health(
     cache_dir: str | Path = DEFAULT_FINANCIAL_CACHE_DIR,
     *,

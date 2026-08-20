@@ -119,4 +119,29 @@ def generate_price_history(days: int = 240) -> dict[str, list[StockCandle]]:
 
 
 def fundamentals_by_symbol() -> dict[str, FundamentalSnapshot]:
-    return {item.symbol: item for item in SAMPLE_FUNDAMENTALS}
+    """Demo snapshots completed so the sample set exercises the real valuation path.
+
+    EPS and book value are back-solved from the scenario price and the sample
+    P/E and P/BV, which keeps the multiples the scanner recomputes identical to
+    the ones written here.
+    """
+    from dataclasses import replace
+
+    from .currency import trading_currency
+
+    output: dict[str, FundamentalSnapshot] = {}
+    for item in SAMPLE_FUNDAMENTALS:
+        price = SCENARIOS.get(item.symbol, ("", 0.0))[1]
+        currency = trading_currency(item.symbol, item.market)
+        output[item.symbol] = replace(
+            item,
+            eps=round(price / item.pe, 4) if item.pe else 0.0,
+            book_value_per_share=round(price / item.pbv, 4) if item.pbv else 0.0,
+            reporting_currency=currency,
+            trading_currency=currency,
+            fundamentals_verified=True,
+            research_verified=True,
+            as_of="2025-12-31",
+            source="Sample dataset",
+        )
+    return output

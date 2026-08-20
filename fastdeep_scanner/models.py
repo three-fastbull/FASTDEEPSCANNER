@@ -53,6 +53,17 @@ class FundamentalSnapshot:
     research_verified: bool = True
     source: str = ""
     as_of: str = ""
+    eps: float = 0.0
+    book_value_per_share: float = 0.0
+    reporting_currency: str = ""
+    trading_currency: str = ""
+    valuation_verified: bool = False
+    valuation_note: str = ""
+    analyst_fair_value: float = 0.0
+    thesis: str = ""
+    research_status: str = "Watch"
+    turnover_usd: float = 0.0
+    liquidity_note: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -80,6 +91,17 @@ class FundamentalSnapshot:
             "research_verified": self.research_verified,
             "source": self.source,
             "as_of": self.as_of,
+            "eps": self.eps,
+            "book_value_per_share": self.book_value_per_share,
+            "reporting_currency": self.reporting_currency,
+            "trading_currency": self.trading_currency,
+            "valuation_verified": self.valuation_verified,
+            "valuation_note": self.valuation_note,
+            "analyst_fair_value": self.analyst_fair_value,
+            "thesis": self.thesis,
+            "research_status": self.research_status,
+            "turnover_usd": self.turnover_usd,
+            "liquidity_note": self.liquidity_note,
         }
 
 
@@ -114,6 +136,7 @@ class RiskPlan:
     reward_risk: float
     invalidation: str
     sizing_note: str
+    risk_pct: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -122,6 +145,7 @@ class RiskPlan:
             "stop": round(self.stop, 4),
             "targets": [round(target, 4) for target in self.targets],
             "reward_risk": round(self.reward_risk, 2),
+            "risk_pct": round(self.risk_pct, 2),
             "invalidation": self.invalidation,
             "sizing_note": self.sizing_note,
         }
@@ -182,6 +206,18 @@ class ScanResult:
     warnings: list[str] = field(default_factory=list)
     fundamentals_verified: bool = False
     research_verified: bool = False
+    valuation_verified: bool = False
+    research_status: str = "Watch"
+    verification_level: str = "technical"
+    score_cap: float = 72.0
+    liquidity_score: float = 0.0
+    turnover_usd: float = 0.0
+    currency: str = ""
+    reporting_currency: str = ""
+    price_as_of: str = ""
+    price_is_fresh: bool = True
+    evidence: dict[str, Any] = field(default_factory=dict)
+    decision_summary: dict[str, Any] = field(default_factory=dict)
     timeframe: str = "D"
     generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
@@ -207,6 +243,18 @@ class ScanResult:
             "warnings": self.warnings,
             "fundamentals_verified": self.fundamentals_verified,
             "research_verified": self.research_verified,
+            "valuation_verified": self.valuation_verified,
+            "research_status": self.research_status,
+            "verification_level": self.verification_level,
+            "score_cap": self.score_cap,
+            "liquidity_score": round(self.liquidity_score, 1),
+            "turnover_usd": round(self.turnover_usd, 2),
+            "currency": self.currency,
+            "reporting_currency": self.reporting_currency,
+            "price_as_of": self.price_as_of,
+            "price_is_fresh": self.price_is_fresh,
+            "evidence": self.evidence,
+            "decision_summary": self.decision_summary,
             "timeframe": self.timeframe,
             "generated_at": self.generated_at.isoformat(),
         }

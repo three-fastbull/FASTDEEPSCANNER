@@ -57,6 +57,24 @@ def build_report_html(
     health_message = data_health.get("message") or "Data health unavailable"
     health_class = "ready" if data_health.get("can_publish") else "warning"
 
+    summary = result.decision_summary or {}
+    verification = (
+        "Verified financial statements"
+        if snapshot.fundamentals_verified
+        else "Pending - technical candidate only"
+    )
+    reporting_currency = result.reporting_currency or "unknown currency"
+    valuation_line = (
+        summary.get("valuation", {}).get("detail")
+        if result.valuation_verified
+        else summary.get("valuation", {}).get("detail") or "Valuation could not be derived"
+    )
+    business_line = (
+        f"{snapshot.moat} / {snapshot.ai_trend}"
+        if result.research_verified
+        else "Not reviewed by an analyst yet"
+    )
+    evidence_line = (result.evidence or {}).get("label") or "No historical study available"
     return f"""<!doctype html>
 <html lang="th">
 <head>
@@ -113,13 +131,14 @@ def build_report_html(
 
     <h2>Fundamental Snapshot</h2>
     <table>
-      <tr><th>Verification</th><td>{'Verified financial statements' if snapshot.fundamentals_verified else 'Pending - technical candidate only'}</td></tr>
-      <tr><th>Statement period</th><td>{html.escape(snapshot.as_of or '-')}</td></tr>
+      <tr><th>Verification</th><td>{html.escape(verification)}</td></tr>
+      <tr><th>Statement period</th><td>{html.escape(snapshot.as_of or '-')} ({html.escape(reporting_currency)})</td></tr>
       <tr><th>ROE / ROA</th><td>{snapshot.roe:.1f}% / {snapshot.roa:.1f}%</td></tr>
       <tr><th>Debt to equity</th><td>{snapshot.debt_to_equity:.2f}x</td></tr>
       <tr><th>Growth</th><td>Revenue {snapshot.revenue_growth:.1f}%, profit {snapshot.profit_growth:.1f}%</td></tr>
-      <tr><th>Valuation</th><td>PE {snapshot.pe:.1f}x, PBV {snapshot.pbv:.1f}x, upside {snapshot.analyst_upside_pct:.1f}%</td></tr>
-      <tr><th>Moat / AI trend</th><td>{html.escape(snapshot.moat)} / {html.escape(snapshot.ai_trend)}</td></tr>
+      <tr><th>Valuation</th><td>{html.escape(valuation_line)}</td></tr>
+      <tr><th>Moat / AI trend</th><td>{html.escape(business_line)}</td></tr>
+      <tr><th>Historical evidence</th><td>{html.escape(evidence_line)}</td></tr>
     </table>
 
     <h2>Agent Notes</h2>

@@ -67,6 +67,10 @@ def detect_breakout(candles: list[StockCandle], timeframe: str = "D") -> Pattern
         return None
     if vol_ratio < 1.15:
         return None
+    # An entry this far past the level cannot carry a sane stop, so it is a
+    # chase rather than a breakout signal.
+    if breakout_pct > 15.0:
+        return None
     trend_bonus = 8 if close > ema200 else 2
     volume_bonus = min(16, max(0, (vol_ratio - 1.0) * 18))
     score = min(95, 58 + breakout_pct * 1.6 + trend_bonus + volume_bonus)
@@ -124,27 +128,62 @@ def detect_retest(candles: list[StockCandle], timeframe: str = "D") -> PatternHi
 
 
 def detect_double_bottom(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    """Reversal off a base, confirmed by a neckline break that is still fresh.
+
+    The freshness and prior-decline checks are what keep this from firing on
+    every stock that merely trades above an old level: without them the detector
+    stayed true for months after a single break and matched most of the market.
+    """
     timeframe = normalize_timeframe(timeframe)
     if len(candles) < _bars(130, timeframe):
         return None
-    pivots = local_lows(candles, lookback=_bars(120, timeframe), radius=_bars(5, timeframe))
-    latest = candles[-1]
-    candidates: list[tuple[int, float, int, float]] = []
-    for left_idx, left_low in pivots:
-        for right_idx, right_low in pivots:
-            if right_idx - left_idx < _bars(18, timeframe):
-                continue
-            similarity = abs(left_low - right_low) / max(left_low, right_low)
-            if similarity <= 0.055 and right_idx > left_idx:
-                candidates.append((left_idx, left_low, right_idx, right_low))
-    if not candidates:
+    lookback = _bars(120, timeframe)
+    pivots = local_lows(candles, lookback=lookback, radius=_bars(5, timeframe))
+    if len(pivots) < 2:
         return None
-    left_idx, left_low, right_idx, right_low = candidates[-1]
-    neckline = max(candle.high for candle in candles[left_idx:right_idx + 1])
-    if latest.close <= neckline * 1.005:
+    latest = candles[-1]
+    base_low = min(candle.low for candle in candles[-lookback:])
+    minimum_separation = _bars(18, timeframe)
+
+    selected: tuple[int, float, int, float, float] | None = None
+    for position, (left_idx, left_low) in enumerate(pivots):
+        for right_idx, right_low in pivots[position + 1 :]:
+            if right_idx - left_idx < minimum_separation:
+                continue
+            if abs(left_low - right_low) / max(left_low, right_low) > 0.05:
+                continue
+            # Both feet must sit at the base of the range. Two dips inside an
+            # ongoing uptrend are not a bottom.
+            if min(left_low, right_low) > base_low * 1.06:
+                continue
+            neckline = max(candle.high for candle in candles[left_idx : right_idx + 1])
+            if pct_change(neckline, min(left_low, right_low)) < 8.0:
+                continue
+            if selected is None or right_idx > selected[2]:
+                selected = (left_idx, left_low, right_idx, right_low, neckline)
+    if selected is None:
+        return None
+    left_idx, left_low, right_idx, right_low, neckline = selected
+
+    prior_start = max(0, left_idx - _bars(60, timeframe))
+    prior_high = max(candle.high for candle in candles[prior_start : left_idx + 1])
+    if pct_change(prior_high, left_low) < 12.0:
+        return None
+
+    trigger = neckline * 1.005
+    if latest.close <= trigger:
+        return None
+    confirmation_window = candles[-_bars(6, timeframe) - 1 : -1]
+    if not confirmation_window or all(candle.close > trigger for candle in confirmation_window):
+        return None
+
+    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
+    if vol_ratio < 1.0:
         return None
     depth = pct_change(neckline, min(left_low, right_low))
-    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
+    extension = pct_change(latest.close, neckline)
+    if extension > 12.0:
+        return None
     score = min(94, 61 + depth * 0.7 + min(12, vol_ratio * 4))
     return PatternHit(
         name="double_bottom",
@@ -154,9 +193,9 @@ def detect_double_bottom(candles: list[StockCandle], timeframe: str = "D") -> Pa
         confidence=min(94, 60 + depth * 0.65 + min(10, vol_ratio * 3)),
         level=neckline,
         reasons=[
-            f"Two lows formed around {((left_low + right_low) / 2):.2f}",
-            f"Neckline broke above {neckline:.2f}",
-            f"Recovery depth is {depth:.1f}%",
+            f"Two lows formed around {((left_low + right_low) / 2):.2f} after a {pct_change(prior_high, left_low):.1f}% decline",
+            f"Neckline {neckline:.2f} broke within the last {_bars(6, timeframe)} bars",
+            f"Recovery depth is {depth:.1f}% on {vol_ratio:.2f}x volume",
         ],
     )
 

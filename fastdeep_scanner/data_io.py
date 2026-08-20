@@ -10,7 +10,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from .currency import trading_currency
 from .models import FundamentalSnapshot, StockCandle
+from .research_journal import load_journal
 from .sample_data import fundamentals_by_symbol, generate_price_history
 
 
@@ -191,6 +193,21 @@ def _financial_cache_path(symbol: str) -> Path:
     return DEFAULT_FINANCIAL_CACHE_DIR / f"{safe}.json"
 
 
+def _shares_outstanding(metrics: dict[str, Any]) -> float | None:
+    """Derive share count from reported net income and basic EPS.
+
+    The statements feed carries no share count, but EPS is reported against the
+    same period's net income, so the ratio recovers it well enough to turn
+    equity into book value per share.
+    """
+    eps = _safe_number(metrics.get("basic_eps"))
+    net_income = _safe_number(metrics.get("net_income"))
+    if not eps or not net_income:
+        return None
+    shares = net_income / eps
+    return shares if shares > 0 else None
+
+
 def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> FundamentalSnapshot:
     path = _financial_cache_path(snapshot.symbol)
     if not path.exists() or time.time() - path.stat().st_mtime > 8 * 24 * 3600:
@@ -205,6 +222,10 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
         ratios = latest.get("ratios") or {}
         revenue = _safe_number(metrics.get("total_revenue"))
         net_income = _safe_number(metrics.get("net_income"))
+        eps = _safe_number(metrics.get("basic_eps"))
+        equity = _safe_number(metrics.get("stockholders_equity"))
+        shares = _shares_outstanding(metrics)
+        book_value_per_share = equity / shares if shares and equity else 0.0
         return replace(
             snapshot,
             roe=_safe_number(ratios.get("roe")),
@@ -218,11 +239,11 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
             pbv=0.0,
             dividend_yield=0.0,
             analyst_upside_pct=0.0,
-            moat="not evaluated",
-            ai_trend="not evaluated",
-            notes="financials_verified; business_and_valuation_pending",
+            eps=eps,
+            book_value_per_share=book_value_per_share,
+            reporting_currency=str(payload.get("currency") or "").upper(),
+            notes="financials_verified",
             fundamentals_verified=True,
-            research_verified=False,
             source=str(payload.get("source") or "Financial statements cache"),
             as_of=str(latest.get("period_end") or ""),
         )
@@ -256,6 +277,9 @@ def load_market_data(
             for symbol, snapshot in fundamentals.items()
         }
     universe = load_universe_metadata()
+    # Sample runs stay hermetic: the real financial cache and the analyst journal
+    # would otherwise leak live data into the demo and into the test suite.
+    journal = {} if force_sample else load_journal()
     for symbol in candles:
         if symbol not in fundamentals:
             fundamentals[symbol] = _placeholder_fundamental(symbol, universe.get(symbol))
@@ -265,8 +289,31 @@ def load_market_data(
                 fundamentals[symbol] = FundamentalSnapshot(
                     **{**snapshot.__dict__, "index_groups": universe[symbol].get("index_groups", "")}
                 )
-        fundamentals[symbol] = _snapshot_from_financial_cache(fundamentals[symbol])
+        snapshot = fundamentals[symbol] if force_sample else _snapshot_from_financial_cache(fundamentals[symbol])
+        fundamentals[symbol] = _apply_analyst_review(
+            replace(snapshot, trading_currency=trading_currency(symbol, snapshot.market)),
+            journal.get(symbol),
+        )
     return candles, fundamentals
+
+
+def _apply_analyst_review(
+    snapshot: FundamentalSnapshot,
+    review: dict[str, Any] | None,
+) -> FundamentalSnapshot:
+    """Business quality comes from a recorded human judgement, never a default."""
+    if not review:
+        return snapshot
+    verified = bool(review.get("research_verified"))
+    return replace(
+        snapshot,
+        moat=str(review.get("moat") or snapshot.moat),
+        ai_trend=str(review.get("ai_trend") or snapshot.ai_trend),
+        analyst_fair_value=_safe_number(review.get("fair_value")),
+        thesis=str(review.get("thesis") or ""),
+        research_status=str(review.get("status") or "Watch"),
+        research_verified=verified,
+    )
 
 
 def data_source_label(

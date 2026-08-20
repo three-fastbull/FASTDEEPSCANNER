@@ -20,7 +20,7 @@ class ReliabilityTest(unittest.TestCase):
             StockCandle(date(2026, 8, 4), "TEST", 11, 14, 10, 13, 200),
             StockCandle(date(2026, 8, 10), "TEST", 13, 15, 12, 14, 300),
         ]
-        weekly = aggregate_candles(candles, "W")
+        weekly = aggregate_candles(candles, "W", as_of=date(2026, 8, 20))
         self.assertEqual(len(weekly), 2)
         self.assertEqual((weekly[0].open, weekly[0].high, weekly[0].low, weekly[0].close, weekly[0].volume), (10, 14, 9, 13, 300))
 
@@ -63,13 +63,15 @@ class ReliabilityTest(unittest.TestCase):
         try:
             study = run_event_study(
                 ScanCriteria(patterns=("breakout",), min_score=45),
-                holding_bars=10,
+                horizons=(5, 10),
                 cooldown_bars=20,
             )
         finally:
             os.environ.pop("FASTDEEP_USE_SAMPLE_DATA", None)
         self.assertIn("Does not model portfolio sizing", study["method"])
-        self.assertIsInstance(study["summary"], list)
+        self.assertIsInstance(study["by_pattern"], list)
+        self.assertIn("baseline", study)
+        self.assertIn("edge_vs_baseline", study)
 
     def test_research_journal_persists_a_symbol_status(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

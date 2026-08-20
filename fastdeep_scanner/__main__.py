@@ -124,13 +124,32 @@ def daily_scan_command(args: argparse.Namespace) -> None:
 def backtest_command(args: argparse.Namespace) -> None:
     output = Path(args.out)
     output.parent.mkdir(parents=True, exist_ok=True)
+    horizons = tuple(int(value) for value in str(args.horizons).split(",") if value.strip())
     result = run_event_study(
         _criteria(args),
-        holding_bars=args.holding_bars,
+        horizons=horizons,
         cooldown_bars=args.cooldown_bars,
+        cost_bps=args.cost_bps,
+        max_symbols=args.max_symbols,
     )
+    if args.summary_only:
+        result = {key: value for key, value in result.items() if key != "events"}
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"wrote event study: {output} ({len(result['events'])} signals)")
+    print(f"wrote event study: {output} ({result['signals']} signals, {result['symbols_scanned']} symbols)")
+    for row in result["by_pattern"]:
+        headline = row.get(f"h{horizons[-1]}") or {}
+        print(
+            f"  {row['pattern']:<15} signals={row['signals']:<6} "
+            f"hit={headline.get('hit_rate_pct', '-')}%  avg={headline.get('average_return_pct_net', '-')}%  "
+            f"dd={headline.get('average_max_drawdown_pct', '-')}%"
+        )
+
+
+def update_fx_command(args: argparse.Namespace) -> None:
+    from .yahoo_prices import update_fx_rates
+
+    payload = update_fx_rates(args.out)
+    print(f"wrote {len(payload['rates'])} FX rates to {args.out}; failed: {payload['failed'] or 'none'}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -220,9 +239,16 @@ def build_parser() -> argparse.ArgumentParser:
     backtest.add_argument("--min-score", type=float, default=70)
     backtest.add_argument("--min-liquidity", type=float, default=40)
     backtest.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
-    backtest.add_argument("--holding-bars", type=int, default=20)
+    backtest.add_argument("--horizons", default="5,10,20", help="Forward holding periods in bars")
     backtest.add_argument("--cooldown-bars", type=int, default=20)
+    backtest.add_argument("--cost-bps", type=float, default=30.0, help="Round-trip commission and slippage")
+    backtest.add_argument("--max-symbols", type=int, default=None)
+    backtest.add_argument("--summary-only", action="store_true", help="Drop the per-signal rows from the output")
     backtest.set_defaults(func=backtest_command)
+
+    update_fx = subparsers.add_parser("update-fx", help="Refresh currency rates used for valuation and liquidity")
+    update_fx.add_argument("--out", default="data/fastdeep_fx_rates.json")
+    update_fx.set_defaults(func=update_fx_command)
 
     return parser
 

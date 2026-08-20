@@ -1145,3 +1145,172 @@ footer {
     border-right: 0;
   }
 }
+
+/* ---------- Data health gate ---------- */
+.health-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.health-fact b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.health-fact[data-tone="ok"] b { color: var(--green); }
+.health-fact[data-tone="warn"] b { color: var(--amber); }
+.health-fact[data-tone="bad"] b { color: var(--red); }
+
+/* ---------- Single decision block ---------- */
+.decision-summary {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.decision-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.decision-item {
+  padding: 9px 11px;
+  border-left: 3px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.decision-item[data-tone="ok"] { border-left-color: var(--green); }
+.decision-item[data-tone="warn"] { border-left-color: var(--amber); }
+.decision-item[data-tone="bad"] { border-left-color: var(--red); }
+.decision-item[data-tone="neutral"] { border-left-color: var(--blue); }
+
+.decision-item span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.decision-item strong {
+  display: block;
+  margin: 2px 0 4px;
+  font-size: 14px;
+}
+
+.decision-item p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.decision-alert {
+  margin: 0 0 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.decision-footer {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Results table extras ---------- */
+.cap-note {
+  margin-left: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.verify-cell {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.verify-cell[data-level="full"] { color: var(--green); }
+.verify-cell[data-level="valuation"] { color: var(--teal); }
+.verify-cell[data-level="financial"] { color: var(--blue); }
+
+/* ---------- Research form ---------- */
+.research-workflow .wide-field {
+  grid-column: 1 / -1;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.inline-status {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--teal);
+}
+
+/* ---------- Evidence table ---------- */
+.evidence-method {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+#evidenceBody td small,
+#journalBody th small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+#evidenceBody td[data-tone="ok"] strong { color: var(--green); }
+#evidenceBody td[data-tone="bad"] strong { color: var(--red); }
+
+.baseline-row {
+  background: #f1f5f9;
+}
+
+.baseline-row th,
+.baseline-row td {
+  font-weight: 700;
+}
+
+/* ---------- Financial statement units ---------- */
+.currency-banner-row th {
+  background: #eff6ff;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+#annualFinancialBody th small,
+#quarterlyFinancialBody th small,
+.vi-check span i {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--muted);
+}

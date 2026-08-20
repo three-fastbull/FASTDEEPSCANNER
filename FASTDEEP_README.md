@@ -4,21 +4,47 @@ FastDeep Scanner v1 คือ MVP สำหรับ workflow ที่เริ
 
 ตอนนี้ระบบรองรับ S&P 500, Nasdaq-100, หุ้นจีน 50 ตัว, SET50, SET100, หุ้นไทยตัวอย่าง และ MAI starter list โดยราคาหลักมาจาก `data/fastdeep_prices.csv` ถ้ามีไฟล์นี้อยู่ ระบบจะใช้ราคาจริงจาก Yahoo Finance ที่ดาวน์โหลดไว้ ไม่ใช่ demo data
 
-ก่อนใช้ผลสแกน ให้ดูบรรทัด `Data Health` ด้านบนของหน้าเว็บเสมอ: ระบบจะแสดงวันที่แท่งราคาล่าสุด, coverage และสถานะพร้อมใช้ หากข้อมูลเก่าหรือดาวน์โหลดไม่ครบ ระบบจะปิด CSV export และระบุว่าผลสแกนยังไม่ควรใช้ตัดสินใจ
+ก่อนใช้ผลสแกน ให้ดูแถบ `Data Health` ด้านบนของหน้าเว็บเสมอ: วันที่ EOD ที่ใช้สแกน, แท่งล่าสุดในไฟล์, ผู้ให้บริการ, จำนวนหุ้นที่ดาวน์โหลดสำเร็จ, **จำนวนหุ้นที่ราคาอัปเดตถึงวันสแกนจริง**, coverage ของงบการเงิน และสถานะอัตราแลกเปลี่ยน หากข้อมูลเก่าหรือดาวน์โหลดไม่ครบ ระบบจะปิด CSV export ทั้งฝั่งหน้าเว็บและฝั่ง server
+
+จำนวนหุ้นที่ค้างสำคัญเป็นพิเศษ: ไฟล์ราคาอาจมีวันที่ล่าสุดถูกต้อง แต่หุ้นบางตัวหยุดอัปเดตเพราะถูกพักการซื้อขายหรือหลุดจากผู้ให้บริการ หุ้นเหล่านั้นจะถูกทำเครื่องหมาย `ข้อมูลราคาไม่สด` และไม่ได้รับสถานะซื้อ
 
 ดูวิธีเปลี่ยนเป็นราคาจริงใน `REAL_DATA_SETUP.md`
 
 ถ้าต้องการอัปเดตราคาจริงแบบกดครั้งเดียว ให้ใช้ `UPDATE_FASTDEEP_PRICES_AND_OPEN.bat`
 
-1. Market Scanner สแกนหุ้นและหา pattern ตาม D / W / M ที่เลือกจริง
+1. Market Scanner สแกนหุ้นและหา pattern ตาม D / W / M ที่ aggregate จริง โดยตัดแท่งของสัปดาห์หรือเดือนที่ยังไม่ปิดออก
 2. Technical Pattern Agent ตรวจ Breakout, Retest, Cup & Handle, Double Bottom, Head & Shoulders
 3. Financial Analysis ตรวจ ROE, ROA, Debt, Growth, Margin จากงบที่ยืนยันแล้วเท่านั้น
-4. Business Quality Agent ตรวจ Moat และ AI/automation trend
-5. Valuation Agent ตรวจ PE, PBV, Dividend, Upside
-6. Report Writer Agent สร้างรายงาน HTML ที่พิมพ์เป็น PDF ได้
-7. Image Match แนบรูปกราฟเพื่อหา asset ที่ทรงกราฟคล้ายกันใน universe ที่เลือก
+4. Business Quality Agent ใช้ Moat และแนวโน้มธุรกิจที่นักวิเคราะห์บันทึกไว้เอง ไม่มีค่าตั้งต้น
+5. Valuation Agent คำนวณ P/E และ P/BV จาก EPS และส่วนของผู้ถือหุ้นในงบจริง เทียบกับราคาปิดล่าสุด
+6. Evidence Gate ตรวจว่า pattern นั้นเคยชนะการถือหุ้นเฉย ๆ ในอดีตหรือไม่ ก่อนอนุญาตให้ขึ้นสถานะ Candidate
+7. Report Writer Agent สร้างรายงาน HTML ที่พิมพ์เป็น PDF ได้
+8. Image Match แนบรูปกราฟเพื่อหา asset ที่ทรงกราฟคล้ายกันใน universe ที่เลือก
 
-หุ้นที่ยังไม่มีงบใน cache จะปรากฏเป็น `Technical Candidate / Research required` และไม่มีสิทธิ์ได้คะแนนพื้นฐานปลอม ระบบนี้เป็น research workflow เท่านั้น ไม่ใช่คำแนะนำการลงทุน
+### ระดับการตรวจสอบและเพดานคะแนน
+
+คะแนนเต็มสงวนไว้ให้หุ้นที่ตรวจครบทุกด้าน หุ้นที่ตรวจไม่ครบจะถูกจำกัดเพดานไว้ ไม่ให้กราฟสวยอย่างเดียวขึ้นไปอยู่บนสุดของตาราง
+
+| ตรวจถึงระดับ | เพดานคะแนน | Grade | สถานะ |
+| --- | --- | --- | --- |
+| กราฟอย่างเดียว | 72 | `T-` | รอตรวจงบการเงิน |
+| กราฟ + งบ | 82 | `T-` | รอประเมินมูลค่า |
+| กราฟ + งบ + มูลค่า | 90 | `T-` | รอบทวิเคราะห์ธุรกิจ |
+| ครบทุกด้าน | 100 | `A+` ถึง `D` | Candidate / Watchlist / Reject |
+
+สถานะ `Candidate` ต้องผ่านทั้งสี่ด้าน **และ** pattern นั้นต้องมีหลักฐานย้อนหลังว่าชนะค่าฐาน หุ้นที่ยังไม่มีงบใน cache จะไม่มีสิทธิ์ได้คะแนนพื้นฐานปลอม ระบบนี้เป็น research workflow เท่านั้น ไม่ใช่คำแนะนำการลงทุน
+
+### สกุลเงินของงบการเงิน
+
+งบแต่ละบริษัทรายงานด้วยสกุลเงินของตัวเอง เช่น `USD` สำหรับหุ้นสหรัฐ `THB` สำหรับหุ้นไทย `HKD` หรือ `CNY` สำหรับหุ้นจีน หน้า `งบการเงิน 5 ปี` จะกำกับหน่วยไว้ทุกจุด: หัวตารางบอก `ล้าน <สกุล>` บรรทัด EPS บอก `<สกุล> ต่อหุ้น` และมีแถบเตือนว่าระบบ **ไม่แปลงค่าเงินให้** จึงห้ามนำตัวเลขข้ามบริษัทที่ยื่นงบคนละสกุลมาเทียบกันตรง ๆ
+
+กรณีที่ราคาซื้อขายกับงบเป็นคนละสกุล เช่น หุ้นที่เทรดเป็น HKD แต่ยื่นงบเป็น CNY ระบบจะแปลงราคาด้วยอัตราแลกเปลี่ยนที่มีวันที่กำกับก่อนคำนวณ P/E และ P/BV ถ้าไม่มีอัตราแลกเปลี่ยนของสกุลนั้น ระบบจะไม่ประกาศตัวเลขมูลค่าเลย แทนที่จะเอาสองสกุลมาหารกัน
+
+อัตราแลกเปลี่ยนเก็บที่ `data/fastdeep_fx_rates.json` และรีเฟรชทุกวันพร้อมราคา:
+
+```powershell
+& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-fx
+```
 
 ## Run CLI
 
@@ -75,13 +101,36 @@ http://127.0.0.1:8765
 
 ## Pattern Validation
 
-ก่อนใช้ pattern เป็นกฎลงทุน ให้รัน event study แยกตามตลาดและ timeframe:
+Event study วัดผลตอบแทนหลังสัญญาณจริงในอดีต และเทียบกับ **ค่าฐาน** คือการเข้าซื้อแบบสุ่มในหุ้นชุดเดียวกันช่วงเวลาเดียวกัน ตัวเลขที่ใช้ตัดสินคือส่วนต่างจากค่าฐาน ไม่ใช่ hit rate ดิบ เพราะ hit rate สูงอาจแปลว่าตลาดขึ้นเฉย ๆ
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner backtest --market US --universe SP500 --timeframe D --patterns breakout,retest --holding-bars 20
+& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner backtest --timeframe W --horizons 5,10,20 --cost-bps 30 --summary-only
 ```
 
-ผลอยู่ที่ `storage/fastdeep_event_study.json` และเป็น historical event study เท่านั้น: ยังไม่หักค่าธรรมเนียม, slippage, position sizing หรือผลจากสัญญาณซ้อนกัน จึงห้ามใช้แทนผลตอบแทนกองทุนจริง
+ผลอยู่ที่ `storage/fastdeep_event_study_D.json`, `_W.json` และ `_M.json` ดูได้จากแท็บ `หลักฐานย้อนหลัง` ในหน้าเว็บ
+
+ผลรอบล่าสุด (universe เต็ม, ถือ 20 แท่ง, หัก 30 bps):
+
+| Timeframe | Pattern ที่ชนะค่าฐาน | Pattern ที่ยังไม่ชนะ |
+| --- | --- | --- |
+| D | ไม่มี (breakout ดีกว่าเพียง 0.45 จุด) | retest, double_bottom, head_shoulders |
+| W | retest (+2.9 จุด), breakout (+0.5 จุด) | cup_handle, double_bottom, head_shoulders |
+| M | breakout (+5.4 จุด), retest (+2.4 จุด) | double_bottom, head_shoulders |
+
+`head_shoulders` ให้ผลลบทุก timeframe ในฐานะสัญญาณขาย จึงควรใช้เป็นเหตุผล "ไม่ซื้อ" เท่านั้น ไม่ใช่สัญญาณ short
+
+Scanner อ่านไฟล์เหล่านี้ทุกครั้งที่สแกน pattern ที่ยังไม่มีหลักฐานว่าชนะค่าฐานจะถูกกันไม่ให้ขึ้นสถานะ `Candidate` และจะมีคำเตือนกำกับในผลสแกน
+
+ยังเป็น historical event study เท่านั้น: ไม่ได้จำลอง position sizing, สัญญาณซ้อนกัน หรือการทบต้น จึงห้ามใช้แทนผลตอบแทนกองทุนจริง
+
+## Paper Trade Journal
+
+แท็บ `Paper Trade` เก็บทุกไม้ที่ตัดสินใจจากระบบ พร้อมแผนที่วางไว้ตอนเข้า (จุดเข้า, จุดตัดขาดทุน, เป้าหมาย, grade, pattern) เมื่อปิดไม้ ระบบจะคำนวณผลตอบแทนสุทธิหลังหักต้นทุน 30 bps และค่า R เทียบกับความเสี่ยงที่วางไว้จริง ข้อมูลอยู่ใน `storage/fastdeep_trade_journal.json`
+
+## Liquidity และ Risk Plan
+
+- สภาพคล่องคำนวณจากมูลค่าซื้อขายกลาง (median ของ `close x volume`) 60 วัน แปลงเป็น USD ก่อนให้คะแนน หุ้นที่ซื้อขายต่ำกว่า 1 ล้าน USD ต่อวันจะมีคำเตือนเรื่องขนาดไม้
+- จุดตัดขาดทุนใช้แนวรับจริง แต่ถูกล็อกไว้ในกรอบ 1.4 ถึง 3.0 ATR เพื่อไม่ให้ได้แผนที่ต้องรับความเสี่ยง 25% ต่อไม้ ถ้าความเสี่ยงยังเกิน 12% ระบบจะเตือนให้ลดขนาดไม้
 
 แหล่งข้อมูลเริ่มต้นคือ Yahoo Finance fundamentals timeseries ซึ่งครอบคลุม US, China และ Thailand แต่โดยทั่วไปเปิดให้รายปีเต็ม 4 ปีและงบรายไตรมาสล่าสุดประมาณ 5 งวดเท่านั้น หน้า dashboard จะแสดงเฉพาะงวดที่ผู้ให้บริการส่งกลับและไม่สร้างตัวเลขย้อนหลังขึ้นเอง
 
@@ -132,8 +181,8 @@ ADVANC.BK,Advanced Info Service,TH,Digital Infrastructure,32,12.5,1.35,8,10,33,1
 
 Phase 2 ที่ควรต่อ:
 
-- เพิ่ม data connector เช่น yfinance, Finnhub, AlphaVantage หรือ CSV จาก TradingView
-- เพิ่ม backtest รายหุ้นและราย pattern
+- ต่อผู้ให้บริการงบการเงินที่มี SLA เพื่อดัน coverage จาก 258/697 ให้ครบ universe
+- ทดสอบ out-of-sample แยกช่วงเวลา เพื่อยืนยันว่า edge ของ retest/breakout ราย W และ M ไม่ได้มาจากช่วงตลาดเดียว
 - เพิ่ม Telegram alert
 - เพิ่ม ingestion เอกสาร 56-1 / 10-K เพื่อส่งต่อ NotebookLM
 - ย้าย frontend เป็น Next.js ถ้าต้องการ authentication, database, และ deploy แบบ startup จริง

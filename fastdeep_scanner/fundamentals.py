@@ -98,42 +98,94 @@ def business_score(snapshot: FundamentalSnapshot) -> tuple[float, list[str]]:
     return _bounded(score), bullets
 
 
-def valuation_score(snapshot: FundamentalSnapshot) -> tuple[float, list[str], list[str]]:
-    score = 48.0
+def valuation_score(
+    snapshot: FundamentalSnapshot,
+    valuation: dict | None = None,
+) -> tuple[float, list[str], list[str]]:
+    """Score the price paid using multiples derived from the filed statements.
+
+    Nothing here falls back to an assumed P/E or upside: when the multiple could
+    not be derived the caller is told so instead of being handed a number.
+    """
+    valuation = valuation or {}
+    if not valuation.get("verified"):
+        note = valuation.get("note") or "ยังไม่มีข้อมูลพอสำหรับประเมินมูลค่า"
+        return 0.0, [note], []
+
+    score = 50.0
     bullets: list[str] = []
     warnings: list[str] = []
+    reporting = valuation.get("reporting_currency") or ""
+    pe = valuation.get("pe")
+    pbv = valuation.get("pbv")
+    upside = valuation.get("upside_pct")
     growth = max(0.0, (snapshot.revenue_growth + snapshot.profit_growth) / 2)
-    peg_like = snapshot.pe / growth if growth else snapshot.pe
 
-    if snapshot.analyst_upside_pct >= 25:
-        score += 22
-        bullets.append(f"Upside estimate is high at {snapshot.analyst_upside_pct:.1f}%")
-    elif snapshot.analyst_upside_pct >= 10:
-        score += 13
-        bullets.append(f"Upside estimate is positive at {snapshot.analyst_upside_pct:.1f}%")
-    elif snapshot.analyst_upside_pct < 0:
-        score -= 10
-        warnings.append(f"Upside estimate is negative at {snapshot.analyst_upside_pct:.1f}%")
-
-    if snapshot.pe <= 18 or peg_like <= 1.3:
-        score += 14
-        bullets.append("Valuation is reasonable versus growth")
-    elif snapshot.pe <= 32:
-        score += 7
-    else:
-        warnings.append(f"PE is demanding at {snapshot.pe:.1f}x")
-
-    if snapshot.pbv <= 3.5:
-        score += 8
-    elif snapshot.pbv > 8:
-        score -= 5
-        warnings.append(f"PBV is expensive at {snapshot.pbv:.1f}x")
-
-    if snapshot.dividend_yield >= 2:
+    if pe is None:
+        score -= 8
+        warnings.append("ไม่มี P/E เพราะบริษัทยังไม่มีกำไรต่อหุ้นเป็นบวก")
+    elif pe <= 12:
+        score += 18
+        bullets.append(f"P/E {pe:.1f} เท่า ถูกเมื่อเทียบกับกำไรที่รายงานจริง ({reporting})")
+    elif pe <= 20:
+        score += 12
+        bullets.append(f"P/E {pe:.1f} เท่า อยู่ในระดับสมเหตุสมผล ({reporting})")
+    elif pe <= 32:
         score += 5
-        bullets.append(f"Dividend yield adds support at {snapshot.dividend_yield:.1f}%")
+        bullets.append(f"P/E {pe:.1f} เท่า เริ่มตึงแต่ยังรับได้ถ้ากำไรโต")
+    else:
+        score -= 6
+        warnings.append(f"P/E สูงถึง {pe:.1f} เท่า ต้องมีการเติบโตรองรับชัดเจน")
 
+    if pe is not None and growth > 0:
+        peg = pe / growth
+        if peg <= 1.0:
+            score += 8
+            bullets.append(f"PEG {peg:.2f} ราคายังตามหลังการเติบโต")
+        elif peg > 2.5:
+            score -= 4
+            warnings.append(f"PEG {peg:.2f} ราคาวิ่งไปไกลกว่าการเติบโต")
+
+    if pbv is None:
+        warnings.append("คำนวณ P/BV ไม่ได้จากงบชุดนี้")
+    elif pbv <= 1.5:
+        score += 12
+        bullets.append(f"P/BV {pbv:.2f} เท่า ต่ำกว่ามูลค่าทางบัญชีที่ 1.5 เท่า")
+    elif pbv <= 3.0:
+        score += 8
+    elif pbv <= 6.0:
+        score += 2
+    else:
+        score -= 6
+        warnings.append(f"P/BV {pbv:.2f} เท่า แพงเมื่อเทียบมูลค่าทางบัญชี")
+
+    if upside is None:
+        bullets.append("ยังไม่ได้บันทึกมูลค่าที่เหมาะสมของนักวิเคราะห์")
+    elif upside >= 25:
+        score += 20
+        bullets.append(f"ต่ำกว่ามูลค่าที่นักวิเคราะห์ประเมิน {upside:.1f}%")
+    elif upside >= 10:
+        score += 12
+        bullets.append(f"ยังมีส่วนต่างจากมูลค่าที่ประเมินไว้ {upside:.1f}%")
+    elif upside < 0:
+        score -= 12
+        warnings.append(f"ราคาสูงกว่ามูลค่าที่ประเมินไว้ {abs(upside):.1f}%")
+
+    if valuation.get("fx_adjusted"):
+        bullets.append(
+            f"แปลงราคาจาก {valuation.get('trading_currency')} เป็น {reporting} ก่อนคำนวณมูลค่า"
+        )
     return _bounded(score), bullets, warnings
+
+
+def valuation_verdict(score: float, valuation: dict | None) -> str:
+    if not (valuation or {}).get("verified"):
+        return "ยังประเมินมูลค่าไม่ได้"
+    if score >= 72:
+        return "ราคายังต่ำกว่าพื้นฐาน"
+    if score >= 55:
+        return "ราคาเหมาะสม"
+    return "ราคาแพงเทียบพื้นฐาน"
 
 
 def financial_insight(score: float, bullets: list[str], warnings: list[str]) -> AgentInsight:

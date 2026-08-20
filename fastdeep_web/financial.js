@@ -63,10 +63,28 @@
     return fractionDigits === 1 ? amountFormatter.format(Number(value)) : preciseFormatter.format(Number(value));
   }
 
+  function isPerShare(metric) {
+    const units = state.financials?.metric_units || {};
+    return units[metric] === "per_share" || metric === "basic_eps";
+  }
+
+  function currencyCode() {
+    return state.financials?.currency || "";
+  }
+
+  // Money lines are reported in millions of the filing currency; per-share
+  // lines are already per share and must not be scaled the same way.
   function amount(value, metric) {
     if (value === null || value === undefined) return "-";
-    if (metric === "basic_eps") return number(value, 2);
-    return number(Number(value) / 1_000_000);
+    if (isPerShare(metric)) return number(value, 2);
+    const scale = state.financials?.unit_scale || 1_000_000;
+    return number(Number(value) / scale);
+  }
+
+  function metricUnitLabel(metric) {
+    const code = currencyCode();
+    if (!code) return "";
+    return isPerShare(metric) ? `${code} ต่อหุ้น` : `ล้าน ${code}`;
   }
 
   function percent(value) {
@@ -92,7 +110,8 @@
     for (const tab of elements.navTabs) {
       tab.classList.toggle("is-active", tab.dataset.viewTarget === viewId);
     }
-    if (viewId !== "scannerView" && state.financials?.symbol !== normalizedSymbol()) loadFinancials(false);
+    const needsStatements = viewId === "financialsView" || viewId === "viView";
+    if (needsStatements && state.financials?.symbol !== normalizedSymbol()) loadFinancials(false);
   }
 
   function selectScannerSymbol(symbol) {
@@ -166,13 +185,18 @@
     const annual = data.annual || [];
     elements.title.textContent = `${data.symbol} - งบการเงินย้อนหลัง`;
     elements.subtitle.textContent = `${data.name} | ${data.market} | ${data.sector}`;
-    elements.unit.textContent = `${data.unit} ${data.currency || ""}`.trim();
-    elements.source.textContent = `${data.source} | ${data.cache_status === "cached" ? "Cache ล่าสุด" : "อัปเดตล่าสุด"}: ${new Date(data.fetched_at).toLocaleString("th-TH")}`;
+    elements.unit.textContent = data.unit_label || `${data.unit} ${data.currency || ""}`.trim();
+    elements.unit.title = data.currency_note || "";
+    const currencyOrigin = data.currency_source === "exchange_default"
+      ? "สกุลเงินอนุมานจากตลาดที่จดทะเบียน เพราะผู้ให้บริการไม่ได้ระบุมาให้"
+      : "สกุลเงินตามที่ผู้ให้บริการงบระบุ";
+    elements.source.textContent = `${data.source} | ${data.cache_status === "cached" ? "Cache ล่าสุด" : "อัปเดตล่าสุด"}: ${new Date(data.fetched_at).toLocaleString("th-TH")} | ${data.currency_label || ""} — ${currencyOrigin}`;
 
     const latest = annual.at(-1) || { metrics: {}, ratios: {} };
     const kpis = [
-      ["รายได้ล่าสุด", amount(latest.metrics.total_revenue, "total_revenue"), `${data.unit} ${data.currency || ""}`],
-      ["กำไรสุทธิ", amount(latest.metrics.net_income, "net_income"), `${data.unit} ${data.currency || ""}`],
+      ["รายได้ล่าสุด", amount(latest.metrics.total_revenue, "total_revenue"), metricUnitLabel("total_revenue")],
+      ["กำไรสุทธิ", amount(latest.metrics.net_income, "net_income"), metricUnitLabel("net_income")],
+      ["กำไรต่อหุ้น", amount(latest.metrics.basic_eps, "basic_eps"), metricUnitLabel("basic_eps")],
       ["ROE", percent(latest.ratios.roe), "ผลตอบแทนผู้ถือหุ้น"],
       ["D/E", multiple(latest.ratios.debt_to_equity), "หนี้สินต่อทุน"],
     ];
@@ -186,10 +210,11 @@
     }).join("")}</tr>`;
 
     const rows = [];
+    rows.push(`<tr class="currency-banner-row"><th colspan="${annual.length + 1}">${escapeHtml(data.currency_note || "")}</th></tr>`);
     for (const section of data.sections || []) {
       rows.push(`<tr class="financial-section-row"><th colspan="${annual.length + 1}">${escapeHtml(section.title)}</th></tr>`);
       for (const metric of section.metrics) {
-        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}</th>${annual.map((period) => financialCell(period, metric)).join("")}</tr>`);
+        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}<small>${escapeHtml(metricUnitLabel(metric))}</small></th>${annual.map((period) => financialCell(period, metric)).join("")}</tr>`);
       }
     }
     rows.push(`<tr class="financial-section-row"><th colspan="${annual.length + 1}">อัตราส่วนทางการเงินที่สำคัญ</th></tr>`);
@@ -206,7 +231,7 @@
     const periods = data.quarterly_by_year[state.selectedYear] || [];
     const byQuarter = new Map(periods.map((period) => [period.quarter, period]));
     const quarters = ["Q1", "Q2", "Q3", "Q4"];
-    elements.quarterlyTitle.textContent = `${data.symbol} - รายไตรมาส ปี ${state.selectedYear}`;
+    elements.quarterlyTitle.textContent = `${data.symbol} - รายไตรมาส ปี ${state.selectedYear} (${data.unit_label || ""})`;
     elements.quarterlySubtitle.textContent = "ตัวเลข Q4* ที่ไม่มีรายงานแยกจะคำนวณจากงบทั้งปีลบ Q1-Q3";
     elements.quarterlyNote.textContent = periods.length ? `${periods.length}/4 งวดจากผู้ให้บริการ` : "ไม่พบข้อมูลงวดรายไตรมาส";
     elements.quarterlyHead.innerHTML = `<tr><th>หัวข้องบการเงิน</th>${quarters.map((quarter) => {
@@ -218,7 +243,7 @@
     for (const section of data.sections || []) {
       rows.push(`<tr class="financial-section-row"><th colspan="5">${escapeHtml(section.title)}</th></tr>`);
       for (const metric of section.metrics) {
-        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}</th>${quarters.map((quarter) => {
+        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}<small>${escapeHtml(metricUnitLabel(metric))}</small></th>${quarters.map((quarter) => {
           const period = byQuarter.get(quarter);
           return `<td>${period ? amount(period.metrics[metric], metric) : "-"}</td>`;
         }).join("")}</tr>`);
@@ -274,7 +299,7 @@
     const score = availableProgress.length ? Math.round(availableProgress.reduce((sum, value) => sum + value, 0) / availableProgress.length) : 0;
 
     elements.viTitle.textContent = `${data.symbol} - VI Thesis และ Financial Quality`;
-    elements.viSubtitle.textContent = `${data.name} | งบ ${summary.period} | เป้าหมายปรับได้จากข้อมูลของคุณ`;
+    elements.viSubtitle.textContent = `${data.name} | งบ ${summary.period} | สกุลเงินของงบ ${data.currency_label || "-"} | เป้าหมายปรับได้จากข้อมูลของคุณ`;
     elements.viScore.textContent = `${score}%`;
     elements.viScore.dataset.quality = score >= 100 ? "strong" : score >= 80 ? "watch" : "weak";
     elements.thesisProgress.innerHTML = [
@@ -292,8 +317,9 @@
         : isDebt
           ? multiple(check.value)
           : amount(check.value, check.key);
+      const unit = ["net_margin", "roe", "debt_to_equity"].includes(check.key) ? "" : metricUnitLabel(check.key);
       return `<article class="vi-check">
-        <span>${escapeHtml(check.label)}</span>
+        <span>${escapeHtml(check.label)}${unit ? ` <i>${escapeHtml(unit)}</i>` : ""}</span>
         <strong>${displayValue}</strong>
         <p>${trend === null || trend === undefined ? "ข้อมูลไม่พอเทียบช่วงเวลา" : `${check.cagr !== undefined ? "CAGR" : "เปลี่ยนแปลง"} ${percent(trend)}`}</p>
       </article>`;
