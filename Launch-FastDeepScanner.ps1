@@ -34,9 +34,12 @@ function Start-PriceUpdateIfStale {
     $lastUpdate = $null
     if (Test-Path -LiteralPath $metadataPath) {
         try {
-            $lastUpdate = [DateTimeOffset]::Parse(
-                ((Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json).updated_at)
-            ).ToLocalTime().Date
+            $updatedAt = (Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json).updated_at
+            if ($updatedAt -is [DateTime]) {
+                $lastUpdate = $updatedAt.ToLocalTime().Date
+            } else {
+                $lastUpdate = [DateTimeOffset]::Parse([string]$updatedAt).ToLocalTime().Date
+            }
         } catch {
             $lastUpdate = $null
         }
