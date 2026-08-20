@@ -24,6 +24,7 @@
     <button class="nav-tab is-active" type="button" data-view-target="scannerView">Scanner</button>
     <button class="nav-tab" type="button" data-view-target="financialsView">งบการเงิน 5 ปี</button>
     <button class="nav-tab" type="button" data-view-target="viView">VI Thesis</button>
+    <button class="nav-tab" type="button" data-view-target="profileView">รู้จักหุ้น</button>
     <button class="nav-tab" type="button" data-view-target="evidenceView">หลักฐานย้อนหลัง</button>
     <button class="nav-tab" type="button" data-view-target="journalView">Paper Trade</button>
   </nav>
@@ -155,7 +156,7 @@
         <canvas id="priceChart" width="720" height="320"></canvas>
         <div class="action-row">
           <a id="tradingViewButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">TradingView</a>
-          <a id="reportButton" class="primary-button" href="#" target="_blank" rel="noreferrer">PDF Report</a>
+          <button id="profileButton" class="primary-button" type="button">รู้จักหุ้นตัวนี้</button>
           <button id="paperTradeButton" class="ghost-button" type="button">บันทึก Paper Trade</button>
         </div>
         <p class="inline-status" id="paperTradeStatus"></p>
@@ -341,6 +342,59 @@
     Research workflow only. Not financial advice.
   </footer>
 
+  <main id="profileView" class="app-shell app-view is-hidden">
+    <header class="profile-head">
+      <div>
+        <p class="eyebrow" id="profileEyebrow">เลือกหุ้นจากผลสแกน</p>
+        <h2 id="profileTitle">รู้จักหุ้นตัวนี้</h2>
+        <p id="profileSubtitle">อ่านตามลำดับ ธุรกิจเป็นอย่างไร คุณภาพผ่านไหม แล้วราคานี้คุ้มหรือยัง</p>
+      </div>
+      <div class="profile-price">
+        <span>ราคาล่าสุด</span>
+        <strong id="profilePrice">-</strong>
+        <small id="profilePriceNote">-</small>
+      </div>
+    </header>
+
+    <section class="profile-verdict" id="profileVerdict" data-key="">
+      <p class="decision-empty">กดปุ่ม “รู้จักหุ้นตัวนี้” จากหน้า Scanner เพื่อดูรายละเอียด</p>
+    </section>
+
+    <section class="profile-block" id="profileIdentityBlock">
+      <h3><span class="profile-step">1</span> หุ้นตัวนี้เป็นหุ้นประเภทไหน</h3>
+      <p class="profile-lead">รู้ประเภทหุ้นก่อน จะได้คาดหวังผลตอบแทนและใช้วิธีประเมินมูลค่าให้ถูกกับหุ้นแต่ละแบบ</p>
+      <div class="profile-identity" id="profileIdentity"></div>
+    </section>
+
+    <section class="profile-block" id="profileFilterBlock">
+      <h3><span class="profile-step">2</span> Financial Quality Filter — คัดกรอง 4 ด่าน</h3>
+      <p class="profile-lead">ธุรกิจที่ดีต้องผ่านครบทั้งสี่ด่าน ตกด่านใดด่านหนึ่งแปลว่ายังไม่ใช่หุ้นคุณภาพ ไม่ว่าราคาจะถูกแค่ไหน</p>
+      <div class="stage-grid" id="profileStages"></div>
+    </section>
+
+    <section class="profile-block" id="profileValuationBlock">
+      <h3><span class="profile-step">3</span> ซื้อใน “ราคาที่เหมาะสม” — Margin of Safety</h3>
+      <p class="profile-lead">บริษัทดีไม่ได้แปลว่าควรซื้อทุกราคา ต้องมีส่วนลดจากมูลค่าที่แท้จริงไว้กันความผิดพลาด</p>
+      <div class="valuation-layout" id="profileValuation"></div>
+    </section>
+
+    <section class="profile-block" id="profileQualitativeBlock">
+      <h3><span class="profile-step">4</span> เชิงคุณภาพ — สิ่งที่ตัวเลขบอกไม่ได้</h3>
+      <p class="profile-lead">ส่วนนี้ระบบเติมให้ไม่ได้ ต้องเป็นคนอ่านและบันทึกเอง บันทึกแล้วคะแนนในหน้า Scanner จะถอดคำนำหน้า T- ออก</p>
+      <div class="qualitative-layout" id="profileQualitative"></div>
+    </section>
+
+    <section class="profile-block" id="profileFlowBlock">
+      <h3><span class="profile-step">5</span> ทบทวนตามลำดับ 8 ขั้น</h3>
+      <p class="profile-lead">ไล่ดูให้ครบทุกขั้นและเชื่อมโยงกันเป็นภาพเดียว จะเห็นว่าธุรกิจนี้แข็งแรงจริงหรือแค่ดูดีบางมุม</p>
+      <ol class="flow-list" id="profileFlow"></ol>
+      <div class="profile-footer-actions">
+        <a id="reportButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">เปิดรายงานสำหรับพิมพ์</a>
+        <a id="profileFinancialLink" class="ghost-button" href="#">ดูงบการเงิน 5 ปี</a>
+      </div>
+    </section>
+  </main>
+
   <main id="evidenceView" class="app-shell app-view is-hidden">
     <section class="vi-heading">
       <div>
@@ -399,5 +453,6 @@
 
   <script src="/app.js"></script>
   <script src="/financial.js"></script>
+  <script src="/profile.js"></script>
 </body>
 </html>

@@ -19,8 +19,10 @@ from .data_io import completed_eod_candles, data_source_label, load_market_data
 from .financials import FinancialDataError, fetch_financials
 from .models import ScanCriteria
 from .report import build_report_html
+from .currency import load_fx_rates
 from .research_journal import MOAT_VALUES, STATUSES, TREND_VALUES, get_research, save_research
 from .scanner import VERIFICATION_LABELS, scan_market
+from .stock_profile import build_stock_profile
 from .timeframes import aggregate_candles, normalize_timeframe
 from .trade_journal import close_trade, journal_summary, list_trades, open_trade
 
@@ -142,6 +144,28 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                     "symbols": symbol_freshness(),
                     "fx": fx_health(),
                 }
+            )
+            return
+
+        if parsed.path == "/api/stock-profile":
+            symbol = (query.get("symbol", [""])[0] or "").strip().upper()
+            candles_by_symbol, fundamentals = load_market_data()
+            if symbol not in candles_by_symbol or symbol not in fundamentals:
+                self._send_json({"error": f"ไม่พบหุ้น {symbol} ในฐานข้อมูล"}, 404)
+                return
+            try:
+                financials = fetch_financials(symbol)
+            except FinancialDataError:
+                financials = None
+            self._send_json(
+                build_stock_profile(
+                    symbol,
+                    financials,
+                    completed_eod_candles(candles_by_symbol[symbol]),
+                    fundamentals[symbol],
+                    get_research(symbol),
+                    load_fx_rates().get("rates", {}),
+                )
             )
             return
 
