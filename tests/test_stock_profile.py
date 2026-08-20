@@ -266,3 +266,64 @@ class QualitativeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TrendSummaryTest(unittest.TestCase):
+    def _summary(self, financials: dict) -> dict:
+        profile = build_stock_profile("TEST", financials, _candles(20.0), _snapshot(), {}, RATES)
+        return {row["key"]: row for row in profile["series_summary"]}
+
+    def test_money_rows_report_average_growth_per_year(self) -> None:
+        rows = self._summary(_growing_company())
+        revenue = rows["revenue"]["trend"]
+        self.assertEqual(revenue["kind"], "cagr")
+        self.assertGreater(revenue["value"], 20)
+        self.assertIn("โตเฉลี่ย", revenue["label"])
+        self.assertIn("ต่อปี", revenue["label"])
+        self.assertEqual(revenue["tone"], "ok")
+
+    def test_shrinking_revenue_is_reported_as_getting_worse(self) -> None:
+        financials = _financials(
+            [
+                _year(2022, revenue=2000, net_income=200, eps=2.00, equity=800),
+                _year(2023, revenue=1700, net_income=150, eps=1.50, equity=780),
+                _year(2024, revenue=1500, net_income=120, eps=1.20, equity=760),
+                _year(2025, revenue=1300, net_income=90, eps=0.90, equity=740),
+            ]
+        )
+        revenue = self._summary(financials)["revenue"]["trend"]
+        self.assertLess(revenue["value"], 0)
+        self.assertIn("แย่ลงเฉลี่ย", revenue["label"])
+        self.assertEqual(revenue["tone"], "bad")
+
+    def test_ratio_rows_report_point_change_not_compound_growth(self) -> None:
+        """ROE ที่ขยับ 10% เป็น 15% คือ +5 จุด ไม่ใช่โต 50%"""
+        rows = self._summary(_growing_company())
+        roe = rows["roe"]["trend"]
+        self.assertEqual(roe["kind"], "change")
+        self.assertIn("จุด", roe["label"])
+        self.assertIn("ล่าสุด", roe["label"])
+
+    def test_falling_debt_reads_as_an_improvement(self) -> None:
+        years = _growing_company()["annual"]
+        for entry, multiple in zip(years, (3.0, 2.2, 1.4, 0.6)):
+            equity = entry["metrics"]["stockholders_equity"]
+            entry["metrics"]["total_debt"] = equity * multiple
+            entry["ratios"]["debt_to_equity"] = multiple
+        debt = self._summary(_financials(years))["debt_to_equity"]["trend"]
+        self.assertEqual(debt["tone"], "ok")
+        self.assertIn("ลดลง", debt["label"])
+        self.assertIn("ดีขึ้น", debt["label"])
+
+    def test_swing_from_loss_to_profit_is_described_in_words(self) -> None:
+        financials = _financials(
+            [
+                _year(2022, revenue=1000, net_income=-50, eps=-0.50, equity=300),
+                _year(2023, revenue=1100, net_income=-10, eps=-0.10, equity=300),
+                _year(2024, revenue=1200, net_income=30, eps=0.30, equity=330),
+                _year(2025, revenue=1300, net_income=80, eps=0.80, equity=400),
+            ]
+        )
+        profit = self._summary(financials)["net_income"]["trend"]
+        self.assertEqual(profit["kind"], "turn")
+        self.assertIn("พลิกจากติดลบเป็นบวก", profit["label"])

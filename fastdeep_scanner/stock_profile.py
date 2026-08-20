@@ -148,6 +148,158 @@ def _historical_pe(
     return output
 
 
+def _trend_cagr(values: list[float | None], label_unit: str = "") -> dict[str, Any]:
+    """อัตราเติบโตเฉลี่ยต่อปีของรายการที่เป็นจำนวนเงิน
+
+    ใช้ปีแรกและปีล่าสุดที่มีข้อมูลจริง ถ้าช่วงนั้นมีปีที่ติดลบ การคิดเป็นอัตรา
+    ทบต้นจะให้ตัวเลขที่ไม่มีความหมาย จึงบอกทิศทางเป็นคำแทน
+    """
+    known = [value for value in values if value is not None]
+    if len(known) < 2:
+        return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
+    first, last = known[0], known[-1]
+    span = len(known) - 1
+    if first <= 0 and last > 0:
+        return {"kind": "turn", "label": f"พลิกจากติดลบเป็นบวกใน {span} ปี", "value": None, "tone": "ok", "years": span}
+    if first > 0 and last <= 0:
+        return {"kind": "turn", "label": f"พลิกจากบวกเป็นติดลบใน {span} ปี", "value": None, "tone": "bad", "years": span}
+    if first <= 0 or last <= 0:
+        return {"kind": "none", "label": "ติดลบตลอดช่วง เทียบอัตราเติบโตไม่ได้", "value": None, "tone": "bad", "years": span}
+
+    cagr = ((last / first) ** (1 / span) - 1) * 100
+    if cagr >= 0.5:
+        word, tone = "โตเฉลี่ย", "ok"
+    elif cagr <= -0.5:
+        word, tone = "แย่ลงเฉลี่ย", "bad"
+    else:
+        word, tone = "แทบไม่เปลี่ยน", "warn"
+    suffix = f" {label_unit}" if label_unit else ""
+    label = (
+        f"{word} {cagr:+.1f}% ต่อปี (เทียบ {span} ปี){suffix}"
+        if word != "แทบไม่เปลี่ยน"
+        else f"{word} ({cagr:+.1f}% ต่อปี เทียบ {span} ปี){suffix}"
+    )
+    return {"kind": "cagr", "label": label, "value": round(cagr, 2), "tone": tone, "years": span}
+
+
+def _trend_change(
+    values: list[float | None],
+    unit: str = "จุด",
+    higher_is_better: bool = True,
+) -> dict[str, Any]:
+    """การเปลี่ยนแปลงของอัตราส่วน วัดเป็นส่วนต่าง ไม่ใช่อัตราทบต้น
+
+    ROE ที่ขยับจาก 10% เป็น 15% เพิ่มขึ้น 5 จุด การรายงานว่าโต 50% ต่อปี
+    จะทำให้เข้าใจผิดว่าเป็นการเติบโตแบบทบต้น
+    """
+    known = [value for value in values if value is not None]
+    if len(known) < 2:
+        return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
+    span = len(known) - 1
+    latest = known[-1]
+    change = latest - known[0]
+    latest_text = f"{latest:,.1f}{'%' if unit == 'จุด' else ' เท่า'}"
+    threshold = 0.5 if unit == "จุด" else 0.05
+    if abs(change) < threshold:
+        return {
+            "kind": "flat",
+            "label": f"ล่าสุด {latest_text} · ทรงตัว ({change:+.2f} {unit} ใน {span} ปี)",
+            "value": round(change, 2),
+            "tone": "warn",
+            "years": span,
+        }
+    # แยกทิศทางของตัวเลขออกจากคำตัดสิน เพราะหนี้ที่ลดลงคือเรื่องดี
+    direction = "เพิ่มขึ้น" if change > 0 else "ลดลง"
+    improving = change > 0 if higher_is_better else change < 0
+    verdict = "ดีขึ้น" if improving else "แย่ลง"
+    return {
+        "kind": "change",
+        "label": f"ล่าสุด {latest_text} · {direction} {abs(change):,.1f} {unit} ใน {span} ปี ({verdict})",
+        "value": round(change, 2),
+        "tone": "ok" if improving else "bad",
+        "years": span,
+    }
+
+
+def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[str, Any]]:
+    """ตารางตัวเลขหลักย้อนหลัง พร้อมสรุปทิศทางของแต่ละแถวเป็นตัวเลขเดียว"""
+    revenue = _series(annual, "total_revenue")
+    net_income = _series(annual, "net_income")
+    eps = _series(annual, "basic_eps")
+    cash_flow = _series(annual, "operating_cash_flow")
+    roe = _ratio_series(annual, "roe")
+    gross_margin = _ratio_series(annual, "gross_margin")
+    net_margin = _ratio_series(annual, "net_margin")
+    debt_to_equity = _ratio_series(annual, "debt_to_equity")
+
+    return [
+        {
+            "key": "revenue",
+            "label": "รายได้รวม",
+            "unit": f"ล้าน {reporting}",
+            "format": "millions",
+            "values": revenue,
+            "trend": _trend_cagr(revenue),
+        },
+        {
+            "key": "net_income",
+            "label": "กำไรสุทธิ",
+            "unit": f"ล้าน {reporting}",
+            "format": "millions",
+            "values": net_income,
+            "trend": _trend_cagr(net_income),
+        },
+        {
+            "key": "eps",
+            "label": "กำไรต่อหุ้น (EPS)",
+            "unit": f"{reporting} ต่อหุ้น",
+            "format": "decimal",
+            "values": eps,
+            "trend": _trend_cagr(eps),
+        },
+        {
+            "key": "operating_cash_flow",
+            "label": "กระแสเงินสดจากการดำเนินงาน",
+            "unit": f"ล้าน {reporting}",
+            "format": "millions",
+            "values": cash_flow,
+            "trend": _trend_cagr(cash_flow),
+        },
+        {
+            "key": "roe",
+            "label": "ROE - ผลตอบแทนผู้ถือหุ้น",
+            "unit": "%",
+            "format": "percent",
+            "values": roe,
+            "trend": _trend_change(roe, "จุด", higher_is_better=True),
+        },
+        {
+            "key": "gross_margin",
+            "label": "อัตรากำไรขั้นต้น",
+            "unit": "%",
+            "format": "percent",
+            "values": gross_margin,
+            "trend": _trend_change(gross_margin, "จุด", higher_is_better=True),
+        },
+        {
+            "key": "net_margin",
+            "label": "อัตรากำไรสุทธิ",
+            "unit": "%",
+            "format": "percent",
+            "values": net_margin,
+            "trend": _trend_change(net_margin, "จุด", higher_is_better=True),
+        },
+        {
+            "key": "debt_to_equity",
+            "label": "หนี้สินต่อทุน (D/E)",
+            "unit": "เท่า",
+            "format": "multiple",
+            "values": debt_to_equity,
+            "trend": _trend_change(debt_to_equity, "เท่า", higher_is_better=False),
+        },
+    ]
+
+
 def _lynch_type(
     revenue_cagr: float | None,
     profit_cagr: float | None,
@@ -754,6 +906,7 @@ def build_stock_profile(
             "stages": stages,
             "passed_stages": passed_stages,
             "total_stages": len(stages),
+            "series_summary": _series_summary(annual, reporting),
             "series": {
                 "years": [str(period.get("period_end"))[:4] for period in annual],
                 "revenue": revenue_series,

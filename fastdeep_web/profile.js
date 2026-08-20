@@ -1,4 +1,4 @@
-/* หน้า "รู้จักหุ้นตัวนี้" — เรียงตามกรอบ ONE Investor
+/* หน้า "ข้อมูลบริษัท" — เรียงตามกรอบ ONE Investor
    ประเภทหุ้น -> Financial Quality Filter 4 ด่าน -> Margin of Safety -> เชิงคุณภาพ */
 (() => {
   const elements = {
@@ -39,44 +39,30 @@
     return (digits === 1 ? compact : precise).format(Number(value));
   }
 
-  // ตัวเลขงบเป็นหน่วยเต็ม แสดงเป็นล้านเพื่อให้อ่านได้ในบรรทัดเดียว
-  function millions(value) {
-    if (value === null || value === undefined) return "-";
-    return compact.format(Number(value) / 1_000_000);
-  }
-
   function stateIcon(itemState) {
     if (itemState === "pass") return "✓";
     if (itemState === "fail") return "✕";
     return "?";
   }
 
-  /* เส้นแนวโน้มเล็ก ๆ วาดจากตัวเลขจริง ไม่ใช้ไลบรารีภายนอก */
-  function sparkline(values, tone = "ok") {
-    const points = values.map((value, index) => [index, value]).filter(([, value]) => value !== null && value !== undefined);
-    if (points.length < 2) return "";
-    const ys = points.map(([, value]) => Number(value));
-    const min = Math.min(...ys);
-    const max = Math.max(...ys);
-    const span = max - min || Math.abs(max) || 1;
-    const width = 132;
-    const height = 34;
-    const stepX = width / (values.length - 1);
-    const path = points
-      .map(([index, value], order) => {
-        const x = (index * stepX).toFixed(1);
-        const y = (height - ((Number(value) - min) / span) * (height - 6) - 3).toFixed(1);
-        return `${order === 0 ? "M" : "L"}${x},${y}`;
-      })
-      .join(" ");
-    return `<svg class="spark" data-tone="${tone}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
-  }
+  const FORMATTERS = {
+    millions: (value) => compact.format(Number(value) / 1_000_000),
+    decimal: (value) => num(value, 2),
+    percent: (value) => `${num(value, 1)}%`,
+    multiple: (value) => `${num(value, 2)}x`,
+  };
 
-  function seriesRow(label, years, values, formatter, tone) {
-    const cells = values
-      .map((value) => `<td>${value === null || value === undefined ? "-" : formatter(value)}</td>`)
+  function seriesRow(row) {
+    const format = FORMATTERS[row.format] || FORMATTERS.decimal;
+    const cells = (row.values || [])
+      .map((value) => `<td>${value === null || value === undefined ? "-" : format(value)}</td>`)
       .join("");
-    return `<tr><th scope="row">${escapeHtml(label)}</th>${cells}<td class="spark-cell">${sparkline(values, tone)}</td></tr>`;
+    const trend = row.trend || {};
+    return `<tr>
+      <th scope="row">${escapeHtml(row.label)}<small>${escapeHtml(row.unit || "")}</small></th>
+      ${cells}
+      <td class="trend-cell" data-tone="${escapeHtml(trend.tone || "unknown")}">${escapeHtml(trend.label || "-")}</td>
+    </tr>`;
   }
 
   function renderVerdict(profile) {
@@ -124,22 +110,17 @@
       <p class="identity-watch"><b>กลุ่มอุตสาหกรรม</b> ${escapeHtml(profile.sector || "-")}</p>
     </article>`);
 
-    const series = profile.series || {};
+    const years = (profile.series || {}).years || [];
+    const rows = (profile.series_summary || []).map(seriesRow).join("");
     cards.push(`<article class="identity-card" data-kind="series">
-      <span>ตัวเลขหลักย้อนหลัง</span>
+      <span>ตัวเลขหลักย้อนหลังและอัตราเติบโตเฉลี่ย</span>
       <div class="table-scroll">
         <table class="series-table">
-          <thead><tr><th>รายการ</th>${(series.years || []).map((year) => `<th>${escapeHtml(year)}</th>`).join("")}<th>แนวโน้ม</th></tr></thead>
-          <tbody>
-            ${seriesRow(`รายได้ (ล้าน ${profile.reporting_currency})`, series.years, series.revenue || [], millions, "ok")}
-            ${seriesRow(`กำไรสุทธิ (ล้าน ${profile.reporting_currency})`, series.years, series.net_income || [], millions, "ok")}
-            ${seriesRow(`EPS (${profile.reporting_currency}/หุ้น)`, series.years, series.eps || [], (value) => num(value, 2), "ok")}
-            ${seriesRow("ROE (%)", series.years, series.roe || [], (value) => num(value, 1), "gold")}
-            ${seriesRow("อัตรากำไรสุทธิ (%)", series.years, series.net_margin || [], (value) => num(value, 1), "gold")}
-            ${seriesRow("หนี้สินต่อทุน (เท่า)", series.years, series.debt_to_equity || [], (value) => num(value, 2), "warn")}
-          </tbody>
+          <thead><tr><th>รายการ</th>${years.map((year) => `<th>${escapeHtml(year)}</th>`).join("")}<th class="trend-head">สรุปแนวโน้ม</th></tr></thead>
+          <tbody>${rows}</tbody>
         </table>
       </div>
+      <p class="series-note">รายการที่เป็นจำนวนเงินสรุปเป็นอัตราเติบโตเฉลี่ยต่อปี ส่วนอัตราส่วนสรุปเป็นส่วนต่างที่เปลี่ยนไป เพราะการคิดอัตราส่วนแบบทบต้นจะทำให้เข้าใจผิด</p>
     </article>`);
     elements.identity.innerHTML = cards.join("");
   }

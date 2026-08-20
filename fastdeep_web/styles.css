@@ -1426,11 +1426,23 @@ footer {
 .series-table th, .series-table td { padding: 6px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 .series-table thead th { text-align: right; color: var(--muted); font-size: 11.5px; }
 .series-table th[scope="row"], .series-table thead th:first-child { text-align: left; }
-.spark-cell { width: 140px; }
-.spark { width: 132px; height: 34px; }
-.spark[data-tone="ok"] path { stroke: var(--green); }
-.spark[data-tone="gold"] path { stroke: var(--amber); }
-.spark[data-tone="warn"] path { stroke: var(--blue); }
+.series-table th[scope="row"] small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+.trend-head { text-align: left !important; }
+
+.trend-cell {
+  min-width: 250px;
+  text-align: left !important;
+  white-space: normal !important;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.trend-cell[data-tone="ok"] { color: var(--green); }
+.trend-cell[data-tone="bad"] { color: var(--red); }
+.trend-cell[data-tone="warn"] { color: var(--amber); }
+.trend-cell[data-tone="unknown"] { color: var(--muted); font-weight: 400; }
+
+.series-note { margin: 9px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--muted); }
 
 .stage-grid {
   display: grid;
