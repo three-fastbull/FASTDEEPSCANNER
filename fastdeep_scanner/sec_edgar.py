@@ -5,8 +5,9 @@ import os
 import re
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,10 @@ from .local_config import get_setting
 
 SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 SEC_COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+SEC_TICKER_LOOKUP_URL = (
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={ticker}"
+    "&type=10-K&dateb=&owner=include&count=10&output=atom"
+)
 # SEC ต้องการอีเมลที่ติดต่อกลับได้จริงในทุก request และปฏิเสธที่อยู่ประเภท
 # noreply ด้วย 403 ทันที ค่าติดต่อจึงเก็บไว้ใน .env ของเครื่อง ไม่ฝังในซอร์ส
 SEC_CONTACT_SETTING = "FASTDEEP_SEC_CONTACT"
@@ -537,19 +542,121 @@ def normalize_companyfacts(payload: dict[str, Any], *, symbol: str, cik: str) ->
     }
 
 
+def lookup_cik_from_edgar(symbol: str, *, timeout: int = 30) -> str | None:
+    """ถาม EDGAR ตรง ๆ ว่า ticker นี้ยื่น 10-K ภายใต้ CIK ไหน
+
+    ``company_tickers.json`` ไม่ครอบคลุมทุกบริษัท และบางครั้งชี้ไปที่นิติบุคคล
+    ใหม่ที่ยังไม่มีประวัติงบ เช่น XOM ที่ถูกแมปไปยังบริษัทโฮลดิ้งที่เพิ่งจดทะเบียน
+    ส่วนการค้นหาของ EDGAR จะคืน CIK ของผู้ยื่นแบบจริง
+    """
+    ticker = symbol.strip().upper().replace(".", "-")
+    if not ticker:
+        return None
+    request = urllib.request.Request(
+        SEC_TICKER_LOOKUP_URL.format(ticker=urllib.parse.quote(ticker, safe="")),
+        headers={
+            "User-Agent": _sec_user_agent(),
+            "From": _sec_contact(),
+            "Accept": "application/atom+xml",
+            "Accept-Encoding": "identity",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body = response.read().decode("utf-8", "replace")
+    except Exception:  # noqa: BLE001 - ทางสำรอง ล้มได้โดยไม่ทำให้ทั้งงานพัง
+        return None
+    found = re.findall(r"CIK=(\d{10})", body)
+    return found[0] if found else None
+
+
+def _companyfacts_for_cik(symbol: str, cik: str, timeout: int) -> dict[str, Any]:
+    try:
+        payload = _download_json(SEC_COMPANYFACTS_URL.format(cik=cik), timeout=timeout)
+    except SecEdgarError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise SecEdgarError(f"ดึง SEC Company Facts ของ {symbol} ไม่สำเร็จ: {exc}") from exc
+    return normalize_companyfacts(payload, symbol=symbol, cik=cik)
+
+
+# งบชุดที่ล่าสุดเก่ากว่านี้ถือว่านิติบุคคลนั้นเลิกยื่นแล้ว
+STALE_FILING_MONTHS = 18
+
+
+def _latest_period(normalized: dict[str, Any] | None) -> str:
+    periods = (normalized or {}).get("annual") or []
+    return max((str(period.get("period_end") or "") for period in periods), default="")
+
+
+def _better_filing_history(
+    current: dict[str, Any] | None,
+    candidate: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """เลือกชุดที่ยังยื่นอยู่ก่อน แล้วจึงดูว่าชุดไหนย้อนหลังได้ยาวกว่า
+
+    บริษัทที่ปรับโครงสร้างจะทิ้งนิติบุคคลเก่าที่มีประวัติยาวแต่หยุดยื่นไปแล้ว
+    การเลือกชุดที่ยาวกว่าอย่างเดียวจึงเคยดึงงบปี 2023 มาใช้กับราคาปี 2026
+    """
+    if current is None:
+        return candidate
+    if candidate is None:
+        return current
+
+    cutoff = (date.today() - timedelta(days=STALE_FILING_MONTHS * 30)).isoformat()
+    current_live = _latest_period(current) >= cutoff
+    candidate_live = _latest_period(candidate) >= cutoff
+    if current_live != candidate_live:
+        return current if current_live else candidate
+
+    current_years = len(current.get("annual") or [])
+    candidate_years = len(candidate.get("annual") or [])
+    if candidate_years != current_years:
+        return candidate if candidate_years > current_years else current
+    return candidate if _latest_period(candidate) > _latest_period(current) else current
+
+
 def fetch_sec_companyfacts(
     symbol: str,
     *,
     ticker_map: dict[str, dict[str, Any]],
     timeout: int = 30,
+    minimum_years: int = 5,
 ) -> dict[str, Any]:
+    """งบจากนิติบุคคลที่ยื่นภายใต้ ticker นี้และมีประวัติยาวที่สุด
+
+    ``company_tickers.json`` ชี้ไปที่ผู้จดทะเบียนล่าสุดของ ticker นั้น ซึ่งบางครั้ง
+    เป็นบริษัทโฮลดิ้งที่เพิ่งตั้ง (XOM), เอนทิตีที่ปรับโครงสร้างใหม่ (BLK) หรือ
+    บริษัทลูกที่เป็นห้างหุ้นส่วน (EQR) ทั้งสามกรณีให้ประวัติสั้นกว่าความเป็นจริงมาก
+    จึงเทียบกับผลจากการค้นหาของ EDGAR แล้วเลือกชุดที่ยาวกว่า
+    """
     ticker = symbol.strip().upper().replace(".", "-")
     identity = ticker_map.get(ticker)
-    if not identity:
-        raise SecEdgarError(f"ไม่พบ CIK ของ {symbol} ในรายการ ticker ของ SEC")
-    cik = str(identity["cik"]).zfill(10)
-    try:
-        payload = _download_json(SEC_COMPANYFACTS_URL.format(cik=cik), timeout=timeout)
-    except Exception as exc:  # noqa: BLE001
-        raise SecEdgarError(f"ดึง SEC Company Facts ของ {symbol} ไม่สำเร็จ: {exc}") from exc
-    return normalize_companyfacts(payload, symbol=symbol, cik=cik)
+    mapped_cik = str(identity["cik"]).zfill(10) if identity else None
+    best: dict[str, Any] | None = None
+    first_error: SecEdgarError | None = None
+
+    if mapped_cik:
+        try:
+            best = _companyfacts_for_cik(symbol, mapped_cik, timeout)
+        except SecEdgarError as exc:
+            first_error = exc
+
+    # ประวัติครบตามเป้าแล้วก็ไม่ต้องยิงเพิ่ม ค่าใช้จ่ายนี้จึงตกเฉพาะตัวที่สั้นผิดปกติ
+    if best is not None and len(best.get("annual") or []) >= minimum_years:
+        return best
+
+    fallback_cik = lookup_cik_from_edgar(symbol, timeout=timeout)
+    if fallback_cik and fallback_cik != mapped_cik:
+        try:
+            candidate = _companyfacts_for_cik(symbol, fallback_cik, timeout)
+        except SecEdgarError as exc:
+            first_error = first_error or exc
+        else:
+            best = _better_filing_history(best, candidate)
+
+    if best is not None:
+        return best
+    if first_error:
+        raise first_error
+    raise SecEdgarError(f"ไม่พบ CIK ของ {symbol} ทั้งในรายการ ticker และการค้นหาของ SEC")

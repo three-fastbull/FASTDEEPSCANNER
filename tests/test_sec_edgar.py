@@ -1,101 +1,70 @@
+"""การเลือกนิติบุคคลที่ถูกต้องของแต่ละ ticker
+
+``company_tickers.json`` ของ SEC ชี้ไปที่ผู้จดทะเบียนล่าสุด ซึ่งอาจเป็นบริษัท
+โฮลดิ้งที่เพิ่งตั้ง เอนทิตีที่ปรับโครงสร้าง หรือบริษัทลูกที่เป็นห้างหุ้นส่วน
+"""
+
 from __future__ import annotations
 
 import unittest
 from datetime import date, timedelta
 
-from fastdeep_scanner.financials import _add_ratios, _quarterly_by_year, assess_financial_payload
-from fastdeep_scanner.sec_edgar import normalize_companyfacts
+from fastdeep_scanner.sec_edgar import _better_filing_history, _latest_period
 
 
-class SecEdgarTest(unittest.TestCase):
-    def _payload(self) -> dict:
-        facts: dict = {"us-gaap": {}}
+def _history(years: list[int], name: str = "Entity") -> dict:
+    return {
+        "entity_name": name,
+        "annual": [{"period_end": f"{year}-12-31", "metrics": {}} for year in years],
+    }
 
-        def add(concept: str, unit: str, item: dict) -> None:
-            node = facts["us-gaap"].setdefault(concept, {"units": {}})
-            node["units"].setdefault(unit, []).append(item)
 
-        concepts = {
-            "RevenueFromContractWithCustomerExcludingAssessedTax": 1_000.0,
-            "NetIncomeLoss": 100.0,
-            "Assets": 2_000.0,
-            "Liabilities": 1_200.0,
-            "StockholdersEquity": 800.0,
-            "NetCashProvidedByUsedInOperatingActivities": 180.0,
-            "PaymentsToAcquirePropertyPlantAndEquipment": 50.0,
-        }
-        for year in range(2021, 2026):
-            annual_end = date(year, 12, 31)
-            for concept, value in concepts.items():
-                item = {
-                    "end": annual_end.isoformat(),
-                    "val": value + (year - 2021) * 10,
-                    "accn": f"0000000000-{year % 100:02d}-000001",
-                    "fy": year,
-                    "fp": "FY",
-                    "form": "10-K",
-                    "filed": (annual_end + timedelta(days=60)).isoformat(),
-                }
-                if concept not in {"Assets", "Liabilities", "StockholdersEquity"}:
-                    item["start"] = date(year, 1, 1).isoformat()
-                add(concept, "USD", item)
+class FilingHistorySelectionTest(unittest.TestCase):
+    def _recent_year(self) -> int:
+        return date.today().year - 1
 
-            for quarter, (month, day) in enumerate(((3, 31), (6, 30), (9, 30)), start=1):
-                quarter_end = date(year, month, day)
-                for concept, annual_value in concepts.items():
-                    is_balance = concept in {"Assets", "Liabilities", "StockholdersEquity"}
-                    is_cash_flow = concept in {
-                        "NetCashProvidedByUsedInOperatingActivities",
-                        "PaymentsToAcquirePropertyPlantAndEquipment",
-                    }
-                    value = annual_value / 10 * quarter
-                    item = {
-                        "end": quarter_end.isoformat(),
-                        "val": value,
-                        "accn": f"0000000000-{year % 100:02d}-00000{quarter + 1}",
-                        "fy": year,
-                        "fp": f"Q{quarter}",
-                        "form": "10-Q",
-                        "filed": (quarter_end + timedelta(days=40)).isoformat(),
-                    }
-                    if not is_balance:
-                        item["start"] = (
-                            date(year, 1, 1) if is_cash_flow else date(year, month - 2, 1)
-                        ).isoformat()
-                    add(concept, "USD", item)
+    def test_current_entity_wins_over_a_longer_but_abandoned_one(self) -> None:
+        """BLK: เอนทิตีเก่ามีประวัติยาวกว่า แต่หยุดยื่นไปแล้ว"""
+        recent = self._recent_year()
+        live = _history([recent - 1, recent], "BlackRock, Inc.")
+        abandoned = _history([recent - 7, recent - 6, recent - 5, recent - 4, recent - 3], "BlackRock Finance")
+        self.assertIs(_better_filing_history(live, abandoned), live)
+        self.assertIs(_better_filing_history(abandoned, live), live)
 
-        return {"entityName": "Example Corp", "facts": facts}
+    def test_longer_history_wins_when_both_are_current(self) -> None:
+        """EQR: ทั้งคู่ยังยื่นอยู่ จึงเลือกชุดที่ย้อนหลังได้ยาวกว่า"""
+        recent = self._recent_year()
+        short = _history([recent], "Operating Partnership")
+        deep = _history([recent - 4, recent - 3, recent - 2, recent - 1, recent], "Equity Residential")
+        self.assertIs(_better_filing_history(short, deep), deep)
+        self.assertIs(_better_filing_history(deep, short), deep)
 
-    def test_normalizes_five_years_and_derives_discrete_cash_flow(self) -> None:
-        normalized = normalize_companyfacts(
-            self._payload(),
-            symbol="TEST",
-            cik="0000000001",
-        )
-        self.assertEqual(normalized["currency"], "USD")
-        self.assertEqual(len(normalized["annual"]), 5)
-        year_2025 = {
-            item["quarter"]: item
-            for item in normalized["quarterly"]
-            if item["fiscal_year"] == "2025"
-        }
-        self.assertEqual(year_2025["Q2"]["metrics"]["operating_cash_flow"], 18.0)
+    def test_a_missing_candidate_never_replaces_a_real_one(self) -> None:
+        recent = self._recent_year()
+        real = _history([recent - 1, recent])
+        self.assertIs(_better_filing_history(real, None), real)
+        self.assertIs(_better_filing_history(None, real), real)
+        self.assertIsNone(_better_filing_history(None, None))
 
-    def test_sec_periods_pass_strict_five_year_quarter_audit(self) -> None:
-        normalized = normalize_companyfacts(
-            self._payload(),
-            symbol="TEST",
-            cik="0000000001",
-        )
-        annual = _add_ratios(normalized["annual"][-5:])
-        quarterly_by_year = _quarterly_by_year(normalized["quarterly"], annual)
-        quality = assess_financial_payload(
-            {"annual": annual, "quarterly_by_year": quarterly_by_year}
-        )
-        self.assertEqual(quality["status"], "complete")
-        self.assertEqual(len(quality["full_quarter_years"]), 5)
-        q4 = next(item for item in quarterly_by_year["2025"] if item["quarter"] == "Q4")
-        self.assertTrue(q4["derived_from_annual"])
+    def test_between_two_stale_entities_the_more_recent_one_wins(self) -> None:
+        older = _history([2015, 2016, 2017])
+        newer = _history([2018, 2019, 2020])
+        self.assertIs(_better_filing_history(older, newer), newer)
+
+    def test_latest_period_reads_the_newest_filing(self) -> None:
+        self.assertEqual(_latest_period(_history([2021, 2025, 2023])), "2025-12-31")
+        self.assertEqual(_latest_period({"annual": []}), "")
+        self.assertEqual(_latest_period(None), "")
+
+    def test_staleness_boundary_uses_eighteen_months(self) -> None:
+        from fastdeep_scanner.sec_edgar import STALE_FILING_MONTHS
+
+        self.assertEqual(STALE_FILING_MONTHS, 18)
+        cutoff = date.today() - timedelta(days=STALE_FILING_MONTHS * 30)
+        just_inside = {"annual": [{"period_end": (cutoff + timedelta(days=20)).isoformat()}]}
+        long_gone = {"annual": [{"period_end": (cutoff - timedelta(days=400)).isoformat()}]}
+        # ชุดที่ยังยื่นอยู่ชนะแม้จะมีเพียงงวดเดียว
+        self.assertIs(_better_filing_history(long_gone, just_inside), just_inside)
 
 
 if __name__ == "__main__":
