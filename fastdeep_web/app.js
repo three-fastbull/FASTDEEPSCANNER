@@ -3,6 +3,7 @@ const state = {
   selectedSymbol: null,
   criteriaQuery: "",
   imageIndex: null,
+  dataHealth: null,
 };
 
 const elements = {
@@ -35,6 +36,11 @@ const elements = {
   imageScanButton: document.getElementById("imageScanButton"),
   chartImagePreview: document.getElementById("chartImagePreview"),
   imageMatches: document.getElementById("imageMatches"),
+  dataHealth: document.getElementById("dataHealth"),
+  researchStatus: document.getElementById("researchStatus"),
+  researchNote: document.getElementById("researchNote"),
+  researchSaveButton: document.getElementById("researchSaveButton"),
+  researchSavedAt: document.getElementById("researchSavedAt"),
 };
 
 function patternValues() {
@@ -249,6 +255,57 @@ function setStatus(text) {
   elements.scanStatus.textContent = text;
 }
 
+function renderDataHealth(health, financialHealth = null) {
+  state.dataHealth = health || null;
+  if (!health) return;
+  const latest = health.latest_candle_date || "-";
+  const coverage = health.symbols_requested
+    ? `${health.symbols_succeeded}/${health.symbols_requested}`
+    : "-";
+  const financialCoverage = financialHealth
+    ? ` | งบยืนยัน ${financialHealth.fresh_symbols}/${financialHealth.symbols_requested}`
+    : "";
+  elements.dataHealth.textContent = `${health.message} | แท่งล่าสุด ${latest} | Coverage ${coverage}${financialCoverage}`;
+  elements.dataHealth.dataset.state = health.state || "unknown";
+  elements.csvButton.classList.toggle("is-disabled", !health.can_publish);
+  elements.csvButton.setAttribute("aria-disabled", String(!health.can_publish));
+  elements.csvButton.title = health.can_publish ? "ส่งออกผลสแกน" : health.message;
+}
+
+async function loadResearch(symbol) {
+  const response = await fetch(`/api/research?symbol=${encodeURIComponent(symbol)}`);
+  if (!response.ok || state.selectedSymbol !== symbol) return;
+  const item = await response.json();
+  elements.researchStatus.value = item.status || "Watch";
+  elements.researchNote.value = item.note || "";
+  elements.researchSavedAt.textContent = item.updated_at
+    ? `บันทึก ${new Date(item.updated_at).toLocaleString("th-TH")}`
+    : "ยังไม่ได้บันทึก";
+}
+
+async function saveResearch() {
+  if (!state.selectedSymbol) return;
+  elements.researchSaveButton.disabled = true;
+  try {
+    const response = await fetch("/api/research", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        symbol: state.selectedSymbol,
+        status: elements.researchStatus.value,
+        note: elements.researchNote.value,
+      }),
+    });
+    const item = await response.json();
+    if (!response.ok) throw new Error(item.error || "บันทึกสถานะไม่ได้");
+    elements.researchSavedAt.textContent = `บันทึก ${new Date(item.updated_at).toLocaleString("th-TH")}`;
+  } catch (error) {
+    elements.researchSavedAt.textContent = error.message || "บันทึกสถานะไม่ได้";
+  } finally {
+    elements.researchSaveButton.disabled = false;
+  }
+}
+
 function scoreClass(decision) {
   if (decision.includes("Candidate") || decision.includes("Watchlist")) return "good";
   if (decision.includes("Reject")) return "bad";
@@ -278,7 +335,7 @@ function renderTable(results) {
       <td><span class="pattern-chip">${topPattern ? topPattern.label : "-"}</span></td>
       <td><strong>${result.grade}</strong></td>
       <td>${result.final_score.toFixed(1)}</td>
-      <td>${result.fundamental_score.toFixed(1)}</td>
+      <td>${result.fundamentals_verified ? result.fundamental_score.toFixed(1) : "รอตรวจ"}</td>
       <td class="decision ${scoreClass(result.decision)}">${result.decision}</td>
     `;
     row.addEventListener("click", () => loadSymbol(result.symbol));
@@ -395,11 +452,12 @@ function renderDetail(payload) {
     row.classList.toggle("active", row.dataset.symbol === result.symbol);
   });
   elements.detailTitle.textContent = `${result.symbol} - ${result.name}`;
-  elements.detailSubtitle.textContent = `${result.market} | ${result.sector} | TF ${elements.timeframeSelect.value} | ${result.decision}`;
+  elements.detailSubtitle.textContent = `${result.market} | ${result.sector} | TF ${result.timeframe} | ${result.decision}`;
   elements.detailGrade.textContent = result.grade;
   drawChart(aggregateCandles(candles, elements.timeframeSelect.value), result);
   elements.tradingViewButton.href = tradingview_url;
   elements.reportButton.href = `/api/report?symbol=${encodeURIComponent(result.symbol)}&${state.criteriaQuery}`;
+  loadResearch(result.symbol);
 
   renderDefinitionList(elements.riskPlan, [
     ["Bias", result.risk_plan.bias],
@@ -409,12 +467,14 @@ function renderDetail(payload) {
     ["R:R", `${result.risk_plan.reward_risk.toFixed(2)}R`],
   ]);
 
-  renderDefinitionList(elements.fundamentalBox, [
+  renderDefinitionList(elements.fundamentalBox, fundamental.fundamentals_verified ? [
+    ["Status", `Verified (${fundamental.as_of || "latest annual"})`],
     ["ROE / ROA", `${fundamental.roe.toFixed(1)}% / ${fundamental.roa.toFixed(1)}%`],
     ["Debt", `${fundamental.debt_to_equity.toFixed(2)}x`],
     ["Growth", `${fundamental.revenue_growth.toFixed(1)}% / ${fundamental.profit_growth.toFixed(1)}%`],
-    ["PE / PBV", `${fundamental.pe.toFixed(1)} / ${fundamental.pbv.toFixed(1)}`],
-    ["Upside", `${fundamental.analyst_upside_pct.toFixed(1)}%`],
+  ] : [
+    ["Status", "รอตรวจงบการเงิน"],
+    ["Next step", "เปิดแท็บงบการเงินเพื่อยืนยันข้อมูล"],
   ]);
 
   elements.agentNotes.innerHTML = "";
@@ -456,6 +516,7 @@ async function runScan() {
   }
   const payload = await response.json();
   elements.dataSourceNote.textContent = `Data Source: ${payload.data_source || "unknown"}`;
+  renderDataHealth(payload.data_health, payload.financial_health);
   state.results = payload.results;
   renderMetrics(payload.results);
   renderTable(payload.results);
@@ -470,6 +531,11 @@ elements.scoreRange.addEventListener("input", () => {
   elements.scoreValue.textContent = elements.scoreRange.value;
 });
 elements.scanButton.addEventListener("click", runScan);
+elements.researchSaveButton.addEventListener("click", saveResearch);
+window.addEventListener("fastdeep:financials-verified", (event) => {
+  const symbol = event.detail?.symbol;
+  if (symbol && symbol === state.selectedSymbol) loadSymbol(symbol);
+});
 elements.marketSelect.addEventListener("change", runScan);
 elements.universeSelect.addEventListener("change", runScan);
 elements.timeframeSelect.addEventListener("change", runScan);
@@ -483,6 +549,10 @@ elements.imageScanButton.addEventListener("click", async () => {
   const file = elements.chartImageInput.files && elements.chartImageInput.files[0];
   if (!file) {
     elements.imageMatches.innerHTML = "<p>กรุณาแนบรูปกราฟก่อน</p>";
+    return;
+  }
+  if (state.dataHealth && !state.dataHealth.can_publish) {
+    elements.imageMatches.innerHTML = `<p>${state.dataHealth.message}</p>`;
     return;
   }
   elements.imageMatches.innerHTML = "<p>กำลังอ่านรูปและเทียบทรงกราฟ...</p>";

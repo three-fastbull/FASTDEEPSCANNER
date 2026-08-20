@@ -67,10 +67,10 @@ OPEN_FASTDEEP_SCANNER.bat
 ระบบจะสร้างหน้าเว็บใหม่ และตรงหัวเว็บจะเปลี่ยนเป็น:
 
 ```text
-Data Source: Real CSV data
+Data Source และ Data Health
 ```
 
-ถ้ายังขึ้นว่า Sample/Demo data แปลว่ายังไม่มีไฟล์ `data/fastdeep_prices.csv`
+ถ้า Data Health ระบุว่าข้อมูลเก่า หรือ coverage ไม่ครบ ให้รอการอัปเดตสำเร็จก่อนใช้ผลสแกนหรือ export รายงาน
 
 ## ถ้าต้องการอัตโนมัติจริง
 
@@ -107,10 +107,10 @@ UPDATE_FASTDEEP_PRICES_AND_OPEN.bat
 ไฟล์นี้จะทำ 3 อย่าง:
 
 1. ดึงราคา OHLCV จาก Yahoo Finance
-2. เขียนลง `data/fastdeep_prices.csv`
+2. เขียนลง `data/fastdeep_prices.csv` แบบ atomic เมื่อ coverage ผ่านเกณฑ์ 97%
 3. สร้างและเปิดหน้า Scanner ใหม่
 
-หมายเหตุ: Yahoo Finance อาจมี delay และราคาอาจไม่ตรง TradingView 100% โดยเฉพาะ exchange/feed ที่ต่างกัน แต่จะเป็นข้อมูลจริง ไม่ใช่ demo data
+หมายเหตุ: Yahoo Finance อาจมี delay และราคาอาจไม่ตรง TradingView 100% โดยเฉพาะ exchange/feed ที่ต่างกัน แต่จะเป็นข้อมูลจริง ไม่ใช่ demo data ใช้ TradingView เพื่อยืนยัน chart/execution ก่อนทุกคำสั่ง
 
 ## ปุ่มแนบรูปกราฟ / Image Match
 

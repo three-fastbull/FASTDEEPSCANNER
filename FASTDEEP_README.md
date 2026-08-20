@@ -4,19 +4,21 @@ FastDeep Scanner v1 คือ MVP สำหรับ workflow ที่เริ
 
 ตอนนี้ระบบรองรับ S&P 500, Nasdaq-100, หุ้นจีน 50 ตัว, SET50, SET100, หุ้นไทยตัวอย่าง และ MAI starter list โดยราคาหลักมาจาก `data/fastdeep_prices.csv` ถ้ามีไฟล์นี้อยู่ ระบบจะใช้ราคาจริงจาก Yahoo Finance ที่ดาวน์โหลดไว้ ไม่ใช่ demo data
 
+ก่อนใช้ผลสแกน ให้ดูบรรทัด `Data Health` ด้านบนของหน้าเว็บเสมอ: ระบบจะแสดงวันที่แท่งราคาล่าสุด, coverage และสถานะพร้อมใช้ หากข้อมูลเก่าหรือดาวน์โหลดไม่ครบ ระบบจะปิด CSV export และระบุว่าผลสแกนยังไม่ควรใช้ตัดสินใจ
+
 ดูวิธีเปลี่ยนเป็นราคาจริงใน `REAL_DATA_SETUP.md`
 
 ถ้าต้องการอัปเดตราคาจริงแบบกดครั้งเดียว ให้ใช้ `UPDATE_FASTDEEP_PRICES_AND_OPEN.bat`
 
-1. Market Scanner Agent สแกนหุ้นและหา pattern
+1. Market Scanner สแกนหุ้นและหา pattern ตาม D / W / M ที่เลือกจริง
 2. Technical Pattern Agent ตรวจ Breakout, Retest, Cup & Handle, Double Bottom, Head & Shoulders
-3. Financial Analysis Agent ตรวจ ROE, ROA, Debt, Growth, Margin, Liquidity
+3. Financial Analysis ตรวจ ROE, ROA, Debt, Growth, Margin จากงบที่ยืนยันแล้วเท่านั้น
 4. Business Quality Agent ตรวจ Moat และ AI/automation trend
 5. Valuation Agent ตรวจ PE, PBV, Dividend, Upside
 6. Report Writer Agent สร้างรายงาน HTML ที่พิมพ์เป็น PDF ได้
 7. Image Match แนบรูปกราฟเพื่อหา asset ที่ทรงกราฟคล้ายกันใน universe ที่เลือก
 
-ระบบนี้เป็น research workflow เท่านั้น ไม่ใช่คำแนะนำการลงทุน
+หุ้นที่ยังไม่มีงบใน cache จะปรากฏเป็น `Technical Candidate / Research required` และไม่มีสิทธิ์ได้คะแนนพื้นฐานปลอม ระบบนี้เป็น research workflow เท่านั้น ไม่ใช่คำแนะนำการลงทุน
 
 ## Run CLI
 
@@ -54,6 +56,30 @@ http://127.0.0.1:8765
 ```powershell
 & 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-financials --universe data/fastdeep_universe.csv
 ```
+
+## Daily Data Operations
+
+`Launch-FastDeepScanner.ps1` จะตรวจโค้ดล่าสุดจาก GitHub และเริ่มอัปเดตราคา 5 ปีแบบ background โดยใช้ atomic publish: ข้อมูลชุดเก่าจะไม่ถูกเขียนทับจนกว่าจะดาวน์โหลดสำเร็จอย่างน้อย 97% ของ universe
+
+ติดตั้งงาน Windows รายวัน 07:00 (ขณะบัญชี Windows นี้ sign in อยู่) เพียงครั้งเดียว:
+
+```powershell
+& '.\Install-FastDeepDailyTask.ps1'
+```
+
+งานนี้อัปเดตราคา, สร้าง `storage/fastdeep_daily_scan_summary.json` และทุกวันอาทิตย์จะ refresh งบทั้ง universe เพิ่มเติม
+
+ในรายละเอียดหุ้น มี workflow สั้น ๆ สำหรับบันทึก `Watch`, `Research`, `Approved`, `Owned` หรือ `Exit` พร้อมโน้ตการตัดสินใจ ข้อมูลอยู่ใน `storage/fastdeep_research_journal.json` เพื่อให้ทีมทบทวนเหตุผลย้อนหลังได้
+
+## Pattern Validation
+
+ก่อนใช้ pattern เป็นกฎลงทุน ให้รัน event study แยกตามตลาดและ timeframe:
+
+```powershell
+& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner backtest --market US --universe SP500 --timeframe D --patterns breakout,retest --holding-bars 20
+```
+
+ผลอยู่ที่ `storage/fastdeep_event_study.json` และเป็น historical event study เท่านั้น: ยังไม่หักค่าธรรมเนียม, slippage, position sizing หรือผลจากสัญญาณซ้อนกัน จึงห้ามใช้แทนผลตอบแทนกองทุนจริง
 
 แหล่งข้อมูลเริ่มต้นคือ Yahoo Finance fundamentals timeseries ซึ่งครอบคลุม US, China และ Thailand แต่โดยทั่วไปเปิดให้รายปีเต็ม 4 ปีและงบรายไตรมาสล่าสุดประมาณ 5 งวดเท่านั้น หน้า dashboard จะแสดงเฉพาะงวดที่ผู้ให้บริการส่งกลับและไม่สร้างตัวเลขย้อนหลังขึ้นเอง
 

@@ -9,6 +9,9 @@ tmp/
 data/fastdeep_prices.csv
 data/fastdeep_prices_source.json
 data/financial_cache/
+data/fastdeep_price_update.lock/
+data/fastdeep_price_update_status.json
+data/fastdeep_financial_update_status.json
 
 # Separate Gold OI project assets (not part of FastDeep Scanner)
 oi_trading_system/

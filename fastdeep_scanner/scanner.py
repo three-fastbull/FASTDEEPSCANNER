@@ -14,6 +14,7 @@ from .fundamentals import (
 from .models import AgentInsight, FundamentalSnapshot, ScanCriteria, ScanResult, StockCandle
 from .patterns import detect_patterns, market_phase, technical_context_score
 from .risk import build_risk_plan
+from .timeframes import aggregate_candles, normalize_timeframe
 
 
 def _grade(score: float) -> str:
@@ -28,9 +29,16 @@ def _grade(score: float) -> str:
     return "D"
 
 
-def _decision(score: float, warnings: list[str], has_bearish: bool) -> str:
+def _decision(
+    score: float,
+    warnings: list[str],
+    has_bearish: bool,
+    research_verified: bool,
+) -> str:
     if has_bearish:
         return "Reject long / watch breakdown"
+    if not research_verified:
+        return "Research required"
     if score >= 82 and not warnings:
         return "Candidate"
     if score >= 72:
@@ -92,7 +100,10 @@ def _scan_symbol(
     snapshot: FundamentalSnapshot,
     criteria: ScanCriteria,
 ) -> ScanResult | None:
-    if len(candles) < 120:
+    timeframe = normalize_timeframe(criteria.timeframe)
+    candles = aggregate_candles(candles, timeframe)
+    minimum_bars = 50 if timeframe == "M" else 90
+    if len(candles) < minimum_bars:
         return None
     if snapshot.liquidity_score < criteria.min_liquidity:
         return None
@@ -102,46 +113,57 @@ def _scan_symbol(
         groups = {group.strip().upper() for group in snapshot.index_groups.split("|") if group.strip()}
         if criteria.universe.upper() not in groups:
             return None
-    if criteria.universe != "ALL":
-        groups = {group.strip().upper() for group in snapshot.index_groups.split("|") if group.strip()}
-        if criteria.universe.upper() not in groups:
-            return None
-
-    patterns = detect_patterns(candles, criteria.patterns)
+    patterns = detect_patterns(candles, criteria.patterns, timeframe)
     if not patterns:
         return None
 
     tech_score, tech_reasons = technical_context_score(candles, patterns)
-    fin_score, fin_bullets, fin_warnings = financial_score(snapshot)
-    biz_score, biz_bullets = business_score(snapshot)
-    val_score, val_bullets, val_warnings = valuation_score(snapshot)
+    fin_score, fin_bullets, fin_warnings = financial_score(snapshot) if snapshot.fundamentals_verified else (0.0, [], [])
+    if snapshot.research_verified:
+        biz_score, biz_bullets = business_score(snapshot)
+        val_score, val_bullets, val_warnings = valuation_score(snapshot)
+        final_score = (
+            tech_score * 0.42
+            + fin_score * 0.30
+            + biz_score * 0.18
+            + val_score * 0.10
+        )
+    elif snapshot.fundamentals_verified:
+        biz_score, biz_bullets = 0.0, ["Business quality has not been verified"]
+        val_score, val_bullets, val_warnings = 0.0, ["Valuation inputs have not been verified"], []
+        final_score = tech_score * 0.60 + fin_score * 0.40
+    else:
+        biz_score, biz_bullets = 0.0, ["Business quality has not been verified"]
+        val_score, val_bullets, val_warnings = 0.0, ["Financial and valuation inputs are pending"], []
+        final_score = tech_score
     has_bearish = any(pattern.side == "SELL" for pattern in patterns)
-
-    final_score = (
-        tech_score * 0.42
-        + fin_score * 0.30
-        + biz_score * 0.18
-        + val_score * 0.10
-    )
     if has_bearish:
         final_score = min(final_score, 62)
 
     warnings = fin_warnings + val_warnings
     if has_bearish:
         warnings.append("Bearish chart structure appears before buy decision")
-    if fin_score < 55:
+    if snapshot.fundamentals_verified and fin_score < 55:
         warnings.append("Fundamental quality does not confirm the chart")
-    if "placeholder_fundamentals" in snapshot.notes:
-        warnings.append("Fundamentals are placeholder values; add real financial data before investing.")
-    if "placeholder_fundamentals" in snapshot.notes:
-        warnings.append("Fundamentals are placeholder values; add real financial data before investing.")
+    if not snapshot.fundamentals_verified:
+        warnings.append("Financial statements are not verified; this is a technical candidate only.")
+    if not snapshot.research_verified:
+        warnings.append("Business quality and valuation require analyst review before approval.")
 
     if final_score < criteria.min_score:
         return None
 
     base_insights = [
         _technical_insight(tech_score, tech_reasons, patterns),
-        financial_insight(fin_score, fin_bullets, fin_warnings),
+        financial_insight(fin_score, fin_bullets, fin_warnings)
+        if snapshot.fundamentals_verified
+        else AgentInsight(
+            agent="Financial Analysis Agent",
+            score=0.0,
+            label="Pending",
+            summary="Financial statements have not been verified for this symbol",
+            bullets=["Open Financials to fetch and verify the latest statement data"],
+        ),
         business_insight(biz_score, biz_bullets),
         valuation_insight(val_score, val_bullets, val_warnings),
     ]
@@ -158,12 +180,15 @@ def _scan_symbol(
         business_score=biz_score,
         valuation_score=val_score,
         final_score=final_score,
-        grade=_grade(final_score),
-        decision=_decision(final_score, warnings, has_bearish),
+        grade=_grade(final_score) if snapshot.research_verified else f"T-{_grade(final_score)}",
+        decision=_decision(final_score, warnings, has_bearish, snapshot.research_verified),
         patterns=patterns,
         risk_plan=build_risk_plan(candles, patterns),
         insights=base_insights,
         warnings=warnings,
+        fundamentals_verified=snapshot.fundamentals_verified,
+        research_verified=snapshot.research_verified,
+        timeframe=timeframe,
         generated_at=datetime.now(UTC),
     )
     return ScanResult(

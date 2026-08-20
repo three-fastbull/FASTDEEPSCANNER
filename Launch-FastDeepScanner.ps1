@@ -45,21 +45,13 @@ function Start-PriceUpdateIfStale {
         return
     }
 
-    $alreadyUpdating = Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" | Where-Object {
-        $_.CommandLine -match "fastdeep_scanner\s+update-prices"
-    }
-    if ($alreadyUpdating) {
-        Write-LauncherLog "Price update is already running."
-        return
-    }
-
     Start-Process -FilePath $python `
-        -ArgumentList "-m", "fastdeep_scanner", "update-prices", "--universe", "data\fastdeep_universe.csv", "--out", "data\fastdeep_prices.csv", "--range", "2y", "--interval", "1d", "--pause", "0.05" `
+        -ArgumentList "-m", "fastdeep_scanner", "update-prices", "--universe", "data\fastdeep_universe.csv", "--out", "data\fastdeep_prices.csv", "--range", "5y", "--interval", "1d", "--pause", "0.05", "--min-success-ratio", "0.97", "--workers", "6", "--request-timeout", "12" `
         -WorkingDirectory $root `
         -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $storage "fastdeep_price_update.out.log") `
         -RedirectStandardError (Join-Path $storage "fastdeep_price_update.err.log")
-    Write-LauncherLog "Started background daily price update."
+    Write-LauncherLog "Started background 5-year price update. Python lock prevents duplicate runs."
 }
 
 New-Item -ItemType Directory -Force -Path $storage | Out-Null

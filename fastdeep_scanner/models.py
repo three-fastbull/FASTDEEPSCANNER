@@ -49,6 +49,10 @@ class FundamentalSnapshot:
     ai_trend: str
     notes: str = ""
     index_groups: str = ""
+    fundamentals_verified: bool = True
+    research_verified: bool = True
+    source: str = ""
+    as_of: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -72,6 +76,10 @@ class FundamentalSnapshot:
             "ai_trend": self.ai_trend,
             "notes": self.notes,
             "index_groups": self.index_groups,
+            "fundamentals_verified": self.fundamentals_verified,
+            "research_verified": self.research_verified,
+            "source": self.source,
+            "as_of": self.as_of,
         }
 
 
@@ -150,6 +158,7 @@ class ScanCriteria:
     )
     min_score: float = 55.0
     min_liquidity: float = 40.0
+    timeframe: str = "D"
 
 
 @dataclass(frozen=True)
@@ -172,6 +181,9 @@ class ScanResult:
     risk_plan: RiskPlan
     insights: list[AgentInsight]
     warnings: list[str] = field(default_factory=list)
+    fundamentals_verified: bool = False
+    research_verified: bool = False
+    timeframe: str = "D"
     generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_dict(self) -> dict[str, Any]:
@@ -194,5 +206,8 @@ class ScanResult:
             "risk_plan": self.risk_plan.to_dict(),
             "insights": [insight.to_dict() for insight in self.insights],
             "warnings": self.warnings,
+            "fundamentals_verified": self.fundamentals_verified,
+            "research_verified": self.research_verified,
+            "timeframe": self.timeframe,
             "generated_at": self.generated_at.isoformat(),
         }

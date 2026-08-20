@@ -12,6 +12,7 @@
       <p class="eyebrow">FastDeep Intelligence Platform</p>
       <h1>Scanner หุ้น + VI + กราฟ</h1>
       <p class="data-source-note" id="dataSourceNote">Data Source: loading...</p>
+      <p class="data-health" id="dataHealth" data-state="loading">กำลังตรวจสอบความพร้อมของข้อมูล...</p>
     </div>
     <div class="status-pill" id="scanStatus">Ready</div>
   </header>
@@ -89,25 +90,28 @@
       </div>
     </section>
 
-    <section class="image-match-panel" aria-label="Chart image matching">
-      <div class="image-tools">
-        <div>
-          <h2>แนบรูปกราฟเพื่อหา asset คล้ายกัน</h2>
-          <p>ระบบจะอ่านทรงกราฟจากรูป แล้วเทียบกับหุ้นใน Universe ที่เลือกอยู่</p>
+    <details class="image-match-panel" aria-label="Chart image matching">
+      <summary>ค้นหาหุ้นจากรูปกราฟ <span>เครื่องมือเสริม</span></summary>
+      <div class="image-match-content">
+        <div class="image-tools">
+          <div>
+            <h2>แนบรูปกราฟเพื่อหา asset คล้ายกัน</h2>
+            <p>ระบบเทียบรูปทรงราคาเท่านั้น ควรใช้เป็นจุดเริ่มต้นในการค้นหา ไม่ใช่สัญญาณซื้อขาย</p>
+          </div>
+          <input id="chartImageInput" class="file-input" type="file" accept="image/*">
+          <button id="imageScanButton" class="primary-button">Scan รูปกราฟ</button>
         </div>
-        <input id="chartImageInput" class="file-input" type="file" accept="image/*">
-        <button id="imageScanButton" class="primary-button">Scan รูปกราฟ</button>
-      </div>
-      <div class="image-preview-area">
-        <img id="chartImagePreview" alt="ตัวอย่างรูปกราฟที่แนบ">
-        <div>
-          <h3>ผลลัพธ์รูปที่คล้าย</h3>
-          <div id="imageMatches" class="image-matches">
-            <p>ยังไม่ได้แนบรูป</p>
+        <div class="image-preview-area">
+          <img id="chartImagePreview" alt="ตัวอย่างรูปกราฟที่แนบ">
+          <div>
+            <h3>ผลลัพธ์รูปที่คล้าย</h3>
+            <div id="imageMatches" class="image-matches">
+              <p>ยังไม่ได้แนบรูป</p>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </details>
 
     <section class="workspace">
       <div class="table-panel">
@@ -145,6 +149,22 @@
           <a id="tradingViewButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">TradingView</a>
           <a id="reportButton" class="primary-button" href="#" target="_blank" rel="noreferrer">PDF Report</a>
         </div>
+        <section class="research-workflow" aria-label="Research workflow">
+          <label>สถานะ Research
+            <select id="researchStatus">
+              <option>Watch</option>
+              <option>Research</option>
+              <option>Approved</option>
+              <option>Owned</option>
+              <option>Exit</option>
+            </select>
+          </label>
+          <label>โน้ตการตัดสินใจ
+            <input id="researchNote" maxlength="1000" placeholder="เหตุผลที่เฝ้าดูหรืออนุมัติหุ้นนี้">
+          </label>
+          <button id="researchSaveButton" class="ghost-button" type="button">บันทึก</button>
+          <span id="researchSavedAt">ยังไม่ได้บันทึก</span>
+        </section>
         <div class="split-grid">
           <section>
             <h3>Risk Plan</h3>
@@ -155,14 +175,13 @@
             <dl id="fundamentalBox"></dl>
           </section>
         </div>
-        <section>
-          <h3>AI Agent Notes</h3>
+        <details class="agent-disclosure">
+          <summary>เหตุผลจากระบบและคำเตือน</summary>
+          <h3>Analysis Notes</h3>
           <div id="agentNotes" class="agent-list"></div>
-        </section>
-        <section>
           <h3>Warnings</h3>
           <ul id="warningList" class="warning-list"></ul>
-        </section>
+        </details>
       </aside>
     </section>
   </main>

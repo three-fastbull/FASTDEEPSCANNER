@@ -3,8 +3,11 @@ from __future__ import annotations
 import csv
 import json
 import os
+import time
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from .models import FundamentalSnapshot, StockCandle
 from .sample_data import fundamentals_by_symbol, generate_price_history
@@ -14,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PRICE_CSV = ROOT / "data" / "fastdeep_prices.csv"
 DEFAULT_FUNDAMENTALS_CSV = ROOT / "data" / "fastdeep_fundamentals.csv"
 DEFAULT_UNIVERSE_CSV = ROOT / "data" / "fastdeep_universe.csv"
+DEFAULT_FINANCIAL_CACHE_DIR = ROOT / "data" / "financial_cache"
 
 
 def _parse_date(value: str):
@@ -128,23 +132,83 @@ def _placeholder_fundamental(symbol: str, metadata: dict[str, str] | None = None
         name=metadata.get("name") or symbol,
         market=metadata.get("market") or "US",
         sector=metadata.get("sector") or "Unknown",
-        roe=12.0,
-        roa=5.0,
-        debt_to_equity=1.0,
-        revenue_growth=5.0,
-        profit_growth=5.0,
-        gross_margin=25.0,
-        net_margin=8.0,
-        pe=20.0,
-        pbv=3.0,
+        roe=0.0,
+        roa=0.0,
+        debt_to_equity=0.0,
+        revenue_growth=0.0,
+        profit_growth=0.0,
+        gross_margin=0.0,
+        net_margin=0.0,
+        pe=0.0,
+        pbv=0.0,
         dividend_yield=0.0,
         analyst_upside_pct=0.0,
         liquidity_score=80.0,
-        moat="medium",
-        ai_trend="neutral",
-        notes="placeholder_fundamentals",
+        moat="not evaluated",
+        ai_trend="not evaluated",
+        notes="unverified_fundamentals",
         index_groups=metadata.get("index_groups") or "",
+        fundamentals_verified=False,
+        research_verified=False,
+        source="Not loaded",
     )
+
+
+def _safe_number(value: Any) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _growth(current: float, previous: float) -> float:
+    if not previous:
+        return 0.0
+    return (current / previous - 1) * 100
+
+
+def _financial_cache_path(symbol: str) -> Path:
+    safe = symbol.replace("/", "_").replace("\\", "_").replace(".", "_")
+    return DEFAULT_FINANCIAL_CACHE_DIR / f"{safe}.json"
+
+
+def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> FundamentalSnapshot:
+    path = _financial_cache_path(snapshot.symbol)
+    if not path.exists() or time.time() - path.stat().st_mtime > 8 * 24 * 3600:
+        return snapshot
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        annual = payload.get("annual") or []
+        latest = annual[-1]
+        previous = annual[-2] if len(annual) > 1 else {"metrics": {}}
+        metrics = latest.get("metrics") or {}
+        previous_metrics = previous.get("metrics") or {}
+        ratios = latest.get("ratios") or {}
+        revenue = _safe_number(metrics.get("total_revenue"))
+        net_income = _safe_number(metrics.get("net_income"))
+        return replace(
+            snapshot,
+            roe=_safe_number(ratios.get("roe")),
+            roa=_safe_number(ratios.get("roa")),
+            debt_to_equity=_safe_number(ratios.get("debt_to_equity")),
+            revenue_growth=_growth(revenue, _safe_number(previous_metrics.get("total_revenue"))),
+            profit_growth=_growth(net_income, _safe_number(previous_metrics.get("net_income"))),
+            gross_margin=_safe_number(ratios.get("gross_margin")),
+            net_margin=_safe_number(ratios.get("net_margin")),
+            pe=0.0,
+            pbv=0.0,
+            dividend_yield=0.0,
+            analyst_upside_pct=0.0,
+            moat="not evaluated",
+            ai_trend="not evaluated",
+            notes="financials_verified; business_and_valuation_pending",
+            fundamentals_verified=True,
+            research_verified=False,
+            source=str(payload.get("source") or "Financial statements cache"),
+            as_of=str(latest.get("period_end") or ""),
+        )
+    except (OSError, json.JSONDecodeError, IndexError, TypeError):
+        return snapshot
 
 
 def load_market_data(
@@ -161,6 +225,17 @@ def load_market_data(
     fundamentals = (
         load_fundamentals_csv(fundamentals_path) if fundamentals_path else fundamentals_by_symbol()
     )
+    if not force_sample and fundamentals_path is None:
+        fundamentals = {
+            symbol: replace(
+                snapshot,
+                notes="unverified_fundamentals",
+                fundamentals_verified=False,
+                research_verified=False,
+                source="Sample values disabled for investment scoring",
+            )
+            for symbol, snapshot in fundamentals.items()
+        }
     universe = load_universe_metadata()
     for symbol in candles:
         if symbol not in fundamentals:
@@ -171,6 +246,7 @@ def load_market_data(
                 fundamentals[symbol] = FundamentalSnapshot(
                     **{**snapshot.__dict__, "index_groups": universe[symbol].get("index_groups", "")}
                 )
+        fundamentals[symbol] = _snapshot_from_financial_cache(fundamentals[symbol])
     return candles, fundamentals
 
 
@@ -195,5 +271,5 @@ def data_source_label(
             label = f"Real CSV price data: {price_path.name}"
         if fundamentals_path.exists():
             return f"{label} + {fundamentals_path.name}"
-        return f"{label} + sample fundamentals"
+        return f"{label} + verified financials on demand"
     return "Sample/Demo data - ยังไม่ใช่ราคาจริง"

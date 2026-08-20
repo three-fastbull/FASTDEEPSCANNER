@@ -4,9 +4,11 @@ import json
 import time
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from .data_io import load_universe_metadata
 from .yahoo_prices import load_universe
@@ -14,6 +16,7 @@ from .yahoo_prices import load_universe
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CACHE_DIR = ROOT / "data" / "financial_cache"
+DEFAULT_UPDATE_STATUS = ROOT / "data" / "fastdeep_financial_update_status.json"
 YAHOO_TIMESERIES_URL = "https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries"
 
 
@@ -128,6 +131,16 @@ def _download_json(url: str, timeout: int = 25) -> dict[str, Any]:
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
+
+
+def _write_update_status(path: Path, state: str, **details: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+    temporary.write_text(
+        json.dumps({"state": state, "updated_at": datetime.now(UTC).isoformat(), **details}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    temporary.replace(path)
 
 
 def _financial_url(symbol: str) -> str:
@@ -407,6 +420,7 @@ def fetch_financials(
     refresh: bool = False,
     cache_dir: str | Path = DEFAULT_CACHE_DIR,
     max_age_hours: int = 24,
+    request_timeout: int = 20,
 ) -> dict[str, Any]:
     symbol = symbol.strip().upper()
     if not symbol:
@@ -421,7 +435,7 @@ def fetch_financials(
             return cached
 
     try:
-        payload = _download_json(_financial_url(symbol))
+        payload = _download_json(_financial_url(symbol), timeout=request_timeout)
     except Exception as exc:  # noqa: BLE001
         raise FinancialDataError(f"ดึงงบของ {symbol} ไม่สำเร็จ: {exc}") from exc
 
@@ -460,15 +474,72 @@ def cache_universe_financials(
     cache_dir: str | Path = DEFAULT_CACHE_DIR,
     pause_seconds: float = 0.35,
     refresh: bool = False,
+    max_workers: int = 4,
+    request_timeout: int = 8,
 ) -> dict[str, Any]:
     symbols = load_universe(universe_path)
+    cache_dir = Path(cache_dir)
+    status_path = cache_dir.parent / DEFAULT_UPDATE_STATUS.name
     succeeded: list[str] = []
     failed: list[str] = []
-    for symbol in symbols:
+    _write_update_status(status_path, "running", symbols_requested=len(symbols))
+    def cache_symbol(symbol: str) -> tuple[str, str | None]:
         try:
-            fetch_financials(symbol, refresh=refresh, cache_dir=cache_dir)
-            succeeded.append(symbol)
+            fetch_financials(
+                symbol,
+                refresh=refresh,
+                cache_dir=cache_dir,
+                request_timeout=request_timeout,
+            )
+            return symbol, None
         except FinancialDataError as exc:
-            failed.append(f"{symbol}: {exc}")
-        time.sleep(pause_seconds)
-    return {"symbols": len(symbols), "succeeded": succeeded, "failed": failed}
+            return symbol, str(exc)
+
+    try:
+        completed = 0
+        with ThreadPoolExecutor(max_workers=max(1, max_workers)) as executor:
+            futures = [executor.submit(cache_symbol, symbol) for symbol in symbols]
+            for future in as_completed(futures):
+                symbol, error = future.result()
+                completed += 1
+                if error:
+                    failed.append(f"{symbol}: {error}")
+                else:
+                    succeeded.append(symbol)
+                if completed % 5 == 0 or completed == len(symbols):
+                    _write_update_status(
+                        status_path,
+                        "running",
+                        symbols_requested=len(symbols),
+                        symbols_processed=completed,
+                        symbols_succeeded=len(succeeded),
+                        failed_count=len(failed),
+                    )
+                if pause_seconds:
+                    time.sleep(pause_seconds)
+        retry_symbols = [item.split(":", 1)[0] for item in failed]
+        if retry_symbols:
+            failed = []
+            for symbol in retry_symbols:
+                try:
+                    fetch_financials(
+                        symbol,
+                        refresh=refresh,
+                        cache_dir=cache_dir,
+                        request_timeout=max(16, request_timeout),
+                    )
+                    succeeded.append(symbol)
+                except FinancialDataError as exc:
+                    failed.append(f"{symbol}: {exc}")
+                time.sleep(max(0.2, pause_seconds))
+        _write_update_status(
+            status_path,
+            "complete",
+            symbols_requested=len(symbols),
+            symbols_succeeded=len(succeeded),
+            failed_count=len(failed),
+        )
+        return {"symbols": len(symbols), "succeeded": succeeded, "failed": failed}
+    except Exception as exc:
+        _write_update_status(status_path, "failed", symbols_requested=len(symbols), error=str(exc))
+        raise

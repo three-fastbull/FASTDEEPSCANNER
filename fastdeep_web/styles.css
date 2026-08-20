@@ -49,6 +49,18 @@ body {
   font-weight: 700;
 }
 
+.data-health {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.data-health[data-state="ready"] { color: var(--green); }
+.data-health[data-state="stale"],
+.data-health[data-state="degraded"] { color: var(--red); }
+.data-health[data-state="updating"] { color: var(--amber); }
+
 h1,
 h2,
 h3,
@@ -196,15 +208,34 @@ a.primary-button {
 }
 
 .image-match-panel {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.72fr) minmax(320px, 1.28fr);
-  gap: 14px;
-  align-items: start;
   margin: 14px 0;
   padding: 14px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
+}
+
+.image-match-panel summary,
+.agent-disclosure summary {
+  cursor: pointer;
+  color: #0a4f83;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.image-match-panel summary span {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.image-match-content {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(320px, 1.28fr);
+  gap: 14px;
+  align-items: start;
+  margin-top: 14px;
 }
 
 .image-tools {
@@ -241,6 +272,8 @@ a.primary-button {
   object-fit: contain;
   background: #f8fafc;
 }
+
+#chartImagePreview:not([src]) { display: none; }
 
 .image-matches {
   display: grid;
@@ -395,6 +428,35 @@ tbody tr.active {
   padding: 0 14px 14px;
 }
 
+.research-workflow {
+  display: grid;
+  grid-template-columns: 130px minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 0 14px 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fbfcfe;
+}
+
+.research-workflow input,
+.research-workflow select {
+  min-height: 36px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.research-workflow > span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .split-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -406,6 +468,19 @@ tbody tr.active {
 .detail-panel > section {
   border-top: 1px solid var(--line);
   padding-top: 14px;
+}
+
+.agent-disclosure {
+  margin: 0 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.agent-disclosure h3:first-of-type { margin-top: 14px; }
+
+.is-disabled {
+  pointer-events: none;
+  opacity: 0.45;
 }
 
 .detail-panel > section {
@@ -479,6 +554,11 @@ footer {
   }
 
   .image-match-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .image-match-content,
+  .research-workflow {
     grid-template-columns: 1fr;
   }
 }

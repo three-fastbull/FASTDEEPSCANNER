@@ -134,6 +134,9 @@
       state.selectedYear = payload.annual.at(-1)?.period_end.slice(0, 4) || null;
       renderFinancials();
       renderVi();
+      window.dispatchEvent(new CustomEvent("fastdeep:financials-verified", {
+        detail: { symbol: payload.symbol },
+      }));
       status(`${payload.symbol} พร้อมใช้งาน (${payload.cache_status === "cached" ? "ใช้ข้อมูลที่บันทึกไว้" : "อัปเดตแล้ว"})`, "ready");
     } catch (error) {
       if (requestId !== state.financialRequestId) return;

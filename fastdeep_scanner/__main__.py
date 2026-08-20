@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .models import ScanCriteria
 from .report import build_report_html
 from .scanner import scan_market
 from .data_io import load_market_data
+from .data_health import price_data_health
+from .backtest import run_event_study
 from .financials import cache_universe_financials
 from .server import run_server
 from .static_export import export_static_dashboard
 from .yahoo_prices import update_prices_from_yahoo
+from .timeframes import aggregate_candles
 
 
 def _criteria(args: argparse.Namespace) -> ScanCriteria:
@@ -22,6 +26,7 @@ def _criteria(args: argparse.Namespace) -> ScanCriteria:
         patterns=patterns,
         min_score=args.min_score,
         min_liquidity=args.min_liquidity,
+        timeframe=getattr(args, "timeframe", "D"),
     )
 
 
@@ -44,7 +49,11 @@ def report_command(args: argparse.Namespace) -> None:
     output = Path(args.out)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
-        build_report_html(result, candles_by_symbol[args.symbol], fundamentals[args.symbol]),
+        build_report_html(
+            result,
+            aggregate_candles(candles_by_symbol[args.symbol], criteria.timeframe),
+            fundamentals[args.symbol],
+        ),
         encoding="utf-8",
     )
     print(f"wrote report: {output}")
@@ -66,10 +75,15 @@ def update_prices_command(args: argparse.Namespace) -> None:
         range_value=args.range,
         interval=args.interval,
         pause_seconds=args.pause,
+        min_success_ratio=args.min_success_ratio,
+        max_workers=args.workers,
+        request_timeout=args.request_timeout,
     )
     print(f"wrote prices: {summary.output}")
     print(f"- symbols requested: {summary.symbols}")
+    print(f"- symbols succeeded: {summary.succeeded}")
     print(f"- rows downloaded: {summary.rows}")
+    print(f"- latest candle: {summary.latest_candle_date}")
     if summary.failed:
         print("- failed:")
         for item in summary.failed:
@@ -82,12 +96,41 @@ def update_financials_command(args: argparse.Namespace) -> None:
         cache_dir=args.cache_dir,
         pause_seconds=args.pause,
         refresh=args.refresh,
+        max_workers=args.workers,
+        request_timeout=args.request_timeout,
     )
     print(f"cached financial statements: {len(summary['succeeded'])}/{summary['symbols']}")
     if summary["failed"]:
         print("- failed:")
         for item in summary["failed"]:
             print(f"  - {item}")
+
+
+def daily_scan_command(args: argparse.Namespace) -> None:
+    criteria = _criteria(args)
+    results = scan_market(criteria)
+    payload = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "criteria": criteria.__dict__,
+        "data_health": price_data_health(),
+        "results": [result.to_dict() for result in results],
+    }
+    output = Path(args.out)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"wrote daily scan: {output} ({len(results)} candidates)")
+
+
+def backtest_command(args: argparse.Namespace) -> None:
+    output = Path(args.out)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    result = run_event_study(
+        _criteria(args),
+        holding_bars=args.holding_bars,
+        cooldown_bars=args.cooldown_bars,
+    )
+    output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"wrote event study: {output} ({len(result['events'])} signals)")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -100,6 +143,7 @@ def build_parser() -> argparse.ArgumentParser:
     scan.add_argument("--patterns", default="")
     scan.add_argument("--min-score", type=float, default=55)
     scan.add_argument("--min-liquidity", type=float, default=40)
+    scan.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     scan.add_argument("--market-data")
     scan.add_argument("--fundamentals")
     scan.set_defaults(func=scan_command)
@@ -112,6 +156,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--patterns", default="")
     report.add_argument("--min-score", type=float, default=55)
     report.add_argument("--min-liquidity", type=float, default=40)
+    report.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     report.add_argument("--market-data")
     report.add_argument("--fundamentals")
     report.set_defaults(func=report_command)
@@ -128,6 +173,7 @@ def build_parser() -> argparse.ArgumentParser:
     static.add_argument("--patterns", default="")
     static.add_argument("--min-score", type=float, default=55)
     static.add_argument("--min-liquidity", type=float, default=40)
+    static.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
     static.set_defaults(func=export_static_command)
 
     update_prices = subparsers.add_parser(
@@ -139,6 +185,9 @@ def build_parser() -> argparse.ArgumentParser:
     update_prices.add_argument("--range", default="2y")
     update_prices.add_argument("--interval", default="1d")
     update_prices.add_argument("--pause", type=float, default=0.05)
+    update_prices.add_argument("--min-success-ratio", type=float, default=0.97)
+    update_prices.add_argument("--workers", type=int, default=6)
+    update_prices.add_argument("--request-timeout", type=int, default=12)
     update_prices.set_defaults(func=update_prices_command)
 
     update_financials = subparsers.add_parser(
@@ -149,7 +198,31 @@ def build_parser() -> argparse.ArgumentParser:
     update_financials.add_argument("--cache-dir", default="data/financial_cache")
     update_financials.add_argument("--pause", type=float, default=0.35)
     update_financials.add_argument("--refresh", action="store_true")
+    update_financials.add_argument("--workers", type=int, default=4)
+    update_financials.add_argument("--request-timeout", type=int, default=8)
     update_financials.set_defaults(func=update_financials_command)
+
+    daily_scan = subparsers.add_parser("daily-scan", help="Write the daily EOD scan summary as JSON")
+    daily_scan.add_argument("--out", default="storage/fastdeep_daily_scan_summary.json")
+    daily_scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    daily_scan.add_argument("--universe", default="ALL")
+    daily_scan.add_argument("--patterns", default="")
+    daily_scan.add_argument("--min-score", type=float, default=55)
+    daily_scan.add_argument("--min-liquidity", type=float, default=40)
+    daily_scan.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
+    daily_scan.set_defaults(func=daily_scan_command)
+
+    backtest = subparsers.add_parser("backtest", help="Run a historical pattern event study")
+    backtest.add_argument("--out", default="storage/fastdeep_event_study.json")
+    backtest.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    backtest.add_argument("--universe", default="ALL")
+    backtest.add_argument("--patterns", default="breakout,retest,cup_handle,double_bottom,head_shoulders")
+    backtest.add_argument("--min-score", type=float, default=55)
+    backtest.add_argument("--min-liquidity", type=float, default=40)
+    backtest.add_argument("--timeframe", default="D", choices=["D", "W", "M"])
+    backtest.add_argument("--holding-bars", type=int, default=20)
+    backtest.add_argument("--cooldown-bars", type=int, default=20)
+    backtest.set_defaults(func=backtest_command)
 
     return parser
 

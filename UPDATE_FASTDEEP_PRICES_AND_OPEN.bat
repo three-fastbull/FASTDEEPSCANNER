@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
 echo Updating real prices from Yahoo Finance...
-"C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m fastdeep_scanner update-prices --universe data\fastdeep_universe.csv --out data\fastdeep_prices.csv --range 2y --interval 1d --pause 0.05
+"C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m fastdeep_scanner update-prices --universe data\fastdeep_universe.csv --out data\fastdeep_prices.csv --range 5y --interval 1d --pause 0.05 --min-success-ratio 0.97 --workers 6 --request-timeout 12
 if errorlevel 1 (
   echo.
   echo Price update failed. Check your internet connection or symbol list.

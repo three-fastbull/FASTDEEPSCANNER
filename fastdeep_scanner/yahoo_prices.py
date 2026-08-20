@@ -2,26 +2,36 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import time
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import uuid4
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_UNIVERSE = ROOT / "data" / "fastdeep_universe.csv"
 DEFAULT_OUTPUT = ROOT / "data" / "fastdeep_prices.csv"
 DEFAULT_METADATA = ROOT / "data" / "fastdeep_prices_source.json"
+DEFAULT_STATUS = ROOT / "data" / "fastdeep_price_update_status.json"
 
 
 @dataclass(frozen=True)
 class DownloadSummary:
     symbols: int
+    succeeded: int
     rows: int
     output: Path
     failed: list[str]
+    latest_candle_date: str
+
+
+class PriceUpdateInProgress(RuntimeError):
+    """Raised when another price update owns the update lock."""
 
 
 def load_universe(path: str | Path = DEFAULT_UNIVERSE) -> list[str]:
@@ -63,12 +73,48 @@ def _download_json(url: str, timeout: int = 20) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+def _atomic_write(path: Path, body: str) -> None:
+    temp = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+    temp.write_text(body, encoding="utf-8")
+    temp.replace(path)
+
+
+def _write_status(path: Path, state: str, **details: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_write(
+        path,
+        json.dumps(
+            {"state": state, "updated_at": datetime.now(UTC).isoformat(), **details},
+            ensure_ascii=False,
+            indent=2,
+        ),
+    )
+
+
+def _acquire_lock(path: Path, stale_lock_minutes: int) -> None:
+    try:
+        path.mkdir(parents=True, exist_ok=False)
+    except FileExistsError as exc:
+        age_seconds = time.time() - path.stat().st_mtime
+        if age_seconds <= stale_lock_minutes * 60:
+            raise PriceUpdateInProgress("Price update is already running") from exc
+        for child in path.iterdir():
+            child.unlink(missing_ok=True)
+        path.rmdir()
+        path.mkdir(parents=True, exist_ok=False)
+    (path / "owner.json").write_text(
+        json.dumps({"pid": os.getpid(), "started_at": datetime.now(UTC).isoformat()}),
+        encoding="utf-8",
+    )
+
+
 def fetch_symbol_prices(
     symbol: str,
     range_value: str = "2y",
     interval: str = "1d",
+    timeout: int = 12,
 ) -> list[dict[str, str | float]]:
-    payload = _download_json(_chart_url(symbol, range_value, interval))
+    payload = _download_json(_chart_url(symbol, range_value, interval), timeout=timeout)
     result = payload.get("chart", {}).get("result", [])
     if not result:
         error = payload.get("chart", {}).get("error") or {}
@@ -114,50 +160,129 @@ def update_prices_from_yahoo(
     range_value: str = "2y",
     interval: str = "1d",
     pause_seconds: float = 0.25,
+    min_success_ratio: float = 0.97,
+    stale_lock_minutes: int = 180,
+    max_workers: int = 6,
+    request_timeout: int = 12,
 ) -> DownloadSummary:
     symbols = load_universe(universe_path)
     if not symbols:
         raise RuntimeError(f"No symbols found in {Path(universe_path)}")
 
+    output = Path(output_path)
+    status_path = output.with_name(DEFAULT_STATUS.name)
+    lock_path = output.with_name("fastdeep_price_update.lock")
+    _acquire_lock(lock_path, stale_lock_minutes)
+    _write_status(status_path, "running", symbols_requested=len(symbols), output=str(output))
+
     rows: list[dict[str, str | float]] = []
     failed: list[str] = []
-    for symbol in symbols:
-        try:
-            rows.extend(fetch_symbol_prices(symbol, range_value, interval))
-        except Exception as exc:  # noqa: BLE001
-            failed.append(f"{symbol}: {exc}")
-        time.sleep(pause_seconds)
+    try:
+        def download(symbol: str) -> tuple[str, list[dict[str, str | float]], str | None]:
+            try:
+                return symbol, fetch_symbol_prices(symbol, range_value, interval, timeout=request_timeout), None
+            except Exception as exc:  # noqa: BLE001
+                return symbol, [], str(exc)
 
-    if not rows:
-        raise RuntimeError("No price rows downloaded. Check network access or symbols.")
+        processed = 0
+        with ThreadPoolExecutor(max_workers=max(1, max_workers)) as executor:
+            futures = [executor.submit(download, symbol) for symbol in symbols]
+            for future in as_completed(futures):
+                symbol, symbol_rows, error = future.result()
+                processed += 1
+                if error:
+                    failed.append(f"{symbol}: {error}")
+                else:
+                    rows.extend(symbol_rows)
+                if processed % 25 == 0 or processed == len(symbols):
+                    _write_status(
+                        status_path,
+                        "running",
+                        symbols_requested=len(symbols),
+                        symbols_processed=processed,
+                        symbols_succeeded=processed - len(failed),
+                        failed_count=len(failed),
+                        output=str(output),
+                    )
+                if pause_seconds:
+                    time.sleep(pause_seconds)
 
-    output = Path(output_path)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    rows.sort(key=lambda row: (str(row["symbol"]), str(row["date"])))
-    with output.open("w", newline="", encoding="utf-8-sig") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=["date", "symbol", "open", "high", "low", "close", "volume"],
+        retry_symbols = [item.split(":", 1)[0] for item in failed]
+        if retry_symbols:
+            failed = []
+            _write_status(
+                status_path,
+                "running",
+                symbols_requested=len(symbols),
+                symbols_processed=processed,
+                symbols_succeeded=processed - len(retry_symbols),
+                failed_count=len(retry_symbols),
+                retrying=len(retry_symbols),
+                output=str(output),
+            )
+            for symbol in retry_symbols:
+                try:
+                    rows.extend(fetch_symbol_prices(symbol, range_value, interval, timeout=max(20, request_timeout)))
+                except Exception as exc:  # noqa: BLE001
+                    failed.append(f"{symbol}: {exc}")
+                time.sleep(max(0.2, pause_seconds))
+
+        succeeded = len(symbols) - len(failed)
+        if not rows:
+            raise RuntimeError("No price rows downloaded. Check network access or symbols.")
+        if succeeded / len(symbols) < min_success_ratio:
+            raise RuntimeError(
+                f"Only {succeeded}/{len(symbols)} symbols downloaded; existing price data was kept unchanged."
+            )
+
+        output.parent.mkdir(parents=True, exist_ok=True)
+        rows.sort(key=lambda row: (str(row["symbol"]), str(row["date"])))
+        latest_candle_date = max(str(row["date"]) for row in rows)
+        temp_output = output.with_name(f".{output.name}.{uuid4().hex}.tmp")
+        with temp_output.open("w", newline="", encoding="utf-8-sig") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=["date", "symbol", "open", "high", "low", "close", "volume"],
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+        temp_output.replace(output)
+
+        metadata_path = output.with_name(f"{output.stem}_source.json")
+        metadata = {
+            "source": "Yahoo Finance",
+            "range": range_value,
+            "interval": interval,
+            "updated_at": datetime.now(UTC).isoformat(),
+            "latest_candle_date": latest_candle_date,
+            "symbols_requested": len(symbols),
+            "symbols_succeeded": succeeded,
+            "rows_downloaded": len(rows),
+            "failed": failed,
+        }
+        _atomic_write(metadata_path, json.dumps(metadata, ensure_ascii=False, indent=2))
+        _write_status(
+            status_path,
+            "complete",
+            symbols_requested=len(symbols),
+            symbols_succeeded=succeeded,
+            failed_count=len(failed),
+            latest_candle_date=latest_candle_date,
+            rows_downloaded=len(rows),
         )
-        writer.writeheader()
-        writer.writerows(rows)
-
-    metadata_path = output.with_name(f"{output.stem}_source.json")
-    metadata_path.write_text(
-        json.dumps(
-            {
-                "source": "Yahoo Finance",
-                "range": range_value,
-                "interval": interval,
-                "updated_at": datetime.now(UTC).isoformat(),
-                "symbols_requested": len(symbols),
-                "rows_downloaded": len(rows),
-                "failed": failed,
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
-
-    return DownloadSummary(symbols=len(symbols), rows=len(rows), output=output, failed=failed)
+        return DownloadSummary(
+            symbols=len(symbols),
+            succeeded=succeeded,
+            rows=len(rows),
+            output=output,
+            failed=failed,
+            latest_candle_date=latest_candle_date,
+        )
+    except Exception as exc:
+        _write_status(status_path, "failed", symbols_requested=len(symbols), error=str(exc))
+        raise
+    finally:
+        for child in lock_path.glob("*") if lock_path.exists() else []:
+            child.unlink(missing_ok=True)
+        if lock_path.exists():
+            lock_path.rmdir()

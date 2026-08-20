@@ -15,6 +15,7 @@ from .indicators import (
     volume_ratio,
 )
 from .models import PatternHit, StockCandle
+from .timeframes import normalize_timeframe
 
 
 PATTERN_LABELS = {
@@ -45,12 +46,17 @@ def market_phase(candles: list[StockCandle]) -> str:
     return "TRANSITION"
 
 
-def detect_breakout(candles: list[StockCandle]) -> PatternHit | None:
-    if len(candles) < 90:
+def _bars(value: int, timeframe: str) -> int:
+    return max(3, round(value * (0.28 if timeframe == "M" else 1.0)))
+
+
+def detect_breakout(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    timeframe = normalize_timeframe(timeframe)
+    if len(candles) < _bars(90, timeframe):
         return None
     close = candles[-1].close
-    previous_high = rolling_high(candles, 60, exclude_latest=True)
-    vol_ratio = volume_ratio(candles, 20)
+    previous_high = rolling_high(candles, _bars(60, timeframe), exclude_latest=True)
+    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
     values = closes(candles)
     ema50 = ema(values, 50)
     ema200 = ema(values, 200)
@@ -80,11 +86,14 @@ def detect_breakout(candles: list[StockCandle]) -> PatternHit | None:
     )
 
 
-def detect_retest(candles: list[StockCandle]) -> PatternHit | None:
-    if len(candles) < 110:
+def detect_retest(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    timeframe = normalize_timeframe(timeframe)
+    if len(candles) < _bars(110, timeframe):
         return None
-    base_window = candles[-90:-24]
-    recent_window = candles[-24:-1]
+    base_bars = _bars(90, timeframe)
+    recent_bars = _bars(24, timeframe)
+    base_window = candles[-base_bars:-recent_bars]
+    recent_window = candles[-recent_bars:-1]
     if not base_window or not recent_window:
         return None
     resistance = max(candle.high for candle in base_window)
@@ -94,7 +103,7 @@ def detect_retest(candles: list[StockCandle]) -> PatternHit | None:
     bounce = latest.close > candles[-2].close and latest.close > resistance
     if not (broke_recently and near_level and bounce):
         return None
-    vol_ratio = volume_ratio(candles, 20)
+    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
     support_quality = max(0, 1 - abs(latest.close - resistance) / max(resistance, 0.01))
     score = min(92, 60 + support_quality * 14 + min(13, vol_ratio * 5))
     return PatternHit(
@@ -112,15 +121,16 @@ def detect_retest(candles: list[StockCandle]) -> PatternHit | None:
     )
 
 
-def detect_double_bottom(candles: list[StockCandle]) -> PatternHit | None:
-    if len(candles) < 130:
+def detect_double_bottom(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    timeframe = normalize_timeframe(timeframe)
+    if len(candles) < _bars(130, timeframe):
         return None
-    pivots = local_lows(candles, lookback=120, radius=5)
+    pivots = local_lows(candles, lookback=_bars(120, timeframe), radius=_bars(5, timeframe))
     latest = candles[-1]
     candidates: list[tuple[int, float, int, float]] = []
     for left_idx, left_low in pivots:
         for right_idx, right_low in pivots:
-            if right_idx - left_idx < 18:
+            if right_idx - left_idx < _bars(18, timeframe):
                 continue
             similarity = abs(left_low - right_low) / max(left_low, right_low)
             if similarity <= 0.055 and right_idx > left_idx:
@@ -132,7 +142,7 @@ def detect_double_bottom(candles: list[StockCandle]) -> PatternHit | None:
     if latest.close <= neckline * 1.005:
         return None
     depth = pct_change(neckline, min(left_low, right_low))
-    vol_ratio = volume_ratio(candles, 20)
+    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
     score = min(94, 61 + depth * 0.7 + min(12, vol_ratio * 4))
     return PatternHit(
         name="double_bottom",
@@ -149,14 +159,18 @@ def detect_double_bottom(candles: list[StockCandle]) -> PatternHit | None:
     )
 
 
-def detect_cup_handle(candles: list[StockCandle]) -> PatternHit | None:
-    if len(candles) < 180:
+def detect_cup_handle(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    timeframe = normalize_timeframe(timeframe)
+    if len(candles) < _bars(180, timeframe):
         return None
-    window = candles[-170:]
-    left = window[:45]
-    bowl = window[45:125]
-    right = window[125:150]
-    handle = window[150:-1]
+    window = candles[-_bars(170, timeframe):]
+    left_end = _bars(45, timeframe)
+    bowl_end = _bars(125, timeframe)
+    right_end = _bars(150, timeframe)
+    left = window[:left_end]
+    bowl = window[left_end:bowl_end]
+    right = window[bowl_end:right_end]
+    handle = window[right_end:-1]
     latest = candles[-1]
     if not (left and bowl and right and handle):
         return None
@@ -173,7 +187,7 @@ def detect_cup_handle(candles: list[StockCandle]) -> PatternHit | None:
     valid_handle = 0.025 <= handle_pullback <= 0.18
     if not (valid_shape and valid_handle and broke_handle):
         return None
-    vol_ratio = volume_ratio(candles, 20)
+    vol_ratio = volume_ratio(candles, _bars(20, timeframe))
     score = min(96, 64 + depth * 55 + min(12, vol_ratio * 4))
     return PatternHit(
         name="cup_handle",
@@ -190,10 +204,11 @@ def detect_cup_handle(candles: list[StockCandle]) -> PatternHit | None:
     )
 
 
-def detect_head_shoulders(candles: list[StockCandle]) -> PatternHit | None:
-    if len(candles) < 130:
+def detect_head_shoulders(candles: list[StockCandle], timeframe: str = "D") -> PatternHit | None:
+    timeframe = normalize_timeframe(timeframe)
+    if len(candles) < _bars(130, timeframe):
         return None
-    peaks = local_highs(candles, lookback=125, radius=4)
+    peaks = local_highs(candles, lookback=_bars(125, timeframe), radius=_bars(4, timeframe))
     if len(peaks) < 3:
         return None
     selected: tuple[int, float, int, float, int, float] | None = None
@@ -201,7 +216,7 @@ def detect_head_shoulders(candles: list[StockCandle]) -> PatternHit | None:
         l_idx, left = peaks[first]
         h_idx, head = peaks[first + 1]
         r_idx, right = peaks[first + 2]
-        separated = h_idx - l_idx >= 10 and r_idx - h_idx >= 10
+        separated = h_idx - l_idx >= _bars(10, timeframe) and r_idx - h_idx >= _bars(10, timeframe)
         head_is_high = head > left * 1.04 and head > right * 1.04
         shoulders_match = abs(left - right) / max(left, right) <= 0.15
         if separated and head_is_high and shoulders_match:
@@ -242,13 +257,15 @@ DETECTORS = {
 }
 
 
-def detect_patterns(candles: list[StockCandle], selected: tuple[str, ...]) -> list[PatternHit]:
+def detect_patterns(
+    candles: list[StockCandle], selected: tuple[str, ...], timeframe: str = "D"
+) -> list[PatternHit]:
     hits: list[PatternHit] = []
     for name in selected:
         detector = DETECTORS.get(name)
         if detector is None:
             continue
-        hit = detector(candles)
+        hit = detector(candles, timeframe)
         if hit is not None:
             hits.append(hit)
     return sorted(hits, key=lambda item: item.score, reverse=True)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 from datetime import UTC, datetime
+from typing import Any
 
 from .models import FundamentalSnapshot, ScanResult, StockCandle
 
@@ -37,6 +38,7 @@ def build_report_html(
     result: ScanResult,
     candles: list[StockCandle],
     snapshot: FundamentalSnapshot,
+    data_health: dict[str, Any] | None = None,
 ) -> str:
     patterns = "".join(
         f"<li><b>{html.escape(pattern.label)}</b>: {html.escape('; '.join(pattern.reasons))}</li>"
@@ -51,6 +53,9 @@ def build_report_html(
     risk = result.risk_plan
     targets = ", ".join(f"{target:.2f}" for target in risk.targets)
     generated = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
+    data_health = data_health or {}
+    health_message = data_health.get("message") or "Data health unavailable"
+    health_class = "ready" if data_health.get("can_publish") else "warning"
 
     return f"""<!doctype html>
 <html lang="th">
@@ -65,6 +70,9 @@ def build_report_html(
     h3 {{ margin-bottom: 6px; }}
     .muted {{ color: #526173; }}
     .badge {{ display: inline-block; padding: 4px 9px; border-radius: 6px; background: #e7f0ff; color: #174ea6; font-weight: 700; }}
+    .health {{ padding: 10px 12px; border-radius: 6px; font-weight: 700; }}
+    .health.ready {{ background: #eaf8f0; color: #116638; }}
+    .health.warning {{ background: #fff4df; color: #9a5b00; }}
     .grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
     table {{ width: 100%; border-collapse: collapse; }}
     th, td {{ text-align: left; padding: 9px 10px; border-bottom: 1px solid #e6ebf2; }}
@@ -77,8 +85,9 @@ def build_report_html(
   <main>
     <button class="no-print" onclick="window.print()">Save as PDF</button>
     <p class="muted">Generated {generated}</p>
+    <p class="health {health_class}">Data Health: {html.escape(str(health_message))} | Latest candle: {html.escape(str(data_health.get('latest_candle_date') or '-'))}</p>
     <h1>{html.escape(result.symbol)} - {html.escape(result.name)}</h1>
-    <p><span class="badge">{html.escape(result.grade)}</span> {html.escape(result.decision)} | {html.escape(result.market)} | {html.escape(result.sector)}</p>
+    <p><span class="badge">{html.escape(result.grade)}</span> {html.escape(result.decision)} | {html.escape(result.market)} | {html.escape(result.sector)} | TF {html.escape(result.timeframe)}</p>
     {_sparkline_svg(candles)}
 
     <h2>Scanner Verdict</h2>
@@ -104,6 +113,8 @@ def build_report_html(
 
     <h2>Fundamental Snapshot</h2>
     <table>
+      <tr><th>Verification</th><td>{'Verified financial statements' if snapshot.fundamentals_verified else 'Pending - technical candidate only'}</td></tr>
+      <tr><th>Statement period</th><td>{html.escape(snapshot.as_of or '-')}</td></tr>
       <tr><th>ROE / ROA</th><td>{snapshot.roe:.1f}% / {snapshot.roa:.1f}%</td></tr>
       <tr><th>Debt to equity</th><td>{snapshot.debt_to_equity:.2f}x</td></tr>
       <tr><th>Growth</th><td>Revenue {snapshot.revenue_growth:.1f}%, profit {snapshot.profit_growth:.1f}%</td></tr>
