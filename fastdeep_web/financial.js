@@ -37,6 +37,7 @@
     financials: null,
     selectedYear: null,
     activeView: "scannerView",
+    financialRequestId: 0,
   };
 
   const amountFormatter = new Intl.NumberFormat("th-TH", {
@@ -91,7 +92,15 @@
     for (const tab of elements.navTabs) {
       tab.classList.toggle("is-active", tab.dataset.viewTarget === viewId);
     }
-    if (viewId !== "scannerView" && !state.financials) loadFinancials(false);
+    if (viewId !== "scannerView" && state.financials?.symbol !== normalizedSymbol()) loadFinancials(false);
+  }
+
+  function selectScannerSymbol(symbol) {
+    const nextSymbol = String(symbol || "").trim().toUpperCase();
+    if (!nextSymbol) return;
+    if (nextSymbol === normalizedSymbol() && state.financials?.symbol === nextSymbol) return;
+    elements.symbolInput.value = nextSymbol;
+    loadFinancials(false, nextSymbol);
   }
 
   async function loadUniverse() {
@@ -106,12 +115,13 @@
     }
   }
 
-  async function loadFinancials(refresh) {
-    const symbol = normalizedSymbol();
+  async function loadFinancials(refresh, requestedSymbol = "") {
+    const symbol = String(requestedSymbol || normalizedSymbol()).trim().toUpperCase();
     if (!symbol) {
       status("กรุณาระบุชื่อย่อหุ้น เช่น AAPL หรือ DOHOME.BK", "error");
       return;
     }
+    const requestId = ++state.financialRequestId;
     elements.loadButton.disabled = true;
     elements.refreshButton.disabled = true;
     status(refresh ? `กำลังดึงงบล่าสุดของ ${symbol}...` : `กำลังโหลดงบของ ${symbol}...`, "loading");
@@ -119,14 +129,17 @@
       const response = await fetch(`/api/financials?symbol=${encodeURIComponent(symbol)}&refresh=${refresh ? "1" : "0"}`);
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "ไม่สามารถโหลดงบการเงินได้");
+      if (requestId !== state.financialRequestId) return;
       state.financials = payload;
       state.selectedYear = payload.annual.at(-1)?.period_end.slice(0, 4) || null;
       renderFinancials();
       renderVi();
       status(`${payload.symbol} พร้อมใช้งาน (${payload.cache_status === "cached" ? "ใช้ข้อมูลที่บันทึกไว้" : "อัปเดตแล้ว"})`, "ready");
     } catch (error) {
+      if (requestId !== state.financialRequestId) return;
       status(error.message || "ไม่สามารถโหลดงบการเงินได้", "error");
     } finally {
+      if (requestId !== state.financialRequestId) return;
       elements.loadButton.disabled = false;
       elements.refreshButton.disabled = false;
     }
@@ -296,6 +309,7 @@
   elements.navTabs.forEach((tab) => tab.addEventListener("click", () => selectView(tab.dataset.viewTarget)));
   elements.loadButton.addEventListener("click", () => loadFinancials(false));
   elements.refreshButton.addEventListener("click", () => loadFinancials(true));
+  window.addEventListener("fastdeep:symbol-selected", (event) => selectScannerSymbol(event.detail?.symbol));
   elements.symbolInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") loadFinancials(false);
   });
@@ -313,6 +327,8 @@
   });
   [elements.targetRevenueCagr, elements.targetProfitCagr, elements.targetRoe, elements.targetDebtEquity]
     .forEach((input) => input.addEventListener("input", renderVi));
+
+  if (window.fastDeepSelectedSymbol) selectScannerSymbol(window.fastDeepSelectedSymbol);
 
   loadUniverse();
 })();

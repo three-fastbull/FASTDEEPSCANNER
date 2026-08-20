@@ -382,6 +382,15 @@ function drawChart(candles, result) {
 function renderDetail(payload) {
   const { result, candles, fundamental, tradingview_url } = payload;
   state.selectedSymbol = result.symbol;
+  window.fastDeepSelectedSymbol = result.symbol;
+  window.dispatchEvent(new CustomEvent("fastdeep:symbol-selected", {
+    detail: {
+      symbol: result.symbol,
+      name: result.name,
+      market: result.market,
+      source: "scanner",
+    },
+  }));
   document.querySelectorAll("tbody tr").forEach((row) => {
     row.classList.toggle("active", row.dataset.symbol === result.symbol);
   });
