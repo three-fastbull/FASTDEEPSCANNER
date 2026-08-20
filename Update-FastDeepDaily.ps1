@@ -24,8 +24,12 @@ try {
     & $python -m fastdeep_scanner update-fx --out data\fastdeep_fx_rates.json 2>&1 | ForEach-Object { Write-DailyLog "fx: $_" }
     if ($LASTEXITCODE -ne 0) { Write-DailyLog "fx: refresh failed, keeping previous rates" }
 
-    # Statements change less often than prices. Resume missing/stale symbols once
-    # a week with a global request limiter, then audit true 5y/Q1-Q4 coverage.
+    # SEC updates resume daily. Fresh seven-day caches are skipped, so the first
+    # successful connection fills the universe and later runs are lightweight.
+    & $python -m fastdeep_scanner update-sec-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --groups SP500,NASDAQ100 --pause 0.20 --request-timeout 30 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json --ticker-cache data\sec_company_tickers.json 2>&1 | ForEach-Object { Write-DailyLog "sec: $_" }
+    if ($LASTEXITCODE -ne 0) { Write-DailyLog "sec: refresh unavailable, keeping previous verified cache" }
+
+    # Yahoo remains the weekly fallback for markets outside SEC coverage.
     if ((Get-Date).DayOfWeek -eq [DayOfWeek]::Saturday) {
         & $python -m fastdeep_scanner update-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --pause 0.75 --workers 1 --request-timeout 20 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financials: $_" }
         if ($LASTEXITCODE -ne 0) { Write-DailyLog "financials: refresh incomplete, keeping verified cache" }

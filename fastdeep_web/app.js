@@ -329,6 +329,20 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
       `${financialHealth.complete_symbols || 0}/${financialHealth.symbols_requested}`,
       financialHealth.complete_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
     ));
+    const secCount = financialHealth.by_source?.["SEC EDGAR"] || 0;
+    const usTotal = financialHealth.by_market?.US?.symbols || 0;
+    const secUpdate = financialHealth.sec_update || {};
+    if (usTotal || secUpdate.symbols_requested) {
+      const secTarget = secUpdate.symbols_requested || usTotal;
+      const secValue = secUpdate.state === "running"
+        ? `${secUpdate.symbols_processed || 0}/${secTarget} กำลังอัปเดต`
+        : `${secCount}/${secTarget}${secUpdate.state === "failed" ? " เชื่อมต่อไม่ได้" : ""}`;
+      facts.push(healthFact(
+        "งบทางการ SEC ",
+        secValue,
+        secUpdate.state === "failed" ? "bad" : (secCount >= secTarget && secTarget ? "ok" : "warn"),
+      ));
+    }
   }
   if (fx) {
     facts.push(healthFact("อัตราแลกเปลี่ยน ", `${fx.rates} สกุล · ${fx.state}`, fx.state === "ready" ? "ok" : "warn"));

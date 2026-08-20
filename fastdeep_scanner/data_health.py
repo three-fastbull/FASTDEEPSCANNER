@@ -14,6 +14,7 @@ DEFAULT_STATUS_PATH = ROOT / "data" / "fastdeep_price_update_status.json"
 DEFAULT_FINANCIAL_CACHE_DIR = ROOT / "data" / "financial_cache"
 DEFAULT_FINANCIAL_STATUS_PATH = ROOT / "data" / "fastdeep_financial_update_status.json"
 DEFAULT_FINANCIAL_COVERAGE_PATH = ROOT / "data" / "fastdeep_financial_coverage.json"
+DEFAULT_SEC_STATUS_PATH = ROOT / "data" / "fastdeep_sec_update_status.json"
 
 
 def expected_eod_date(today: date | None = None) -> date:
@@ -169,10 +170,12 @@ def financial_data_health(
     *,
     status_path: str | Path = DEFAULT_FINANCIAL_STATUS_PATH,
     coverage_path: str | Path = DEFAULT_FINANCIAL_COVERAGE_PATH,
+    sec_status_path: str | Path = DEFAULT_SEC_STATUS_PATH,
 ) -> dict[str, Any]:
     cache_dir = Path(cache_dir)
     status = _read_json(Path(status_path))
     coverage = _read_json(Path(coverage_path))
+    sec_status = _read_json(Path(sec_status_path))
     files = list(cache_dir.glob("*.json")) if cache_dir.exists() else []
     fresh_cutoff = datetime.now().timestamp() - 8 * 24 * 3600
     fresh = sum(path.stat().st_mtime >= fresh_cutoff for path in files)
@@ -198,4 +201,15 @@ def financial_data_health(
         "partial_symbols": int(coverage.get("partial_symbols") or 0),
         "missing_symbols": int(coverage.get("missing_symbols") or max(0, requested - cached)),
         "by_market": coverage.get("by_market") or {},
+        "by_source": coverage.get("by_source") or {},
+        "sec_update": {
+            "state": sec_status.get("state") or "not_started",
+            "updated_at": sec_status.get("updated_at"),
+            "symbols_requested": int(sec_status.get("symbols_requested") or 0),
+            "symbols_processed": int(sec_status.get("symbols_processed") or 0),
+            "symbols_succeeded": int(sec_status.get("symbols_succeeded") or 0),
+            "failed_count": int(sec_status.get("failed_count") or 0),
+            "last_symbol": sec_status.get("last_symbol"),
+            "error": sec_status.get("error"),
+        },
     }

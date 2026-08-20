@@ -11,7 +11,11 @@ from .scanner import scan_market
 from .data_io import load_market_data
 from .data_health import price_data_health
 from .backtest import run_event_study
-from .financials import audit_financial_cache, cache_universe_financials
+from .financials import (
+    audit_financial_cache,
+    cache_sec_universe_financials,
+    cache_universe_financials,
+)
 from .server import run_server
 from .static_export import export_static_dashboard
 from .yahoo_prices import update_prices_from_yahoo
@@ -109,6 +113,41 @@ def update_financials_command(args: argparse.Namespace) -> None:
         f"cached {coverage['cached_symbols']}/{coverage['symbols_requested']}, "
         f"annual 5y {coverage['annual_5y_symbols']}, "
         f"5y + Q1-Q4 {coverage['complete_symbols']}"
+    )
+    if summary["failed"]:
+        print("- failed:")
+        for item in summary["failed"]:
+            print(f"  - {item}")
+
+
+def update_sec_financials_command(args: argparse.Namespace) -> None:
+    groups = tuple(value.strip() for value in args.groups.split(",") if value.strip())
+    symbols = tuple(value.strip().upper() for value in args.symbols.split(",") if value.strip())
+    try:
+        summary = cache_sec_universe_financials(
+            args.universe,
+            cache_dir=args.cache_dir,
+            groups=groups,
+            symbols=symbols,
+            pause_seconds=args.pause,
+            refresh=args.refresh,
+            request_timeout=args.request_timeout,
+            cache_max_age_hours=args.cache_max_age_hours,
+            max_retries=args.retries,
+            limit=args.limit,
+            coverage_path=args.coverage_out,
+            ticker_cache_path=args.ticker_cache,
+        )
+    except Exception as exc:  # noqa: BLE001
+        raise SystemExit(f"SEC update unavailable: {exc}") from exc
+    print(f"SEC statements: {len(summary['succeeded'])}/{summary['symbols']}")
+    coverage = summary["coverage"]
+    us_coverage = coverage.get("by_market", {}).get("US", {})
+    print(
+        "US coverage: "
+        f"cached {us_coverage.get('cached', 0)}/{us_coverage.get('symbols', 0)}, "
+        f"annual 5y {us_coverage.get('annual_5y', 0)}, "
+        f"5y + Q1-Q4 {us_coverage.get('complete', 0)}"
     )
     if summary["failed"]:
         print("- failed:")
@@ -247,6 +286,24 @@ def build_parser() -> argparse.ArgumentParser:
     update_financials.add_argument("--retries", type=int, default=2)
     update_financials.add_argument("--coverage-out", default="data/fastdeep_financial_coverage.json")
     update_financials.set_defaults(func=update_financials_command)
+
+    update_sec = subparsers.add_parser(
+        "update-sec-financials",
+        help="Download SEC EDGAR 10-K/10-Q XBRL for US index constituents",
+    )
+    update_sec.add_argument("--universe", default="data/fastdeep_universe.csv")
+    update_sec.add_argument("--cache-dir", default="data/financial_cache")
+    update_sec.add_argument("--groups", default="SP500,NASDAQ100")
+    update_sec.add_argument("--symbols", default="")
+    update_sec.add_argument("--pause", type=float, default=0.20)
+    update_sec.add_argument("--refresh", action="store_true")
+    update_sec.add_argument("--request-timeout", type=int, default=30)
+    update_sec.add_argument("--cache-max-age-hours", type=int, default=168)
+    update_sec.add_argument("--retries", type=int, default=2)
+    update_sec.add_argument("--limit", type=int, default=None)
+    update_sec.add_argument("--coverage-out", default="data/fastdeep_financial_coverage.json")
+    update_sec.add_argument("--ticker-cache", default="data/sec_company_tickers.json")
+    update_sec.set_defaults(func=update_sec_financials_command)
 
     audit_financials = subparsers.add_parser(
         "audit-financials",

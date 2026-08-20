@@ -13,13 +13,16 @@ from uuid import uuid4
 
 from .currency import currency_label, currency_name_th, trading_currency
 from .data_io import load_universe_metadata
+from .sec_edgar import fetch_sec_companyfacts, load_sec_ticker_map
 from .yahoo_prices import load_universe
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CACHE_DIR = ROOT / "data" / "financial_cache"
 DEFAULT_UPDATE_STATUS = ROOT / "data" / "fastdeep_financial_update_status.json"
+DEFAULT_SEC_UPDATE_STATUS = ROOT / "data" / "fastdeep_sec_update_status.json"
 DEFAULT_COVERAGE_REPORT = ROOT / "data" / "fastdeep_financial_coverage.json"
+DEFAULT_SEC_TICKER_CACHE = ROOT / "data" / "sec_company_tickers.json"
 YAHOO_TIMESERIES_URL = "https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries"
 
 
@@ -271,15 +274,19 @@ def _quarterly_by_year(
 ) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for period in periods:
-        year = period["period_end"][:4]
-        grouped.setdefault(year, []).append({**period, "quarter": _quarter_name(period["period_end"])})
+        year = str(period.get("fiscal_year") or period["period_end"][:4])
+        quarter = str(period.get("quarter") or _quarter_name(period["period_end"]))
+        grouped.setdefault(year, []).append({**period, "fiscal_year": year, "quarter": quarter})
 
     for year, values in grouped.items():
         values.sort(key=lambda item: item["period_end"])
         by_quarter = {item["quarter"]: item for item in values}
         grouped[year] = [by_quarter[key] for key in ("Q1", "Q2", "Q3", "Q4") if key in by_quarter]
 
-    annual_by_year = {item["period_end"][:4]: item for item in annual_periods}
+    annual_by_year = {
+        str(item.get("fiscal_year") or item["period_end"][:4]): item
+        for item in annual_periods
+    }
     for year, annual in annual_by_year.items():
         entries = grouped.setdefault(year, [])
         quarters = {entry["quarter"]: entry for entry in entries}
@@ -299,9 +306,14 @@ def _quarterly_by_year(
                 entries.append(
                     {
                         "period_end": annual["period_end"],
+                        "fiscal_year": year,
                         "quarter": "Q4",
                         "metrics": q4_metrics,
                         "derived_from_annual": True,
+                        "source_form": annual.get("source_form"),
+                        "accession": annual.get("accession"),
+                        "filed_at": annual.get("filed_at"),
+                        "source_url": annual.get("source_url"),
                     }
                 )
                 entries.sort(key=lambda item: item["quarter"])
@@ -334,7 +346,7 @@ def _vi_summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
         previous = periods[index - 1] if index else None
         yearly.append(
             {
-                "year": period["period_end"][:4],
+                "year": str(period.get("fiscal_year") or period["period_end"][:4]),
                 "revenue_growth": _growth(
                     _value(period["metrics"], "total_revenue"),
                     _value(previous["metrics"], "total_revenue") if previous else None,
@@ -405,12 +417,15 @@ def _vi_summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
     ]
     return {
         "available": True,
-        "period": f"{first['period_end'][:4]}-{latest['period_end'][:4]}",
+        "period": (
+            f"{first.get('fiscal_year') or first['period_end'][:4]}-"
+            f"{latest.get('fiscal_year') or latest['period_end'][:4]}"
+        ),
         "elapsed_years": elapsed_years,
         "yearly": yearly,
         "checks": checks,
         "latest": {
-            "year": latest["period_end"][:4],
+            "year": str(latest.get("fiscal_year") or latest["period_end"][:4]),
             "revenue": _value(latest_metrics, "total_revenue"),
             "net_income": _value(latest_metrics, "net_income"),
             "free_cash_flow": _value(latest_metrics, "free_cash_flow"),
@@ -475,7 +490,10 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
     annual = sorted(payload.get("annual") or [], key=lambda item: str(item.get("period_end") or ""))
     annual = [item for item in annual if item.get("period_end")]
     annual_five = annual[-5:]
-    annual_years = [str(item["period_end"])[:4] for item in annual_five]
+    annual_years = [
+        str(item.get("fiscal_year") or str(item["period_end"])[:4])
+        for item in annual_five
+    ]
 
     metric_slots = len(annual_five) * len(CORE_ANNUAL_METRICS)
     metric_values = sum(
@@ -489,11 +507,31 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
     quarterly_by_year = payload.get("quarterly_by_year") or {}
     quarter_periods = 0
     full_quarter_years: list[str] = []
+    quarter_metric_values = 0
+    quarter_metric_slots = 0
     for year, periods in quarterly_by_year.items():
-        quarters = {str(item.get("quarter") or "") for item in periods or []}
+        period_list = list(periods or [])
+        quarters = {str(item.get("quarter") or "") for item in period_list}
         quarter_periods += len(quarters & {"Q1", "Q2", "Q3", "Q4"})
-        if {"Q1", "Q2", "Q3", "Q4"}.issubset(quarters):
+        relevant_periods = [
+            item for item in period_list if str(item.get("quarter") or "") in {"Q1", "Q2", "Q3", "Q4"}
+        ]
+        year_slots = len(relevant_periods) * len(CORE_ANNUAL_METRICS)
+        year_values = sum(
+            1
+            for period in relevant_periods
+            for metric in CORE_ANNUAL_METRICS
+            if _safe_number((period.get("metrics") or {}).get(metric)) is not None
+        )
+        quarter_metric_slots += year_slots
+        quarter_metric_values += year_values
+        year_coverage = year_values / year_slots * 100 if year_slots else 0.0
+        if {"Q1", "Q2", "Q3", "Q4"}.issubset(quarters) and year_coverage >= 80.0:
             full_quarter_years.append(str(year))
+
+    quarter_metric_coverage = (
+        quarter_metric_values / quarter_metric_slots * 100 if quarter_metric_slots else 0.0
+    )
 
     annual_complete = len(annual_five) >= 5 and metric_coverage >= 80.0
     quarterly_complete = len(set(annual_years) & set(full_quarter_years)) >= 5
@@ -528,6 +566,7 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
         "annual_complete": annual_complete,
         "core_metric_coverage_pct": round(metric_coverage, 1),
         "quarter_periods": quarter_periods,
+        "quarter_core_metric_coverage_pct": round(quarter_metric_coverage, 1),
         "full_quarter_years": sorted(full_quarter_years),
         "quarterly_target_years": 5,
         "quarterly_complete": quarterly_complete,
@@ -546,6 +585,7 @@ def audit_financial_cache(
     cache_dir = Path(cache_dir)
     items: list[dict[str, Any]] = []
     by_market: dict[str, dict[str, int]] = {}
+    by_source: dict[str, int] = {}
 
     for symbol, details in metadata.items():
         path = _cache_path(symbol, cache_dir)
@@ -558,6 +598,14 @@ def audit_financial_cache(
                 error = str(exc)
         quality = assess_financial_payload(payload)
         market = str(details.get("market") or payload and payload.get("market") or "Unknown")
+        source_name = str((payload or {}).get("source") or "missing")
+        if source_name.startswith("SEC EDGAR"):
+            source_key = "SEC EDGAR"
+        elif source_name.startswith("Yahoo Finance"):
+            source_key = "Yahoo Finance"
+        else:
+            source_key = source_name
+        by_source[source_key] = by_source.get(source_key, 0) + 1
         market_counts = by_market.setdefault(
             market,
             {"symbols": 0, "cached": 0, "annual_5y": 0, "complete": 0, "partial": 0, "missing": 0},
@@ -594,6 +642,7 @@ def audit_financial_cache(
         "partial_symbols": sum(item["status"] in {"annual_complete", "partial"} for item in items),
         "missing_symbols": sum(item["status"] == "missing" for item in items),
         "by_market": by_market,
+        "by_source": by_source,
         "items": items,
     }
     report["cached_coverage_pct"] = round(
@@ -609,6 +658,84 @@ def audit_financial_cache(
     return report
 
 
+def _build_financial_payload(
+    symbol: str,
+    *,
+    annual_periods: list[dict[str, Any]],
+    quarterly_periods: list[dict[str, Any]],
+    currency: str,
+    source: str,
+    source_url: str = "",
+    provider_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    metadata = load_universe_metadata().get(symbol, {})
+    annual = _add_ratios(
+        sorted(annual_periods, key=lambda item: str(item.get("period_end") or ""))[-5:]
+    )
+    if not annual:
+        raise FinancialDataError(f"ไม่พบงบการเงินของ {symbol} จาก {source}")
+    annual_years = {
+        str(item.get("fiscal_year") or str(item.get("period_end") or "")[:4])
+        for item in annual
+    }
+    quarterly_by_year = {
+        year: periods
+        for year, periods in _quarterly_by_year(quarterly_periods, annual).items()
+        if year in annual_years
+    }
+    output = {
+        "symbol": symbol,
+        "name": metadata.get("name") or symbol,
+        "market": metadata.get("market") or "Unknown",
+        "sector": metadata.get("sector") or "Unknown",
+        "currency": currency.upper(),
+        "unit": "ล้าน",
+        "source": source,
+        "source_url": source_url,
+        "fetched_at": datetime.now(UTC).isoformat(),
+        "cache_status": "fresh",
+        "annual": annual,
+        "quarterly_by_year": quarterly_by_year,
+        "sections": FINANCIAL_SECTIONS,
+        "metric_labels": METRIC_LABELS,
+        "ratio_labels": RATIO_LABELS,
+        "vi_summary": _vi_summary(annual),
+        **(provider_metadata or {}),
+    }
+    output["data_quality"] = assess_financial_payload(output)
+    return _with_currency_presentation(output)
+
+
+def _sec_financial_payload(
+    symbol: str,
+    *,
+    ticker_map: dict[str, dict[str, Any]] | None = None,
+    request_timeout: int = 30,
+) -> dict[str, Any]:
+    if ticker_map is None:
+        ticker_map = load_sec_ticker_map(
+            DEFAULT_SEC_TICKER_CACHE,
+            timeout=request_timeout,
+        )
+    normalized = fetch_sec_companyfacts(
+        symbol,
+        ticker_map=ticker_map,
+        timeout=request_timeout,
+    )
+    return _build_financial_payload(
+        symbol,
+        annual_periods=normalized["annual"],
+        quarterly_periods=normalized["quarterly"],
+        currency=normalized["currency"],
+        source=normalized["source"],
+        source_url=normalized["source_url"],
+        provider_metadata={
+            "cik": normalized["cik"],
+            "sec_entity_name": normalized["entity_name"],
+        },
+    )
+
+
 def fetch_financials(
     symbol: str,
     *,
@@ -616,6 +743,8 @@ def fetch_financials(
     cache_dir: str | Path = DEFAULT_CACHE_DIR,
     max_age_hours: int = 24,
     request_timeout: int = 20,
+    provider: str = "auto",
+    sec_ticker_map: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     symbol = symbol.strip().upper()
     if not symbol:
@@ -630,6 +759,32 @@ def fetch_financials(
             cached["data_quality"] = assess_financial_payload(cached)
             return _with_currency_presentation(cached)
 
+    provider = provider.strip().lower()
+    if provider not in {"auto", "sec", "yahoo"}:
+        raise FinancialDataError(f"ไม่รู้จักผู้ให้บริการงบ: {provider}")
+    metadata = load_universe_metadata().get(symbol, {})
+    market = metadata.get("market") or "Unknown"
+    sec_error = ""
+    if provider == "sec" or (provider == "auto" and market == "US"):
+        try:
+            output = _sec_financial_payload(
+                symbol,
+                ticker_map=sec_ticker_map,
+                request_timeout=request_timeout,
+            )
+            _write_json_atomic(cache_file, output)
+            return output
+        except Exception as exc:  # noqa: BLE001
+            if provider == "sec":
+                raise FinancialDataError(f"ดึงงบ SEC ของ {symbol} ไม่สำเร็จ: {exc}") from exc
+            sec_error = str(exc)
+            existing = _read_cache(cache_file, max_age_hours=24 * 365 * 20)
+            if existing and str(existing.get("source") or "").startswith("SEC EDGAR"):
+                existing["cache_status"] = "stale_verified"
+                existing["refresh_error"] = sec_error
+                existing["data_quality"] = assess_financial_payload(existing)
+                return _with_currency_presentation(existing)
+
     try:
         payload = _download_json(_financial_url(symbol), timeout=request_timeout)
     except Exception as exc:  # noqa: BLE001
@@ -637,32 +792,14 @@ def fetch_financials(
 
     annual, annual_currency = _extract_periods(payload, "annual")
     quarterly, quarterly_currency = _extract_periods(payload, "quarterly")
-    annual = _add_ratios(annual[-5:])
-    if not annual:
-        raise FinancialDataError(f"ไม่พบงบการเงินของ {symbol} จาก Yahoo Finance")
-
-    metadata = load_universe_metadata().get(symbol, {})
-    market = metadata.get("market") or "Unknown"
-    output = {
-        "symbol": symbol,
-        "name": metadata.get("name") or symbol,
-        "market": market,
-        "sector": metadata.get("sector") or "Unknown",
-        "currency": (annual_currency or quarterly_currency or "").upper(),
-        "unit": "ล้าน",
-        "source": "Yahoo Finance fundamentals timeseries",
-        "fetched_at": datetime.now(UTC).isoformat(),
-        "cache_status": "fresh",
-        "annual": annual,
-        "quarterly_by_year": _quarterly_by_year(quarterly, annual),
-        "sections": FINANCIAL_SECTIONS,
-        "metric_labels": METRIC_LABELS,
-        "ratio_labels": RATIO_LABELS,
-        "vi_summary": _vi_summary(annual),
-    }
-    output["data_quality"] = assess_financial_payload(output)
-    output = _with_currency_presentation(output)
-    cache_dir.mkdir(parents=True, exist_ok=True)
+    output = _build_financial_payload(
+        symbol,
+        annual_periods=annual,
+        quarterly_periods=quarterly,
+        currency=annual_currency or quarterly_currency,
+        source="Yahoo Finance fundamentals timeseries",
+        provider_metadata={"provider_fallback_note": sec_error} if sec_error else None,
+    )
     _write_json_atomic(cache_file, output)
     return output
 
@@ -722,6 +859,7 @@ def cache_universe_financials(
                 refresh=True,
                 cache_dir=cache_dir,
                 request_timeout=request_timeout,
+                provider="yahoo",
             )
             return symbol, None
         except Exception as exc:  # noqa: BLE001
@@ -790,4 +928,153 @@ def cache_universe_financials(
         }
     except Exception as exc:
         _write_update_status(status_path, "failed", symbols_requested=len(symbols), error=str(exc))
+        raise
+
+
+def cache_sec_universe_financials(
+    universe_path: str | Path,
+    *,
+    cache_dir: str | Path = DEFAULT_CACHE_DIR,
+    groups: tuple[str, ...] = ("SP500", "NASDAQ100"),
+    symbols: tuple[str, ...] = (),
+    pause_seconds: float = 0.20,
+    refresh: bool = False,
+    request_timeout: int = 30,
+    cache_max_age_hours: int = 24 * 7,
+    max_retries: int = 2,
+    limit: int | None = None,
+    coverage_path: str | Path = DEFAULT_COVERAGE_REPORT,
+    ticker_cache_path: str | Path = DEFAULT_SEC_TICKER_CACHE,
+) -> dict[str, Any]:
+    metadata = load_universe_metadata(universe_path)
+    group_filter = {group.strip().upper() for group in groups if group.strip()}
+    symbol_filter = {symbol.strip().upper() for symbol in symbols if symbol.strip()}
+    selected = []
+    for symbol, details in metadata.items():
+        index_groups = {
+            group.strip().upper()
+            for group in str(details.get("index_groups") or "").split("|")
+            if group.strip()
+        }
+        if str(details.get("market") or "").upper() != "US":
+            continue
+        if symbol_filter and symbol not in symbol_filter:
+            continue
+        if not symbol_filter and group_filter and not index_groups & group_filter:
+            continue
+        selected.append(symbol)
+    if limit is not None:
+        selected = selected[: max(0, limit)]
+
+    cache_dir = Path(cache_dir)
+    status_path = cache_dir.parent / DEFAULT_SEC_UPDATE_STATUS.name
+    cached_before: list[str] = []
+    for symbol in selected:
+        cached = None if refresh else _read_cache(
+            _cache_path(symbol, cache_dir), cache_max_age_hours
+        )
+        if cached and str(cached.get("source") or "").startswith("SEC EDGAR"):
+            cached_before.append(symbol)
+    cached_set = set(cached_before)
+    pending = [symbol for symbol in selected if symbol not in cached_set]
+    succeeded = set(cached_before)
+    errors: dict[str, str] = {}
+    _write_update_status(
+        status_path,
+        "running",
+        provider="SEC EDGAR",
+        symbols_requested=len(selected),
+        symbols_cached_before=len(cached_before),
+        symbols_pending=len(pending),
+        symbols_processed=len(cached_before),
+        symbols_succeeded=len(succeeded),
+        failed_count=0,
+    )
+
+    next_request_at = 0.0
+
+    def wait_for_request_slot() -> None:
+        nonlocal next_request_at
+        wait_seconds = max(0.0, next_request_at - time.monotonic())
+        if wait_seconds:
+            time.sleep(wait_seconds)
+        next_request_at = time.monotonic() + max(0.11, pause_seconds)
+
+    try:
+        ticker_map = (
+            load_sec_ticker_map(ticker_cache_path, timeout=request_timeout)
+            if pending
+            else {}
+        )
+        attempt_symbols = pending
+        for attempt in range(max(0, max_retries) + 1):
+            if not attempt_symbols:
+                break
+            round_errors: dict[str, str] = {}
+            for index, symbol in enumerate(attempt_symbols, start=1):
+                wait_for_request_slot()
+                try:
+                    output = _sec_financial_payload(
+                        symbol,
+                        ticker_map=ticker_map,
+                        request_timeout=request_timeout,
+                    )
+                    _write_json_atomic(_cache_path(symbol, cache_dir), output)
+                    succeeded.add(symbol)
+                except Exception as exc:  # noqa: BLE001
+                    round_errors[symbol] = str(exc)
+                if index % 5 == 0 or index == len(attempt_symbols):
+                    processed = len(cached_before) + len(succeeded - cached_set) + len(round_errors)
+                    _write_update_status(
+                        status_path,
+                        "running",
+                        provider="SEC EDGAR",
+                        symbols_requested=len(selected),
+                        symbols_cached_before=len(cached_before),
+                        symbols_pending=len(pending),
+                        symbols_processed=min(processed, len(selected)),
+                        symbols_succeeded=len(succeeded),
+                        failed_count=len(round_errors),
+                        retry_attempt=attempt,
+                        last_symbol=symbol,
+                    )
+            errors = round_errors
+            attempt_symbols = list(round_errors)
+            if attempt_symbols and attempt < max_retries:
+                time.sleep(max(1.0, pause_seconds * (attempt + 2) * 10))
+
+        coverage = audit_financial_cache(
+            universe_path,
+            cache_dir=cache_dir,
+            output_path=coverage_path,
+        )
+        failed = [f"{symbol}: {message}" for symbol, message in sorted(errors.items())]
+        final_state = "complete" if not failed else "partial"
+        _write_update_status(
+            status_path,
+            final_state,
+            provider="SEC EDGAR",
+            symbols_requested=len(selected),
+            symbols_succeeded=len(succeeded),
+            failed_count=len(failed),
+            symbols_cached=coverage["cached_symbols"],
+            annual_5y_symbols=coverage["annual_5y_symbols"],
+            complete_symbols=coverage["complete_symbols"],
+            missing_symbols=coverage["missing_symbols"],
+            failed=failed[:100],
+        )
+        return {
+            "symbols": len(selected),
+            "succeeded": sorted(succeeded),
+            "failed": failed,
+            "coverage": coverage,
+        }
+    except Exception as exc:
+        _write_update_status(
+            status_path,
+            "failed",
+            provider="SEC EDGAR",
+            symbols_requested=len(selected),
+            error=str(exc),
+        )
         raise

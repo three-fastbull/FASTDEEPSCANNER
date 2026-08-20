@@ -96,7 +96,16 @@ class FinancialDataTest(unittest.TestCase):
                 }
             )
             quarterly[str(year)] = [
-                {"quarter": f"Q{quarter}", "metrics": {"total_revenue": 25}}
+                {
+                    "quarter": f"Q{quarter}",
+                    "metrics": {metric: 25 for metric in (
+                        "total_revenue",
+                        "net_income",
+                        "total_assets",
+                        "total_liabilities",
+                        "stockholders_equity",
+                    )},
+                }
                 for quarter in range(1, 5)
             ]
         quality = assess_financial_payload({"annual": annual, "quarterly_by_year": quarterly})
@@ -120,7 +129,16 @@ class FinancialDataTest(unittest.TestCase):
                 }
             )
             quarterly[str(year)] = [
-                {"quarter": f"Q{quarter}", "metrics": {"total_revenue": 25}}
+                {
+                    "quarter": f"Q{quarter}",
+                    "metrics": {metric: 25 for metric in (
+                        "total_revenue",
+                        "net_income",
+                        "total_assets",
+                        "total_liabilities",
+                        "stockholders_equity",
+                    )},
+                }
                 for quarter in range(1, 5)
             ]
         quality = assess_financial_payload({"annual": annual, "quarterly_by_year": quarterly})
@@ -154,7 +172,16 @@ class FinancialDataTest(unittest.TestCase):
                     }
                 )
                 quarterly[str(year)] = [
-                    {"quarter": f"Q{quarter}", "metrics": {"total_revenue": 25}}
+                    {
+                        "quarter": f"Q{quarter}",
+                        "metrics": {metric: 25 for metric in (
+                            "total_revenue",
+                            "net_income",
+                            "total_assets",
+                            "total_liabilities",
+                            "stockholders_equity",
+                        )},
+                    }
                     for quarter in range(1, 5)
                 ]
             (cache / "AAA.json").write_text(

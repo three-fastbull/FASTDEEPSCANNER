@@ -16,6 +16,8 @@ data/fastdeep_price_update.lock/
 data/fastdeep_price_update_status.json
 data/fastdeep_financial_update_status.json
 data/fastdeep_financial_coverage.json
+data/fastdeep_sec_update_status.json
+data/sec_company_tickers.json
 
 # Separate Gold OI project assets (not part of FastDeep Scanner)
 oi_trading_system/

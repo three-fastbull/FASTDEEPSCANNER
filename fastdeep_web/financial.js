@@ -150,7 +150,7 @@
       if (!response.ok) throw new Error(payload.error || "ไม่สามารถโหลดงบการเงินได้");
       if (requestId !== state.financialRequestId) return;
       state.financials = payload;
-      state.selectedYear = payload.annual.at(-1)?.period_end.slice(0, 4) || null;
+      state.selectedYear = fiscalYear(payload.annual.at(-1));
       renderFinancials();
       renderVi();
       window.dispatchEvent(new CustomEvent("fastdeep:financials-verified", {
@@ -158,7 +158,9 @@
       }));
       const quality = payload.data_quality || {};
       const qualityLabel = quality.status_label || "ยังไม่ได้ตรวจความครบถ้วน";
-      const cacheLabel = payload.cache_status === "cached" ? "ใช้ข้อมูลที่บันทึกไว้" : "อัปเดตแล้ว";
+      const cacheLabel = payload.cache_status === "cached"
+        ? "ใช้ข้อมูลที่บันทึกไว้"
+        : (payload.cache_status === "stale_verified" ? "ใช้ SEC ล่าสุด เพราะอัปเดตใหม่ไม่ได้" : "อัปเดตแล้ว");
       status(
         `${payload.symbol}: ${qualityLabel} (${cacheLabel})${quality.gaps?.length ? ` — ${quality.gaps.join(" · ")}` : ""}`,
         quality.status === "complete" ? "ready" : "partial",
@@ -173,13 +175,18 @@
     }
   }
 
+  function fiscalYear(period) {
+    if (!period) return null;
+    return String(period.fiscal_year || period.period_end?.slice(0, 4) || "") || null;
+  }
+
   function financialCell(period, metric) {
-    const year = period.period_end.slice(0, 4);
+    const year = fiscalYear(period);
     return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${amount(period.metrics[metric], metric)}</button></td>`;
   }
 
   function ratioCell(period, key) {
-    const year = period.period_end.slice(0, 4);
+    const year = fiscalYear(period);
     const value = period.ratios[key];
     const formatted = key === "debt_to_equity" ? multiple(value) : percent(value);
     return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${formatted}</button></td>`;
@@ -196,7 +203,10 @@
     const currencyOrigin = data.currency_source === "exchange_default"
       ? "สกุลเงินอนุมานจากตลาดที่จดทะเบียน เพราะผู้ให้บริการไม่ได้ระบุมาให้"
       : "สกุลเงินตามที่ผู้ให้บริการงบระบุ";
-    elements.source.textContent = `${data.source} | ${data.cache_status === "cached" ? "Cache ล่าสุด" : "อัปเดตล่าสุด"}: ${new Date(data.fetched_at).toLocaleString("th-TH")} | ${data.currency_label || ""} — ${currencyOrigin}`;
+    const sourceText = `${data.source} | ${data.cache_status === "cached" ? "Cache ล่าสุด" : "อัปเดตล่าสุด"}: ${new Date(data.fetched_at).toLocaleString("th-TH")} | ${data.currency_label || ""} — ${currencyOrigin}`;
+    elements.source.innerHTML = data.source_url
+      ? `<a href="${escapeHtml(data.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceText)}</a>`
+      : escapeHtml(sourceText);
 
     const latest = annual.at(-1) || { metrics: {}, ratios: {} };
     const kpis = [
@@ -211,7 +221,7 @@
     )).join("");
 
     elements.annualHead.innerHTML = `<tr><th scope="col">งวดงบการเงิน</th>${annual.map((period) => {
-      const year = period.period_end.slice(0, 4);
+      const year = fiscalYear(period);
       return `<th scope="col"><button class="year-header-button ${year === state.selectedYear ? "is-selected" : ""}" type="button" data-year="${year}">${year}<small>${period.period_end}</small></button></th>`;
     }).join("")}</tr>`;
 
