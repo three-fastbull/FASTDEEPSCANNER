@@ -12,6 +12,7 @@ tmp/
 
 # Regenerated market data
 data/fastdeep_prices.csv
+data/.fastdeep_prices.csv.*.tmp
 data/fastdeep_prices_source.json
 data/financial_cache/
 data/fastdeep_price_update.lock/
@@ -21,16 +22,5 @@ data/fastdeep_financial_coverage.json
 data/fastdeep_sec_update_status.json
 data/sec_company_tickers.json
 
-# Separate Gold OI project assets (not part of FastDeep Scanner)
-oi_trading_system/
-tradingview/
-data/gold_*.csv
-data/sample_market.csv
-data/sample_oi_zones.csv
-BLANK_WEB.html
-OPEN_BLANK_WEB.bat
-README.md
-TRIGGER_ZONE_PRO_V1.md
-config.example.json
+# Local shortcut to the FastDeep web server.
 FASTDEEP_SCANNER.url
-ระบบเทรดใหม่.txt
