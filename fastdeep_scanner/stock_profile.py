@@ -14,6 +14,7 @@ from datetime import date
 from statistics import mean, median, pstdev
 from typing import Any
 
+from .company_research import build_company_business
 from .currency import convert, currency_label, price_scale, trading_currency
 from .models import StockCandle
 
@@ -827,19 +828,8 @@ def build_stock_profile(
             "company_profile_verified": bool(research.get("company_profile_verified")),
             "updated_at": research.get("updated_at"),
         },
-        "business": {
-            "summary": research.get("business_summary") or "",
-            "revenue_model": research.get("revenue_model") or "",
-            "revenue_segments": research.get("revenue_segments") or "",
-            "key_customers": research.get("key_customers") or "",
-            "competitors": research.get("competitors") or "",
-            "moat_evidence": research.get("moat_evidence") or "",
-            "catalysts": research.get("catalysts") or "",
-            "risks": research.get("risks") or "",
-            "invalidation": research.get("invalidation") or "",
-            "source_urls": research.get("source_urls") or "",
-            "verified": bool(research.get("company_profile_verified")),
-        },
+        "business": build_company_business(symbol, research),
+        "research": dict(research),
         "five_forces": FIVE_FORCES,
         "flow": FINANCIAL_QUALITY_FLOW,
     }
@@ -949,8 +939,8 @@ def build_stock_profile(
     elif not business_ok:
         verdict_key, verdict = "research", "ตัวเลขผ่าน - รอตรวจธุรกิจ"
         verdict_note = (
-            "งบผ่านเกณฑ์เชิงปริมาณ แต่ยังไม่มีหลักฐานเรื่องแหล่งรายได้ คู่แข่ง Moat ความเสี่ยง "
-            "และเงื่อนไขที่ทำให้ Thesis ผิด จึงยังไม่ใช่สัญญาณซื้อ"
+            "งบผ่านเกณฑ์เชิงปริมาณ แต่ยังไม่ได้บันทึกการทบทวนธุรกิจ Moat ความเสี่ยง "
+            "และเงื่อนไขที่ทำให้ Thesis ผิดครบ จึงยังไม่ใช่สัญญาณซื้อ"
         )
     elif margin_of_safety is None:
         verdict_key, verdict = "wait", "คุณภาพผ่าน แต่ประเมินมูลค่าไม่ได้ - รอ"
@@ -976,9 +966,13 @@ def build_stock_profile(
             + (f" · ตกด่าน {', '.join(failed)}" if failed else ""),
         },
         {
-            "label": "งานวิจัยธุรกิจครบและมีแหล่งอ้างอิง",
+            "label": "งานวิจัยธุรกิจผ่านการทบทวนครบ",
             "passed": business_ok,
-            "detail": "ธุรกิจ รายได้ ลูกค้า คู่แข่ง Moat Thesis และความเสี่ยง",
+            "detail": (
+                "มีข้อมูลอ้างอิงแล้ว · รอบันทึกการประเมิน Moat, Thesis และความเสี่ยง"
+                if profile["business"]["reference"]["available"] and not business_ok
+                else "ธุรกิจ รายได้ ลูกค้า คู่แข่ง Moat Thesis และความเสี่ยง"
+            ),
         },
         {
             "label": "มีข้อมูลพอประเมินมูลค่าเบื้องต้น",

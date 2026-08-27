@@ -283,6 +283,15 @@ class ValuationTest(unittest.TestCase):
 
 
 class QualitativeTest(unittest.TestCase):
+    def test_reference_facts_do_not_approve_the_investment(self) -> None:
+        profile = build_stock_profile("TRV", _growing_company(), _candles(20.0, "TRV"), _snapshot("TRV"), {}, RATES)
+        self.assertTrue(profile["business"]["reference"]["available"])
+        self.assertFalse(profile["business"]["verified"])
+        self.assertEqual(profile["verdict"]["key"], "research")
+        self.assertFalse(profile["verdict"]["checklist"][1]["passed"])
+        self.assertIn("มีข้อมูลอ้างอิงแล้ว", profile["verdict"]["checklist"][1]["detail"])
+        self.assertNotIn("ยังไม่มีหลักฐาน", profile["verdict"]["note"])
+
     def test_quantitative_pass_is_not_a_buy_before_company_research(self) -> None:
         profile = build_stock_profile("TEST", _growing_company(), _candles(20.0), _snapshot(), {}, RATES)
         self.assertEqual(profile["passed_stages"], 4)

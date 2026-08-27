@@ -83,17 +83,47 @@
   }
 
   function sourceLinks(value) {
-    const items = splitResearchLines(value);
+    const items = Array.isArray(value) ? value : splitResearchLines(value).map((url) => ({ url }));
     if (!items.length) return '<p class="research-empty">ยังไม่มีแหล่งข้อมูลอ้างอิง</p>';
     return `<ul class="source-list">${items.map((item) => {
       try {
-        const url = new URL(item);
+        const url = new URL(item.url);
         if (!["http:", "https:"].includes(url.protocol)) throw new Error("unsupported");
-        return `<li><a href="${escapeHtml(url.href)}" target="_blank" rel="noreferrer">${escapeHtml(url.hostname)}</a></li>`;
+        return `<li><a href="${escapeHtml(url.href)}" target="_blank" rel="noreferrer">${escapeHtml(item.title || url.hostname)}</a></li>`;
       } catch (_) {
-        return `<li>${escapeHtml(item)}</li>`;
+        return `<li>${escapeHtml(item.title || item.url || "")}</li>`;
       }
     }).join("")}</ul>`;
+  }
+
+  function citations(ids, reference) {
+    const sources = (reference.sources || []).filter((source) => (ids || []).includes(source.id));
+    return sources.length ? `<div class="reference-citations">${sourceLinks(sources)}</div>` : "";
+  }
+
+  function journalMarker(business, key) {
+    return business.field_origins?.[key] === "journal" ? '<small class="journal-marker">บันทึกของคุณ</small>' : "";
+  }
+
+  function renderRevenueBreakdown(business) {
+    const reference = business.reference || {};
+    const breakdown = reference.revenue_breakdown;
+    if (!breakdown || business.field_origins?.revenue_segments === "journal") {
+      return researchList(business.revenue_segments, "ยังไม่มีข้อมูลแยกรายได้ที่อ้างอิงได้");
+    }
+    const segments = breakdown.segments || [];
+    const amounts = segments.filter((segment) => Number.isFinite(segment.amount));
+    return `<ul class="revenue-breakdown">${segments.map((segment) => {
+      const share = Number.isFinite(segment.share_pct) ? Math.max(0, Math.min(100, segment.share_pct)) : null;
+      return `<li><div><strong>${escapeHtml(segment.name)}</strong>${share !== null ? `<b>${num(share, 1)}%</b>` : ""}</div>
+        ${share !== null ? `<span class="segment-track" aria-hidden="true"><i style="width:${share}%"></i></span>` : ""}
+        ${segment.description ? `<small>${escapeHtml(segment.description)}</small>` : ""}</li>`;
+    }).join("")}</ul>
+    <p class="breakdown-basis">ฐาน: ${escapeHtml(breakdown.basis)}</p>
+    ${breakdown.note ? `<p class="breakdown-note">${escapeHtml(breakdown.note)}</p>` : ""}
+    ${amounts.length ? `<details class="business-extra"><summary>จำนวนเงิน (${escapeHtml(breakdown.unit)} ${escapeHtml(breakdown.currency)})</summary>
+      <dl>${amounts.map((segment) => `<div><dt>${escapeHtml(segment.name)}</dt><dd>${num(segment.amount)}</dd></div>`).join("")}
+      <div><dt>รวม</dt><dd>${num(breakdown.total)}</dd></div></dl></details>` : ""}`;
   }
 
   function renderVerdict(profile) {
@@ -185,30 +215,57 @@
 
   function renderBusiness(profile) {
     const business = profile.business || {};
+    const reference = business.reference || {};
     const verified = Boolean(business.verified);
+    const hasReference = Boolean(reference.available);
+    const reviewed = reference.reviewed_at ? new Date(`${reference.reviewed_at}T00:00:00`).toLocaleDateString("th-TH") : "";
+    const status = hasReference
+      ? (reference.needs_review ? "มีข้อมูลอ้างอิงเดิม · ถึงรอบทบทวน" : "มีข้อมูลธุรกิจอ้างอิงแล้ว")
+      : verified ? "มีบันทึกตรวจธุรกิจครบแล้ว" : "ยังไม่มีข้อมูลธุรกิจอ้างอิง";
+    const context = hasReference
+      ? `${reference.period} · ตรวจแหล่งข้อมูล ${reviewed}`
+      : reference.status === "error" ? "ฐานข้อมูลธุรกิจอ่านไม่ได้ · บันทึกส่วนตัวยังอยู่"
+        : `${profile.symbol} ยังไม่อยู่ในฐานวิจัย ${reference.catalog_count || 0} บริษัท`;
     elements.business.innerHTML = `
-      <div class="research-state" data-verified="${verified}">
-        <strong>${verified ? "ตรวจข้อมูลธุรกิจครบแล้ว" : "รอตรวจข้อมูลธุรกิจ"}</strong>
-        <span>${verified ? "มีหลักฐานและแหล่งอ้างอิงครบตามเกณฑ์" : "ช่องว่างจะไม่ถูกเดาหรือเติมด้วยข้อความตัวอย่าง"}</span>
+      <div class="research-state" data-verified="${verified}" data-reference="${hasReference}">
+        <strong>${status}</strong><span>${escapeHtml(context)}</span>
       </div>
       <div class="business-layout">
-        <article class="business-summary"><span>บริษัททำอะไร</span><p>${escapeHtml(business.summary || "ยังไม่มีคำอธิบายธุรกิจจากแหล่งข้อมูลที่ตรวจสอบได้")}</p></article>
-        <article><span>บริษัทหาเงินอย่างไร</span><p>${escapeHtml(business.revenue_model || "ยังไม่ได้บันทึกรูปแบบรายได้")}</p></article>
-        <article><span>รายได้แต่ละทาง</span>${researchList(business.revenue_segments, "ยังไม่มีสัดส่วนรายได้แยกตามธุรกิจ")}</article>
-        <article><span>ลูกค้าหลัก</span><p>${escapeHtml(business.key_customers || "ยังไม่ได้ตรวจลูกค้าหลักและความกระจุกตัว")}</p></article>
+        <article class="business-summary"><span>บริษัททำอะไร ${journalMarker(business, "summary")}</span><p>${escapeHtml(business.summary || "ยังไม่มีคำอธิบายธุรกิจจากแหล่งข้อมูลที่ตรวจสอบได้")}</p></article>
+        <article><span>บริษัทหาเงินอย่างไร ${journalMarker(business, "revenue_model")}</span><p>${escapeHtml(business.revenue_model || "ยังไม่ได้บันทึกรูปแบบรายได้")}</p></article>
+        <article><span>รายได้แต่ละทาง ${journalMarker(business, "revenue_segments")}</span>${renderRevenueBreakdown(business)}</article>
+        <article><span>ลูกค้าหลัก ${journalMarker(business, "key_customers")}</span><p>${escapeHtml(business.key_customers || "ยังไม่ได้ตรวจลูกค้าหลักและความกระจุกตัว")}</p></article>
       </div>
-      <div class="business-sources"><strong>แหล่งข้อมูล</strong>${sourceLinks(business.source_urls)}</div>`;
+      ${hasReference ? `<div class="business-sources"><strong>แหล่งอ้างอิงบริษัท</strong>${sourceLinks((reference.sources || []).filter((source) => (reference.source_ids || []).includes(source.id)))}</div>` : ""}
+      ${!hasReference || business.field_origins?.source_urls === "journal" ? `<div class="business-sources"><strong>แหล่งข้อมูลในบันทึก</strong>${sourceLinks(business.source_urls)}</div>` : ""}`;
   }
 
   function renderCompetition(profile) {
     const business = profile.business || {};
     const qualitative = profile.qualitative || {};
+    const reference = business.reference || {};
+    const peers = reference.available && business.field_origins?.competitors !== "journal" ? reference.peers || [] : [];
+    const evidence = reference.available && business.field_origins?.moat_evidence !== "journal" ? reference.evidence || [] : [];
+    const kinds = { reported: "ข้อมูลรายงาน", company_claim: "บริษัทระบุ", analysis: "ข้อวิเคราะห์" };
     elements.competition.innerHTML = `
       <div class="competition-layout">
-        <article><span>คู่แข่งที่ต้องเทียบ</span>${researchList(business.competitors, "ยังไม่มีรายชื่อคู่แข่งที่ผ่านการตรวจ")}</article>
-        <article class="moat-evidence"><span>Moat: ${escapeHtml(qualitative.moat || "ยังไม่ประเมิน")}</span><p>${escapeHtml(business.moat_evidence || "ยังไม่มีหลักฐานว่าส่วนแบ่งตลาด ต้นทุน แบรนด์ หรือ Switching cost แข็งแรงกว่าคู่แข่ง")}</p></article>
+        <article><span>คู่แข่ง / บริษัทเทียบเคียง ${journalMarker(business, "competitors")}</span>
+          ${peers.length ? `<ul class="peer-list">${peers.map((peer) => `<li>
+            <strong>${escapeHtml(peer.name)}${peer.symbol ? ` <small>${escapeHtml(peer.symbol)}</small>` : ""}</strong>
+            <p>${escapeHtml(peer.overlap)}</p><p class="peer-compare">ประเด็นเปรียบเทียบ: ${escapeHtml(peer.compare)}</p>
+            ${citations(peer.source_ids, reference)}</li>`).join("")}</ul>` : researchList(business.competitors, "ยังไม่มีรายชื่อคู่แข่งที่อ้างอิงได้")}
+        </article>
+        <article class="moat-evidence"><span>ความได้เปรียบและข้อจำกัด ${journalMarker(business, "moat_evidence")}</span>
+          <p>${escapeHtml(business.moat_evidence || "ยังไม่มีหลักฐานเพียงพอประเมินความได้เปรียบ")}</p>
+          ${evidence.length ? `<ul class="evidence-list">${evidence.map((item) => `<li>
+            <div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(kinds[item.kind] || "ข้อวิเคราะห์")}</small></div>
+            <p>${escapeHtml(item.detail)}</p>${citations(item.source_ids, reference)}</li>`).join("")}</ul>` : ""}
+          <p class="moat-review">Moat ที่คุณประเมิน: <strong>${escapeHtml(qualitative.moat || "ยังไม่ประเมิน")}</strong></p>
+        </article>
       </div>
-      <p class="comparison-note">การมีรายชื่อคู่แข่งอย่างเดียวไม่พอ ควรบันทึกด้วยว่าแต่ละรายชนะกันที่ราคา คุณภาพ ต้นทุน ช่องทาง หรือเทคโนโลยี</p>`;
+      ${peers.length ? '<p class="comparison-note">กลุ่มเปรียบเทียบคัดจากธุรกิจที่ทับซ้อน ไม่ใช่อันดับความเก่งหรือหลักฐานว่าใครมี Moat สูงกว่า</p>' : ""}
+      ${reference.industry_note ? `<p class="industry-research-note">${escapeHtml(reference.industry_note)}</p>` : ""}
+      ${(reference.watch_items || []).length ? `<details class="business-extra research-followup"><summary>ประเด็นที่ยังต้องติดตาม</summary>${researchList(reference.watch_items.join("\n"), "")}</details>` : ""}`;
   }
 
   function renderThesis(profile) {
@@ -225,19 +282,21 @@
   function renderResearchEditor(profile) {
     const business = profile.business || {};
     const qualitative = profile.qualitative || {};
-    elements.businessSummary.value = business.summary || "";
-    elements.revenueModel.value = business.revenue_model || "";
-    elements.revenueSegments.value = business.revenue_segments || "";
-    elements.keyCustomers.value = business.key_customers || "";
-    elements.competitors.value = business.competitors || "";
-    elements.moatEvidence.value = business.moat_evidence || "";
+    const journal = profile.research;
+    // Loading source material must not silently turn it into a saved personal judgement.
+    elements.businessSummary.value = (journal ? journal.business_summary : business.summary) || "";
+    elements.revenueModel.value = (journal ? journal.revenue_model : business.revenue_model) || "";
+    elements.revenueSegments.value = (journal ? journal.revenue_segments : business.revenue_segments) || "";
+    elements.keyCustomers.value = (journal ? journal.key_customers : business.key_customers) || "";
+    elements.competitors.value = (journal ? journal.competitors : business.competitors) || "";
+    elements.moatEvidence.value = (journal ? journal.moat_evidence : business.moat_evidence) || "";
     elements.researchMoat.value = qualitative.moat || "";
     elements.researchTrend.value = qualitative.ai_trend || "";
     elements.researchDecision.value = qualitative.status || "Watch";
-    elements.catalysts.value = business.catalysts || "";
-    elements.risks.value = business.risks || "";
-    elements.invalidation.value = business.invalidation || "";
-    elements.sourceUrls.value = business.source_urls || "";
+    elements.catalysts.value = (journal ? journal.catalysts : business.catalysts) || "";
+    elements.risks.value = (journal ? journal.risks : business.risks) || "";
+    elements.invalidation.value = (journal ? journal.invalidation : business.invalidation) || "";
+    elements.sourceUrls.value = (journal ? journal.source_urls : business.source_urls) || "";
     elements.researchThesis.value = qualitative.thesis || "";
     elements.researchStatus.textContent = qualitative.updated_at
       ? `บันทึกล่าสุด ${new Date(qualitative.updated_at).toLocaleString("th-TH")}`
