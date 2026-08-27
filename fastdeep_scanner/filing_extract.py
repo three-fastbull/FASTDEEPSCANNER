@@ -93,6 +93,12 @@ def _substantive_lines(body: str) -> list[str]:
 
 
 def business_summary(body: str, limit: int = SUMMARY_LIMIT) -> str:
+    """ย่อหน้าแรก ๆ ของ Item 1 ตามลำดับที่ปรากฏในเอกสาร
+
+    เคยลองข้ามย่อหน้านิยามคำแทนตัวบริษัท แต่ทำให้บางบริษัทได้ย่อหน้าการเปิดเผย
+    ข้อมูลแทนคำอธิบายธุรกิจ การยกตามลำดับจริงจึงคาดเดาได้กว่า และผู้อ่านมีลิงก์
+    ไปยังเอกสารเต็มอยู่แล้ว
+    """
     collected: list[str] = []
     for line in _substantive_lines(body):
         collected.append(line)

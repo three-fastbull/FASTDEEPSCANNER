@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-27T13:41:16.215192+00:00",
+ "updated_at": "2026-08-27T13:44:17.580602+00:00",
  "note": "ข้อความยกมาจากแบบที่บริษัทยื่นต่อ SEC โดยไม่ผ่านการเรียบเรียง ใช้เป็นข้อมูลตั้งต้น ไม่ใช่บทวิเคราะห์ที่ทบทวนแล้ว",
  "profiles": {
   "A": {
@@ -1501,6 +1501,1006 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   }
+  },
+  "BXP": {
+   "symbol": "BXP",
+   "cik": "0001037540",
+   "entity_name": "BXP, Inc.",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/bxp-20251231.htm",
+   "language": "en",
+   "business_summary": "BXP, a Delaware corporation, is a fully integrated, self-administered and self-managed REIT, and it is one of the largest publicly-traded office REITs (based on total market capitalization as of December 31, 2025) in the United States that develops, owns and manages primarily premier workplaces. BXP was formed in 1997 to succeed the real estate development, redevelopment, acquisition, management, operating and leasing businesses associated with the predecessor company founded by Mortimer B. Zuckerman and Edward H. Linde in 1970. Our properties are concentrated in six dynamic gateway markets—Boston, Los Angeles, New York, San Francisco, Seattle and Washington, DC. At December 31, 2025, we owned or had joint venture interests in a portfolio of 179 commercial real estate properties, aggregating approximately 52.6 million net rentable square feet of primarily premier workplaces, including eight properties under construction/redevelopment totaling approximately 3.5 million net rentable square feet. As of December 31, 2025, our properties consisted of: We consider premier workplaces to be",
+   "competition": "Competition — We compete in the leasing of premier workplace, retail and residential space with a considerable number of other real estate companies, some of which may have greater marketing and financial resources than are available to us. In addition, our hotel property competes for guests with other hotels, some of which may have greater marketing and financial resources than are available to us and to the manager of our one hotel, Marriott International, Inc. Principal factors of competition in our primary business of owning, acquiring and developing premier workplaces are the quality of properties, leasing terms (including rent and other charges and allowances for tenant improvements), attractiveness and convenience of location, the quality and breadth of client services and amenities provided, and reputation as an owner and operator of premier workplaces in the relevant market. Add",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:21.567777+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "C": {
+   "symbol": "C",
+   "cik": "0000831001",
+   "entity_name": "CITIGROUP INC",
+   "industry": "National Commercial Banks",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/831001/000083100126000011/c-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:31.776072+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CAG": {
+   "symbol": "CAG",
+   "cik": "0000023217",
+   "entity_name": "CONAGRA BRANDS INC.",
+   "industry": "Food and Kindred Products",
+   "form": "10-K",
+   "filed_at": "2026-07-15",
+   "period": "2026-05-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/23217/000110465926083905/tmb-20260531x10k.htm",
+   "language": "en",
+   "business_summary": "Conagra Brands, Inc. (the “Company”, “Conagra Brands”, “we”, “us”, or “our”), headquartered in Chicago, is one of North America’s leading branded food companies. We combine a 100-year history of making quality food with agility and a relentless focus on collaboration and innovation. The Company’s portfolio is continuously evolving to satisfy consumers’ ever-changing food preferences. Conagra’s brands include Birds Eye ® , Duncan Hines ® , Healthy Choice ® , Marie Callender’s ® , Reddi-wip ® , Slim Jim ® , Angie’s ® BOOMCHICKAPOP ® , and many more. We began as a Midwestern flour-milling company and entered other commodity-based businesses throughout our history. We were initially incorporated as a Nebraska corporation in 1919 and reincorporated as a Delaware corporation in 1976. Over time, we transformed into the branded, pure-play consumer packaged goods food company we are today. Growing our food businesses has also been fueled by innovation, organic growth of our brands, and expansion into adjacent categories, including through acquisitions. We are focused on delivering sustainable",
+   "competition": "Competition — We experience intense competition for sales of our food items in our major markets. Our food items compete with widely advertised, well-known, branded food, as well as private branded and customized food items. Some of our competitors are larger and have greater resources than we have. We compete primarily on the basis of quality, product innovation, value, convenience, customer service, brand recognition, and brand loyalty.",
+   "customer_concentration": "Our largest customer, Walmart, Inc. Changes in our relationships with significant customers, including our largest customer, could adversely affect us. During fiscal 2026, our 10 largest customers accounted for approximately 60% of our consolidated net sales, with our largest customer, Walmart, Inc.",
+   "extracted_at": "2026-08-27T13:41:34.828026+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CAH": {
+   "symbol": "CAH",
+   "cik": "0000721371",
+   "entity_name": "CARDINAL HEALTH INC",
+   "industry": "Wholesale-Drugs, Proprietaries & Druggists' Sundries",
+   "form": "10-K",
+   "filed_at": "2026-08-11",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/721371/000072137126000038/cah-20260630.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "Our largest customer, CVS Health, accounted for 28 percent of our fiscal 2026 revenue. In the aggregate, our five largest customers, including CVS Health, accounted for 43 percent of our fiscal 2026 revenue. In fiscal 2026, CVS Health was our largest customer.",
+   "extracted_at": "2026-08-27T13:41:37.749627+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CARR": {
+   "symbol": "CARR",
+   "cik": "0001783180",
+   "entity_name": "CARRIER GLOBAL Corp",
+   "industry": "Air-Cond & Warm Air Heatg Equip & Comm & Indl Refrig Equip",
+   "form": "10-K",
+   "filed_at": "2026-02-05",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1783180/000178318026000008/carr-20251231.htm",
+   "language": "en",
+   "business_summary": "Carrier Global Corporation (\"we\" or \"our\" or the \"Company\") is a global leader in intelligent climate and energy solutions, focused on providing differentiated, digitally enabled lifecycle solutions to our customers. Our portfolio includes industry-leading brands such as Carrier, Viessmann, Toshiba, Automated Logic and Carrier Transicold, among others, that offer innovative heating, cooling and cold chain solutions to enhance the lives we live and the world we share. We also provide a broad array of related building services, including audit, design, installation, system integration, repair, maintenance and monitoring. Through our performance-driven culture, we anticipate creating long-term shareowner value by investing strategically to strengthen our product position in homes, buildings and across the cold chain to drive profitable growth. We believe our business segments are well positioned to benefit from favorable secular trends, including the mega-trends of urbanization, population growth and demographic shifts, food security and safety, electrification, increasing demand for cl",
+   "competition": "Competitive Conditions — Each of our businesses is subject to significant competition from a number of companies throughout the world. Due to the nature of our products and services and the markets we serve, our competition can vary from regional or specialized companies to larger public or private companies. The most significant competitive factors we face are technology differentiation, product performance, service, delivery schedule and price. Brand reputation, service to customers and quality are also important competitive factors for our products and services. While our competitive position varies among our products and services, we are a significant competitor with respect to each of our major product and service offerings. We believe that the loss of any individual contract or customer would not have a material adverse effect on our results.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:40.973854+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CASY": {
+   "symbol": "CASY",
+   "cik": "0000726958",
+   "entity_name": "CASEYS GENERAL STORES INC",
+   "industry": "Retail-Auto Dealers & Gasoline Stations",
+   "form": "10-K",
+   "filed_at": "2026-06-22",
+   "period": "2026-04-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/726958/000072695826000046/casy-20260430.htm",
+   "language": "en",
+   "business_summary": "As of April 30, 2026, Casey’s General Stores, Inc. and its direct and indirect wholly-owned subsidiaries operate convenience stores primarily under the names \"Casey's\" and \"Casey’s General Store\" (collectively, with the stores below referenced as \"GoodStop (by Casey's)\" or \"CEFCO\", referred to as \"Casey's\" or the \"Company\") throughout 19 states, approximately half of which are located in Iowa, Missouri and Illinois. As of April 30, 2026, there were 2,944 stores in operation. Approximately 71% of all stores were opened in areas with populations of fewer than 20,000 persons. The Company competes on the basis of traditional features of convenience store operations such as location, extended hours, product offerings, price and quality of service. All stores carry a broad selection of food items (which at most stores includes, but is not limited to, prepared foods such as regular and breakfast pizza, donuts, hot breakfast items, and hot and cold sandwiches), beverages, tobacco and nicotine products, groceries, health and beauty aids, automotive products, and other non-food items. As of Ap",
+   "competition": "Competition — Our business is highly competitive. Food, including prepared foods, and non-food items similar or identical to those sold by the Company, are generally available from various competitors in the communities served by Casey’s and by certain online retailers. We believe our stores located in smaller towns compete principally with other local grocery and convenience stores, similar retail outlets, including \"dollar\" stores, and, to a lesser extent, prepared food outlets, restaurants, and expanded fuel stations offering a more limited selection of grocery and food items for sale. Stores located in more heavily populated communities may compete with local and national grocery and drug store chains, quick service restaurants, expanded fuel stations, supermarkets, discount food stores, and traditional convenience stores. In addition to our inside store products, the fuel business i",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:42.900086+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CAT": {
+   "symbol": "CAT",
+   "cik": "0000018230",
+   "entity_name": "CATERPILLAR INC",
+   "industry": "Construction Machinery & Equip",
+   "form": "10-K",
+   "filed_at": "2026-02-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/cat-20251231.htm",
+   "language": "en",
+   "business_summary": "Originally organized as Caterpillar Tractor Co. in 1925 in the State of California, our company was reorganized as Caterpillar Inc. in 1986 in the State of Delaware. As used herein, the term “Caterpillar,” “we,” “us,” “our” or “the company” refers to Caterpillar Inc. and its subsidiaries unless designated or identified otherwise. With 2025 sales and revenues of $67.589 billion, Caterpillar Inc. is shaping the future as the world’s leading manufacturer of construction and mining equipment, off-highway diesel and natural gas engines, industrial gas turbines and diesel-electric locomotives. Backed by one of the largest independent global dealer networks and financing services through Cat Financial, the company’s primary business segments: Power & Energy, Construction Industries and Resource Industries are solving customers’ toughest challenges through commercial excellence and advanced technology, driven by a highly skilled, dedicated global team. In 2025, our company introduced a revised strategy anchored by a new mission statement: Solving our customers' toughest challenges. Coupled w",
+   "competition": "Competitive Environment — Caterpillar products and services are sold worldwide into a variety of highly competitive markets. In all markets, we compete on the basis of product performance, customer service, quality and price. From time to time, the intensity of competition results in price discounting in a particular industry or region. Such price discounting puts pressure on margins and can negatively impact operating profit. Outside the United States, certain competitors enjoy competitive advantages inherent to operating in their home countries or regions.",
+   "customer_concentration": "No single customer or dealer represented a significant concentration of credit risk.",
+   "extracted_at": "2026-08-27T13:41:46.840717+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CB": {
+   "symbol": "CB",
+   "cik": "0000896159",
+   "entity_name": "Chubb Ltd",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/896159/000089615926000005/cb-20251231.htm",
+   "language": "en",
+   "business_summary": "Chubb Limited is the Swiss-incorporated holding company of the Chubb Group of Companies. Chubb Limited, which is headquartered in Zurich, Switzerland, and its direct and indirect subsidiaries (collectively, the Chubb Group of Companies, Chubb, we, us, or our) are a global insurance and reinsurance organization, serving the needs of a diverse group of clients worldwide. At December 31, 2025, we had total assets of $272 billion and total shareholders’ equity, of $74 billion (excluding noncontrolling interests). Chubb was incorporated in 1985 at which time it opened its first business office in Bermuda and continues to maintain operations in Bermuda. We have grown our business through increased premium volume, expansio n of product offerings and geographic reach, and the acquisition of other companies, to become a global property and casualty (P&C) leader. We expanded our personal accident and supplemental health (A&H), and life insurance business with the acquisition of Cigna's business in several Asian markets in 2022. We further advanced our goal of greater product, customer, and geo",
+   "competition": "Competitive Environment — The Commercial Insurance operations compete against numerous insurance companies ranging from large national carriers to small and mid-size insurers who provide specialty coverages and standard P&C products. Major Accounts competes against large, global carriers; regional competitors; and self-insured retentions and captive programs. The markets are subject to cycles of fluctuating capacity and price adequacy. We pursue a specialist strategy and focus on market opportunities where we can compete effectively. We also achieve a competitive advantage through Major Accounts’ innovative product offerings and our ability to provide multiple products to a single client. In addition, all our domestic commercial units deliver global products and coverage to customers. North America Personal P&C Insurance (13 percent of 2025 Consolidated NPE)",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:53.169997+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CBOE": {
+   "symbol": "CBOE",
+   "cik": "0001374310",
+   "entity_name": "Cboe Global Markets, Inc.",
+   "industry": "Security & Commodity Brokers, Dealers, Exchanges & Services",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1374310/000162828026010013/cboe-20251231.htm",
+   "language": "en",
+   "business_summary": "The following description of the business should be read in conjunction with the information included elsewhere in this Annual Report on Form 10-K for the year ended December 31, 2025. This description contains forward-looking statements that involve risks and uncertainties. Actual results could differ significantly from the results discussed in the forward-looking statements due to the factors set forth in “Risk Factors” and elsewhere in this Annual Report on Form 10-K. Cboe Global Markets, Inc., the world's leading derivatives and securities exchange network, delivers cutting-edge trading, clearing, and investment solutions to people around the world. Cboe provides trading solutions and products in multiple asset classes, including equities, derivatives, and FX, across North America, Europe, and Asia Pacific. Above all, the Company is committed to building a trusted, inclusive global marketplace that enables people to pursue a sustainable financial future. Cboe’s subsidiaries include the largest options exchange and the third largest equities exchange operator in the U.S. In additi",
+   "competition": "Competitive Strengths — Cboe is a leading provider of market infrastructure and tradable products across cash and spot markets, derivatives markets, and Cboe Data Vantage products and services. Cboe delivers cutting-edge trading, clearing, and investment solutions across the globe through a comprehensive ecosystem that helps drive innovation and growth. 8",
+   "customer_concentration": "For example, in 2025, our top ten customers accounted for approximately 57% of our revenues. For each of the years ended December 31, 2025, 2024, and 2023, one customer accounted for approximately 10 % of the Company’s total revenue. No customer is contractually or otherwise obligated to continue to use the Company’s services.",
+   "extracted_at": "2026-08-27T13:41:57.375703+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CBRE": {
+   "symbol": "CBRE",
+   "cik": "0001138118",
+   "entity_name": "CBRE GROUP, INC.",
+   "industry": "Real Estate",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1138118/000113811826000005/cbre-20251231.htm",
+   "language": "en",
+   "business_summary": "CBRE is the world’s largest commercial real estate services and investments firm (based on 2025 revenue). We derive competitive advantage from our considerable scale and ability to offer integrated solutions for real estate investors and occupiers in more than 100 countries. We are global market leaders in most of our business lines and drive significant growth by helping clients optimize real estate costs, value, investment returns and workplace experiences. These capabilities, combined with our extensive knowledge platform (research, data, strategy, etc.), allow us to generate superior outcomes for our clients, which included nearly 90% of Fortune 100 companies and many of the world’s largest institutional real estate investors in 2025. Our growth opportunity is enhanced by the large and expanding total addressable market for our services. We are focused on cementing our leadership position in each of our businesses with a strategy that achieves growth across four dimensions of our business: geographies, clients, property types and services. We are committed to deploying our resour",
+   "competition": "Competitive Positioning — Because of the range of services we provide and numerous markets we serve, we encounter a wide variety of competitors. These range from a handful of well-established globally diversified real estate services firms that are smaller than CBRE to many specialists that operate in specific geographies or business lines. Despite this competition, we are the market leaders in most of our business lines, with significant opportunities for continued growth. These opportunities result from the high value our clients place on our scale, in-depth expertise, technology and data-led insights, as well as their increasing preference for consolidating the number of service providers, which plays to our advantage in delivering integrated solutions globally. Our leadership across a wide spectrum of asset classes, including secular growth sectors like logistics and data centers, pr",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:01.008049+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CCEP": {
+   "symbol": "CCEP",
+   "cik": "0001650107",
+   "entity_name": "COCA-COLA EUROPACIFIC PARTNERS plc",
+   "industry": "Bottled & Canned Soft Drinks & Carbonated Waters",
+   "form": "20-F",
+   "filed_at": "2026-03-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1650107/000165010726000029/cce-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:04.997657+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CCI": {
+   "symbol": "CCI",
+   "cik": "0001051470",
+   "entity_name": "CROWN CASTLE INC.",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-23",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1051470/000105147026000016/cci-20251231.htm",
+   "language": "en",
+   "business_summary": "We own, operate and lease shared communications infrastructure that is geographically dispersed throughout the U.S., including (1) more than 40,000 towers and other structures, such as rooftops (collectively, \"towers\"), (2) approximately 105,000 small cell nodes either currently generating revenue or under contract and (3) approximately 90,000 route miles of fiber primarily supporting small cells and fiber solutions. We refer to our towers, small cells and fiber assets collectively as \"communications infrastructure,\" and, at times, to our customers on our communications infrastructure as \"tenants.\" Our operating segments historically consisted of (1) Towers and (2) Fiber, which includes both small cells and fiber solutions. On March 13, 2025, management signed a definitive agreement (\"Strategic Fiber Agreement\") to sell our Fiber segment, together with certain supporting assets and personnel (\"Fiber Business\"), with Zayo Group Holdings Inc. (\"Zayo\") acquiring the fiber solutions business and EQT Active Core Infrastructure fund (\"EQT\") acquiring the small cell business (\"Strategic Fib",
+   "competition": "",
+   "customer_concentration": "Our largest customers are primarily comprised of wireless carriers that operate national networks. Risk Factors\" and note 15 to our consolidated financial statements for a further discussion of our largest customers.",
+   "extracted_at": "2026-08-27T13:42:07.997667+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CCL": {
+   "symbol": "CCL",
+   "cik": "0000815097",
+   "entity_name": "Carnival Corp Ltd.",
+   "industry": "Water Transportation",
+   "form": "10-K",
+   "filed_at": "2026-01-27",
+   "period": "2025-11-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/815097/000081509726000007/ccl-20251130.htm",
+   "language": "en",
+   "business_summary": "Carnival Corporation was incorporated in Panama in 1974 and Carnival plc was incorporated in England and Wales in 2000. Carnival Corporation and Carnival plc operate a dual listed company whereby the businesses of Carnival Corporation and Carnival plc are combined through a number of contracts and through provisions in Carnival Corporation’s Articles of Incorporation and By-Laws and Carnival plc’s Articles of Association. The two companies operate as if they are a single economic enterprise with a single executive management team and identical Boards of Directors, but each has retained its separate legal identity. Carnival Corporation and Carnival plc are both public companies with separate stock exchange listings and their own shareholders. Together with their consolidated subsidiaries, Carnival Corporation and Carnival plc are referred to collectively in this Form 10-K as “Carnival Corporation & plc,” “company,” “our,” “us” and “we.” We are the largest global cruise company, and among the largest leisure travel companies, with a portfolio of world-class cruise lines - AIDA Cruises,",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:10.369922+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CDNS": {
+   "symbol": "CDNS",
+   "cik": "0000813672",
+   "entity_name": "CADENCE DESIGN SYSTEMS INC",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/813672/000081367226000016/cdns-20251231.htm",
+   "language": "en",
+   "business_summary": "This Annual Report and the documents incorporated by reference in this Annual Report contain statements that are not historical in nature, are predictive, or that depend upon or refer to future events or conditions or contain other forward-looking statements. Statements including, but not limited to, statements regarding artificial intelligence (“AI\"), other technological and market advancements and their impacts on our business; the extent, timing and mix of future revenues and customer demand; the deployment of our products and services; the impact of the macroeconomic and geopolitical environment, including but not limited to, expanded trade controls, tariffs, conflicts around the world, volatility in foreign currency exchange rates, inflation and changes in interest rates; the impact of government actions; future costs, expenses, tax rates and uses of cash; pending legal, administrative and tax proceedings; restructuring actions and associated charges and benefits; pending acquisitions, accounting for acquisitions and integration of acquired businesses; and other statements using",
+   "competition": "Competition — We operate in a highly competitive market, facing both domestic and international competition. Competition in our market is driven by several critical factors, including the ability to deliver continuous technological innovation, the quality and differentiation of product and service offerings, the strength and stability of customer relationships, the ability to attract and retain top engineering talent, and potential geopolitical trade restrictions. Our success hinges on providing comprehensive, integrated solutions that address the growing complexity of semiconductor and systems design. Our competitors range from large, established providers to smaller, specialized firms, emerging companies, and internal design teams within major technology corporations. Key competitors include Synopsys, Inc., Ansys, Inc. (acquired by Synopsys), Siemens EDA, and a variety of other tool pr",
+   "customer_concentration": "No one customer accounted for 10% or more of total revenue during fiscal 2025 or 2024. No single customer accounted for 10% or more of total revenue during fiscal 2025, 2024 or 2023. As of December 31, 2025, no single customer accounted for 10% or more of Cadence’s total receivables. As of December 31, 2024, one customer accounted for approximately 11 % of Cadence’s total receivables.",
+   "extracted_at": "2026-08-27T13:42:13.603210+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CDW": {
+   "symbol": "CDW",
+   "cik": "0001402057",
+   "entity_name": "CDW Corp",
+   "industry": "Retail-Catalog & Mail-Order Houses",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1402057/000140205726000011/cdw-20251231.htm",
+   "language": "en",
+   "business_summary": "CDW Corporation (together with its subsidiaries, the “Company,” “CDW”, “we”, “us”, or “our”), a Fortune 500 company and member of the S&P 500 Index, is a leading multi-brand provider of information technology (“IT”) solutions to business, government, education, and healthcare customers in the United States (“US”), the United Kingdom (“UK”), and Canada. Our broad array of offerings ranges from discrete hardware and software products to integrated IT solutions and services that include on-premise and cloud capabilities across hybrid infrastructure, digital experience, and security. We are vendor, technology, and consumption model unbiased, offering a broad selection of products and multi-branded IT solutions. Our solutions are delivered in physical, virtual, and cloud-based environments through approximately 10,500 customer-facing coworkers, including sellers, highly-skilled specialists, and engineers. We are a leading sales channel partner for many original equipment manufacturers (“OEMs”), software publishers, and cloud providers (collectively, our “vendor partners”) and wholesale di",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:16.228386+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CEG": {
+   "symbol": "CEG",
+   "cik": "0001868275",
+   "entity_name": "Constellation Energy Corp",
+   "industry": "Electric Services",
+   "form": "10-K",
+   "filed_at": "2026-02-24",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/ceg-20251231.htm",
+   "language": "en",
+   "business_summary": "On February 21, 2021, the Board of Directors of Exelon authorized management to pursue a plan to separate its competitive generation and customer-facing energy businesses, conducted through Constellation and its subsidiaries, into an independent, publicly traded company. CEG Parent, a Pennsylvania corporation and a direct, wholly owned subsidiary of Exelon, was newly formed for the purpose of separation and had not engaged in any activities except in preparation for the distribution. On February 1, 2022, Exelon completed the separation by distributing all the outstanding shares of the Company’s common stock, on a pro rata basis to the holders of Exelon’s common stock, with the Company holding all the interests in Constellation previously held by Exelon (the “Separation”). As of 2002, Constellation has been an individual registrant concurrent with the registration of its public debt under the Securities Act. As an individual registrant, Constellation has historically filed consolidated financial statements to reflect their financial position and operating results as a stand-alone, who",
+   "competition": "",
+   "customer_concentration": "As one of the largest customer-facing platforms in the U.",
+   "extracted_at": "2026-08-27T13:42:20.459137+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CF": {
+   "symbol": "CF",
+   "cik": "0001324404",
+   "entity_name": "CF Industries Holdings, Inc.",
+   "industry": "Agricultural Chemicals",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1324404/000132440426000007/cf-20251231.htm",
+   "language": "en",
+   "business_summary": "All references to “CF Holdings,” “we,” “us,” “our” and “the Company,” refer to CF Industries Holdings, Inc. and its subsidiaries, except where the context makes clear that the reference is to CF Industries Holdings, Inc. only and not its subsidiaries. All references to “CF Industries” refer to CF Industries, Inc., a 100% owned subsidiary of CF Industries Holdings, Inc. References to tons refer to short tons. Notes referenced throughout this document refer to consolidated financial statement note disclosures that are found in Item 8. Financial Statements and Supplementary Data—Notes to Consolidated Financial Statements. Our mission is to provide clean energy to feed and fuel the world sustainably. With our employees focused on safe and reliable operations, environmental stewardship, and disciplined capital and corporate management, we are on a path to decarbonize our ammonia production network – the world’s largest – to enable low-carbon hydrogen and nitrogen products for energy, fertilizer, emissions abatement and other industrial activities. Our value chain consists of manufacturing",
+   "competition": "Competition — Our markets are global and intensely competitive, based primarily on delivered price and, to a lesser extent, on low-carbon attributes, reliability, customer service and product quality. During the peak demand periods, product availability and delivery time also play a role in the buying decisions of customers. Our primary competitors with North American operations include Nutrien Ltd., Koch Fertilizer LLC, LSB Industries, CVR Partners, LP and Yara International. There is also significant competition from products sourced from other regions of the world, including some with lower natural gas or other feedstock costs, which may include the benefit of government subsidies. Because ammonia, urea and UAN are widely-traded fertilizer products and there are limited barriers to entry, we experience 9",
+   "customer_concentration": "CHS was our largest customer in 2025 and accounted for approximately 13% of our consolidated net sales.",
+   "extracted_at": "2026-08-27T13:42:24.205663+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CFG": {
+   "symbol": "CFG",
+   "cik": "0000759944",
+   "entity_name": "CITIZENS FINANCIAL GROUP INC/RI",
+   "industry": "State Commercial Banks",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/759944/000075994426000028/cfg-20251231.htm",
+   "language": "en",
+   "business_summary": "Citizens Financial Group, Inc. is headquartered in Providence, Rhode Island. We offer a broad range of retail and commercial banking products and services to individuals, small businesses, middle-market companies, large corporations, and institutions. Our products and services are offered through more than 1,000 branches in 14 states and the District of Columbia and 75 retail and commercial non-branch offices, though certain lines of business serve national markets. At December 31, 2025, we had total assets of $226.4 billion, total deposits of $183.3 billion, and total stockholders’ equity of $26.3 billion. In addition, we had total client assets of $61.9 billion, including assets under management of $35.9 billion, representing assets for which continuous and regular supervisory or management services are provided, and transactional assets of $26.0 billion, representing assets for which execution, custody, recordkeeping, reporting, and other services are provided. We are a BHC incorporated under Delaware state law in 1984, and our primary federal regulator is the FRB. CBNA is our ban",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:29.116903+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CHD": {
+   "symbol": "CHD",
+   "cik": "0000313927",
+   "entity_name": "CHURCH & DWIGHT CO INC /DE/",
+   "industry": "Soap, Detergents, Cleang Preparations, Perfumes, Cosmetics",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/313927/000119312526048139/chd-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "In each of the years ended December 31, 2025, 2024 and 2023, net sales to our largest customer, Walmart Inc. No other customer accounted for 10% or more of our consolidated net sales in the three-year period. In 2025, some of our largest customers launched private label brands that compete with our products and may continue to expand those offerings in the future. Walmart is our largest customer, accounting for approximately 23% of net sales in each of 2025, 2024, and 2023. Our top four customers accounted for approximately 44%, 43%, and 44% of net sales in 2025, 2024, and 2023, respectively. As a result, changes in the strategies of any of our largest customers, including a reduction in the",
+   "extracted_at": "2026-08-27T13:42:32.162693+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CHRW": {
+   "symbol": "CHRW",
+   "cik": "0001043277",
+   "entity_name": "C. H. ROBINSON WORLDWIDE, INC.",
+   "industry": "Arrangement of  Transportation of  Freight & Cargo",
+   "form": "10-K",
+   "filed_at": "2026-02-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1043277/000104327726000009/chrw-20251231.htm",
+   "language": "en",
+   "business_summary": "C.H. Robinson Worldwide, Inc. (“C.H. Robinson,” “the company,” “we,” “us,” or “our”) is one of the largest global logistics providers in the world, with consolidated total revenues of $16.2 billion in 2025. As a leader in Lean artificial intelligence (“AI”) supply chains, we deliver logistics like no one else. For more than a century, companies everywhere have looked to us to reimagine how goods move. We deliver tailored solutions across the world via truckload, less-than-truckload, ocean, air, and more. With our unique combination of human insight and Lean AI working as one, supply chains move faster, smarter, and more sustainably. Operating throughout North America, Europe, Asia, Oceania, South America, and the Middle East, we help ensure the seamless delivery of goods across industries and continents. Our global suite of multimodal logistics services brings together the expertise of our people with custom technology differentiated by one of the largest datasets on shipments, routings, and carriers in the world. The Robinson Operating Model is the foundation of our strategy, execut",
+   "competition": "Competition — The transportation services industry is highly competitive and fragmented. We compete against traditional and non-traditional logistics companies, including transportation providers that own equipment, third-party freight brokers, technology matching services, internet freight brokers, carriers offering logistics services, on-demand transportation service providers, NVOCCs, IACs, and freight forwarders. We also buy from and sell transportation services to companies that compete with us. In our sourcing business, we compete with produce brokers, produce growers, produce marketing companies, produce wholesalers, and foodservice buying groups. We also buy from and sell produce to companies that compete with us. 6",
+   "customer_concentration": "During 2025, our largest customer accounted for approximately two percent of our consolidated total revenues. We derive a significant portion of our total revenues and adjusted gross profits from our largest customers. Our largest customer comprised approximately two percent of our consolidated total revenues.",
+   "extracted_at": "2026-08-27T13:42:34.520071+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CHTR": {
+   "symbol": "CHTR",
+   "cik": "0001091667",
+   "entity_name": "CHARTER COMMUNICATIONS, INC. /MO/",
+   "industry": "Cable & Other Pay Television Services",
+   "form": "10-K",
+   "filed_at": "2026-01-30",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1091667/000109166726000017/chtr-20251231.htm",
+   "language": "en",
+   "business_summary": "We are a leading broadband connectivity company with services available to 58 million homes and small to large businesses across 41 states through our Spectrum ® brand. Founded in 1993, we have evolved from providing cable TV to streaming, and from high-speed Internet to a converged broadband, WiFi and mobile experience. Over the Spectrum Fiber Broadband Network and supported by our 100% U.S.-based employees, we offer Seamless Connectivity and Entertainment with Spectrum Internet ® , Mobile, TV and Voice products. Our strategy is focused on utilizing our fiber-powered network to deliver high-quality, competitively priced products, with outstanding service, allowing us to increase both the number of customers we serve over our network and the number of products we sell to each customer. This combination also reduces the number of service transactions we perform per relationship, yielding higher customer satisfaction and lower customer churn, which results in lower costs to acquire and serve customers and drives greater profitability. We offer Spectrum Internet products with speeds up",
+   "competition": "Competition — Residential Services We face intense competition for residential customers, both from existing competitors and, as a result of the rapid development of new technologies, services and products, from new entrants.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:37.958084+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CI": {
+   "symbol": "CI",
+   "cik": "0001739940",
+   "entity_name": "Cigna Group",
+   "industry": "Hospital & Medical Service Plans",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1739940/000173994026000006/ci-20251231.htm",
+   "language": "en",
+   "business_summary": "The Cigna Group ® , together with its subsidiaries (either individually or collectively referred to as the \"Company,\" \"we,\" \"us\" or \"our\"), is a global health company. The Cigna Group is a global health company committed to creating a better future for every individual and every community. Powered by our dedicated people and valued brands, we advance our mission to improve the health and vitality of those we serve by staying grounded in the needs of our customers and patients - delivering a personalized, transparent and affordable health care experience. We focus on leading the way to partner and innovate solutions for better health. At The Cigna Group our global workforce of approximately 67,700 colleagues strives to fulfill our mission to improve the health and vitality of more than 185 million customer relationships in more than 30 markets and jurisdictions (as of December 31, 2025). We play an important role in the health care system, and the breadth and depth of our customer relationships - as well as our approximately 1.7 million relationships with health care providers, clinic",
+   "competition": "Competition — The primary competitive factors in the industry include the ability to negotiate with retail pharmacies to ensure retail pharmacy networks meet the needs of clients and customers; provide home delivery and specialty pharmacy services; negotiate with drug manufacturers to lower the cost of prescription drugs; manage cost and quality of specialty drugs; specialize in claim adjudication and benefit administration; improve access, outcomes, and efficiencies within the health care ecosystem; deliver quality primary and behavioral care in virtual-led hybrid settings and in the workplace; navigate the complexities of government-reimbursed business including Medicare, Medicaid and the public exchanges; and use the information obtained about drug, behavioral and medical utilization patterns and consumer behavior to reduce costs for clients and customers and assess the level of servi",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:42.068169+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CIEN": {
+   "symbol": "CIEN",
+   "cik": "0000936395",
+   "entity_name": "CIENA CORP",
+   "industry": "Telephone & Telegraph Apparatus",
+   "form": "10-K",
+   "filed_at": "2025-12-12",
+   "period": "2025-11-01",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/936395/000162828025056698/cien-20251101.htm",
+   "language": "en",
+   "business_summary": "We are a network technology company, providing hardware, software, and services to a wide range of network operators and enabling enhanced network capacity, service delivery, and automation. Our solutions support network traffic across a wide range of applications, including cloud, voice, video, data, and artificial intelligence (“AI”). Our network solutions are used globally by cloud providers, service providers, and other network operators across multiple industry verticals. Our Networking Platforms, including our Optical Networking portfolio and Routing and Switching portfolio, are solutions applied from the network core to end user access points and allow network operators to scale capacity, increase transmission speeds, allocate traffic efficiently, and adapt dynamically to changing end-user service demands. Complementing our Networking Platforms, we offer Platform Software, which delivers multi-layer domain control and operations for network operators, and Blue Planet ® Automation Software, which enables service lifecycle management automation with productized operational suppo",
+   "competition": "Competitive Environment — Competition among networking solution vendors remains intense on a global basis. The market in which we compete is characterized by rapidly advancing technology, frequent introduction of new solutions, and aggressive selling efforts, including using significant pricing pressure to displace incumbent vendors and capture market share. Competition for sales of networking solutions is dominated by a small number of very large, multi-national companies. Our competitors include Nokia, Huawei, Cisco, Hewlett Packard Enterprise, and ZTE. As compared to us, many of these competitors have substantially greater financial, operational and marketing resources, and broader product offerings. We also compete with several smaller but established companies that offer one or more products that compete directly or indirectly with our offerings or whose products address specific ge",
+   "customer_concentration": "For example, in fiscal 2025, our five largest customers contributed approximately 50% of our revenue, a cloud provider customer accounted for approximately 18% of our revenue, and a service provider accounted for approximately 11% of our revenue. Sales to our five largest customers contributed 49. No other customer accounted for greater than 10% of our revenue in fiscal 2025 or fiscal 2024. No other customer accounted for 10% or more of total revenue for the fiscal years presented. As of November 1, 2025 , two customers accounted for 15. As of November 2, 2024 , two customers accounted for 13.",
+   "extracted_at": "2026-08-27T13:42:44.829814+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CINF": {
+   "symbol": "CINF",
+   "cik": "0000020286",
+   "entity_name": "CINCINNATI FINANCIAL CORP",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-23",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/20286/000002028626000008/cinf-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:49.296971+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CL": {
+   "symbol": "CL",
+   "cik": "0000021665",
+   "entity_name": "COLGATE PALMOLIVE CO",
+   "industry": "Perfumes, Cosmetics & Other Toilet Preparations",
+   "form": "10-K",
+   "filed_at": "2026-02-23",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/21665/000002166526000006/cl-20251231.htm",
+   "language": "en",
+   "business_summary": "Colgate-Palmolive Company (together with its subsidiaries, “we,” “us,” “our,” the “Company” or “Colgate-Palmolive”) is a caring, innovative growth company united behind our purpose to reimagine a healthier future for all people, their pets and our planet. To achieve our business and financial objectives and deliver peer-leading performance and total shareholder return, we are focused on driving organic sales growth; delivering consistent, compounded earnings per share growth; achieving operational efficiencies; and driving growth in free cash flow along with the efficient use of our balance sheet. We do this by leveraging the global reach and penetration of our brands; building the incremental benefit of superior, science-based innovation supported by an agile and resilient supply chain; harnessing the power of best-in-class omni-channel demand generation; leading in capabilities such as data, analytics and artificial intelligence (“AI”); and evolving our high-impact, inclusive culture. Our products are marketed in over 200 countries and territories throughout the world. Colgate-Palm",
+   "competition": "",
+   "customer_concentration": "No other customer represented more than 10% of our Net sales in 2025. No other customer represented more than 10% of Net sales in any period presented.",
+   "extracted_at": "2026-08-27T13:42:52.178761+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CLX": {
+   "symbol": "CLX",
+   "cik": "0000021076",
+   "entity_name": "CLOROX CO /DE/",
+   "industry": "Specialty Cleaning, Polishing and Sanitation Preparations",
+   "form": "10-K",
+   "filed_at": "2026-08-07",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/21076/000002107626000034/clx-20260630.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "Net sales to the Company’s largest customer, Walmart Stores, Inc. No other customers accounted for 10% or more of the Company’s consolidated net sales in any of these fiscal years. The Company’s five largest customers accounted for about half of the Company’s consolidated net sales for each of the fiscal years 2026, 2025 and 2024. The Company’s five largest customers accounted for about half of the Company’s consolidated net sales for each of the fiscal years ended June 30, 2026, 2025, and 2024, and a significant portion of the Company’s future revenues may continue to be derived from a small number of customers.",
+   "extracted_at": "2026-08-27T13:42:54.417363+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CMCSA": {
+   "symbol": "CMCSA",
+   "cik": "0001166691",
+   "entity_name": "COMCAST CORP",
+   "industry": "Cable & Other Pay Television Services",
+   "form": "10-K",
+   "filed_at": "2026-02-03",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1166691/000162828026004994/cmcsa-20251231.htm",
+   "language": "en",
+   "business_summary": "We are a global media and technology company that reaches customers, viewers and guests worldwide through the connectivity and platforms services we provide and the content and experiences we create. We deliver broadband, wireless, video and voice services primarily under the Xfinity, Comcast Business, Sky and NOW brands; produce, distribute and stream leading entertainment, sports and news through brands including NBC, Telemundo, Universal, Peacock and Sky; and own and operate Universal theme parks. • Connectivity & Platforms: Contains our broadband, wireless, video and wireline voice businesses in the United States, United Kingdom and Italy (collectively, the “Connectivity & Platforms markets”). Also includes the operations of our Sky-branded entertainment television networks in the United Kingdom and Italy. Our Connectivity & Platforms business is reported in two segments, Residential Connectivity & Platforms and Business Services Connectivity. • Content & Experiences: Contains our media and entertainment businesses that produce and distribute entertainment, sports, news and other",
+   "competition": "Competition — Residential Connectivity & Platforms Broadband We compete with a number of companies, many with significant financial resources, that offer internet services, including: • wireline telecommunications companies • wireless telecommunications companies • municipal broadband networks and power companies • satellite broadband providers Certain wireline telecommunications companies, such as AT&T, Lumen and Verizon in the United States and BT and Virgin Media O2 in the United Kingdom, have built and are continuing to build fiber-based wireline network infrastructure further into their networks, which enables them to provide data transmission speeds that exceed those that can be provided with traditional copper digital subscriber line (“DSL”) technology, and are offering services with these higher speeds in many of our service areas. Certain companies that offer DSL services have i",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:42:57.396918+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CME": {
+   "symbol": "CME",
+   "cik": "0001156375",
+   "entity_name": "CME GROUP INC.",
+   "industry": "Security & Commodity Brokers, Dealers, Exchanges & Services",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1156375/000115637526000009/cme-20251231.htm",
+   "language": "en",
+   "business_summary": "CME Group enables clients to trade futures, options, cash and over-the-counter (OTC) products, optimize portfolios and analyze data - empowering market participants worldwide to efficiently manage risk and capture opportunities. CME Group provides primary price discovery and referential pricing information through its market data in a variety of formats, including real-time, historical and derived data for customers in both listed and cash products. CME Group also offers industry-leading research and analytics tools to provide customers with market education resources. In addition, it operates one of the world's leading central counterparty clearing providers. Our principal executive offices are located at 20 South Wacker Drive, Chicago, Illinois 60606, our telephone number is 312-930-1000 and our website is cmegroup.com . CME Group exchanges offer the widest range of global benchmark products across interest rates, equity indexes, foreign exchange (FX), and agricultural, energy and metals commodities. We also offer cash and repo fixed income trading via BrokerTec, and spot and OTC F",
+   "competition": "Competition — The industry in which we operate is highly competitive and has seen multiple new entrants over time, and we expect competition to continue to intensify and become more global, especially in light of changes in the financial services industry driven by regulatory reforms such as the Dodd-Frank Wall Street Reform and Consumer Protection Act (Dodd-Frank), European Market Infrastructure Regulation (EMIR), EMIR 3.0, Markets in Financial Instruments Directive II (MiFID II), Capital Requirements Directive IV, Market Abuse Regulation, Benchmarks Regulation, Basel III and various other laws and regulations. Please also refer to the discussion below and in \" Item 1A - Risk Factors\" beginning o n page 16 f or a description of competitive risks and uncertainties.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:00.432833+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CMG": {
+   "symbol": "CMG",
+   "cik": "0001058090",
+   "entity_name": "CHIPOTLE MEXICAN GRILL INC",
+   "industry": "Retail-Eating  Places",
+   "form": "10-K",
+   "filed_at": "2026-02-04",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1058090/000105809026000009/cmg-20251231.htm",
+   "language": "en",
+   "business_summary": "Chipotle Mexican Grill, Inc., a Delaware corporation, together with its subsidiaries (“Chipotle,” “we,” “us,” or “our”) owns and operates Chipotle Mexican Grill restaurants, which feature a relevant menu of burritos, burrito bowls (a burrito without the tortilla), quesadillas, tacos, and salads. We strive to cultivate a better world by serving responsibly sourced, classically cooked, real food with wholesome ingredients and without artificial colors, flavors or preservatives. We are passionate about providing a great guest experience and making our food more accessible to everyone while continuing to be a brand with a demonstrated purpose. Our first Chipotle restaurant opened in Denver, Colorado in 1993. Over 30 years later, our devotion to seeking out high-quality ingredients, raised with respect for animals, farmers, and the environment, remains at the core of our commitment to Food with Integrity. As of December 31, 2025, we owned 3,938 Chipotle restaurants throughout the United States (“U.S.”) and 104 international Chipotle restaurants. Additionally, we had 14 international partn",
+   "competition": "Competition — The fast-casual, quick-service, and casual dining segments of the restaurant industry are highly competitive with respect to, among other things, taste, price, food quality and presentation, customer service, location, convenience, brand reputation, and cleanliness and ambience of each restaurant. Our competition includes a variety of restaurants in each of these segments, including locally-owned restaurants, as well as national and regional chains. Competition from food delivery services, which offer meals from a wide variety of restaurants, also has increased in recent years and is expected to continue to increase. Many of our competitors also offer dine-in, carry-out, online, catering, and delivery services. Among our main competitors are restaurant formats that claim to serve higher quality ingredients without artificial flavors, colors and preservatives, and that serve",
+   "customer_concentration": "No customer accounts for 10% or more of our revenues.",
+   "extracted_at": "2026-08-27T13:43:02.418942+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CMI": {
+   "symbol": "CMI",
+   "cik": "0000026172",
+   "entity_name": "CUMMINS INC",
+   "industry": "Engines & Turbines",
+   "form": "10-K",
+   "filed_at": "2026-02-10",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/26172/000002617226000009/cmi-20251231.htm",
+   "language": "en",
+   "business_summary": "We were founded in 1919 as Cummins Engine Company, a corporation in Columbus, Indiana, and one of the first diesel engine manufacturers. In 2001, we changed our name to Cummins Inc. We are a global power leader committed to powering a more prosperous world. Since 1919, we have delivered innovative solutions that move people, goods and economies forward. Our five reportable segments - Engine, Components, Distribution, Power Systems and Accelera - offer a broad portfolio, including advanced diesel, electric and hybrid powertrains; integrated power generation systems; critical components such as aftertreatment, turbochargers, fuel systems, controls, transmissions, axles and brakes; and zero emissions technologies like battery and electric powertrain systems. With a global footprint, deep technical expertise and an extensive service network, we deliver dependable, cutting-edge solutions tailored to our customers' needs, supporting them through the energy transition with our Destination Zero strategy. We sell our products to original equipment manufacturers (OEMs), distributors, dealers a",
+   "competition": "Competitive Pay, Benefits and Well-Being — To attract and retain the best talent, we focus on providing progressive, market-competitive pay, benefits and rewards. Our programs are designed to remain sustainable and responsive to the market while still honoring our core values. We provide benefit programs with the goal of supporting the emotional, financial, physical and social health of our employees throughout their career at Cummins. Some examples include base and variable pay, healthcare programs, global mental health support, paid time off, flexible work, retirement saving plans and employee stock purchase plans. When designing our base pay ranges, we conduct market analyses to ensure our ranges are competitive and our employees are advancing their earning potential. We also perform annual compensation studies to assess market movement, pay equity and living wages. We review wages gl",
+   "customer_concentration": "PACCAR is our largest customer, accounting for 13 percent of our consolidated net sales in 2025, 16 percent in 2024 and 16 percent in 2023. Our largest customer is PACCAR, Inc. No other customer accounted for more than 10 percent of consolidated net sales.",
+   "extracted_at": "2026-08-27T13:43:05.782454+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CMS": {
+   "symbol": "CMS",
+   "cik": "0000811156",
+   "entity_name": "CMS ENERGY CORP",
+   "industry": "Electric & Other Services Combined",
+   "form": "10-K",
+   "filed_at": "2026-02-10",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/811156/000081115626000004/cms-20251231.htm",
+   "language": "en",
+   "business_summary": "CMS Energy was formed as a corporation in Michigan in 1987 and is an energy company operating primarily in Michigan. It is the parent holding company of several subsidiaries, including Consumers, an electric and gas utility, and NorthStar Clean Energy, primarily a domestic independent power producer and marketer. Consumers’ customer base consists of a mix of primarily residential, commercial, and diversified industrial customers. NorthStar Clean Energy, through its subsidiaries and equity investments, is engaged in domestic independent power production, including the development and operation of renewable generation, and the marketing of independent power production. CMS Energy manages its businesses by the nature of services each provides, and operates principally in three business segments: electric utility; gas utility; and NorthStar Clean Energy, its non‑utility operations and investments. Consumers’ consolidated operations account for the substantial majority of CMS Energy’s total assets, income, and operating revenue. CMS Energy’s consolidated operating revenue was $8.5 billion",
+   "competition": "",
+   "customer_concentration": "Consumers’ electric utility operations are not dependent on a single customer, or even a few customers, and the loss of any one or even a few of Consumers’ largest customers is not reasonably likely to have a material adverse effect on Consumers’ financial condition. Consumers’ gas utility operations are not dependent on a single customer, or even a few customers, and the loss of any one or even a few of Consumers’ largest customers is not reasonably likely to have a material adverse effect on Consumers’ financial condition.",
+   "extracted_at": "2026-08-27T13:43:09.968654+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CNC": {
+   "symbol": "CNC",
+   "cik": "0001071739",
+   "entity_name": "CENTENE CORP",
+   "industry": "Hospital & Medical Service Plans",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1071739/000107173926000049/cnc-20251231.htm",
+   "language": "en",
+   "business_summary": "Our mission is to transform the health of the communities we serve, one person at a time. As the nation's largest managed care company focused on underserved populations, Centene is committed to helping people live healthier lives. Centene offers affordable and high-quality products to more than 1 in 15 individuals across the nation, including Medicaid and Medicare members (including Medicare Prescription Drug Plans) as well as individuals and families served by the Health Insurance Marketplace. Centene provides access to high-quality healthcare, innovative programs and a wide range of health solutions that help families and individuals get well, stay well and be well. We believe the best way to deliver healthcare is with a personal approach, with local brands and local teams who live in, care about and directly influence the communities they serve – a key differentiator in our ability to provide access to quality care for our members. Our state-based plans are built on community expertise and backed by the depth, breadth, and experience of a leading national company. Our model is st",
+   "competition": "COMPETITION — We operate in a highly competitive and evolving industry characterized by business consolidations, strategic partnerships, market pressures, and ongoing regulatory and legislative changes at both at the federal and state levels, including healthcare reform initiatives described under the heading \"Regulation.\" Shifts in the political environment may further influence the competitive landscape. We compete with MCOs, specialty providers and emerging non-traditional entrants to secure and retain state, county, federal, and commercial contracts. Government agencies evaluate multiple factors before awarding contracts, including quality of care, provider network access, administrative efficiency, financial strength, prior performance, and local market investments. Competition also extends to member acquisition and retention. Individuals typically select health plans based on quali",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:13.562003+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CNP": {
+   "symbol": "CNP",
+   "cik": "0001130310",
+   "entity_name": "CENTERPOINT ENERGY INC",
+   "industry": "Electric Services",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1130310/000113031026000008/cnp-20251231.htm",
+   "language": "en",
+   "business_summary": "This combined Form 10-K is filed separately by three registrants: CenterPoint Energy, Inc., CenterPoint Energy Houston Electric, LLC and CenterPoint Energy Resources Corp. Information contained herein relating to any individual Registrant is filed by such Registrant solely on its own behalf. No Registrant makes any representation as to information relating to the other Registrants or the subsidiaries of CenterPoint Energy, Inc. other than itself or its subsidiaries. Except as discussed in Note 12 to the consolidated financial statements, no Registrant has an obligation in respect of any other Registrant’s debt securities, and holders of such debt securities should not consider the financial resources or results of operations of any Registrant other than the obligor in making a decision with respect to such securities. The discussion of CenterPoint Energy’s consolidated financial information includes the financial results of Houston Electric and CERC. Where appropriate, information relating to a specific Registrant has been segregated and labeled as such. Unless the context indicates",
+   "competition": "Competition — There are no other electric transmission and distribution utilities in Houston Electric’s service area. For another provider of transmission and distribution services to provide such services in Houston Electric’s territory, it would be required to obtain a CCN from the PUCT and, depending on the location of the facilities, may also be required to obtain franchises from one or more municipalities. Houston Electric is not aware of any other party intending to enter this business in its service area at this time. Distributed generation (i.e., power generation located at or near the point of consumption) could result in a reduction of demand for Houston Electric’s distribution services but has not been a significant factor to date.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:20.994960+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "COF": {
+   "symbol": "COF",
+   "cik": "0000927628",
+   "entity_name": "CAPITAL ONE FINANCIAL CORP",
+   "industry": "National Commercial Banks",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/927628/000092762826000024/cof-20251231.htm",
+   "language": "en",
+   "business_summary": "Capital One Financial Corporation, a Delaware corporation established in 1994 and headquartered in McLean, Virginia, is a diversified financial services holding company with banking and non-banking subsidiaries. Capital One Financial Corporation and its subsidiaries (the “Company” or “Capital One”) operate as a global payments provider and diversified financial institution, delivering a broad array of financial products and services to consumers, small businesses and commercial clients through digital channels, branch locations, cafés and other distribution channels. As of December 31, 2025, Capital One Financial Corporation’s principal operating subsidiary was Capital One, National Association (“CONA”). On May 18, 2025 (the “Closing Date”), Discover Financial Services (“Discover”) merged into Capital One and Discover Bank merged into CONA. See “Part II—Item 8. Financial Statements and Supplementary Data—Note 2—Business Combinations and Discontinued Operations” for additional information. The Company is hereafter collectively referred to as “we,” “us” or “our.” CONA is referred to as",
+   "competition": "",
+   "customer_concentration": "The Company has substantially completed the reissuance of legacy Capital One customer debit cards onto the Global Payment Network.",
+   "extracted_at": "2026-08-27T13:43:28.002688+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "COHR": {
+   "symbol": "COHR",
+   "cik": "0000820318",
+   "entity_name": "COHERENT CORP.",
+   "industry": "Optical Instruments & Lenses",
+   "form": "10-K",
+   "filed_at": "2026-08-14",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm",
+   "language": "en",
+   "business_summary": "Coherent Corp. (“Coherent,” the “Company,” “we,” “us,” or “our”), is a vertically integrated manufacturing company that develops, manufactures, and markets lasers, transceivers, and other optical and optoelectronic devices, modules, and systems, as well as engineered materials, for use in the data center, communications and industrial markets. Our headquarters are located at 375 Saxonburg Boulevard, Saxonburg, Pennsylvania 16056, USA. Our telephone number is +1-724-352-4455. Reference to “Coherent,” the “Company,” “we,” “us,” or “our” in this Annual Report on Form 10-K, unless the context requires otherwise, refers to Coherent Corp. and its wholly owned subsidiaries. The following defined terms are used in this Annual Report on Form 10-K: artificial intelligence (AI); bismuth telluride (Bi 2 Te 3 ); carbon dioxide (CO 2 ); continuous wave (CW); co-packaged optics (CPO); datacenter interconnect (DCI); deep ultraviolet (DUV); digital signal processor (DSP); edge-emitting laser (EEL); electron-absorption modulated laser (EML); environmental, social, and governance (ESG); fifth-generatio",
+   "competition": "Competition — Coherent is a global leader in many of its product families. We compete, in part, on our core competencies from materials to systems, our differentiated products and services, and the sustainability of our competitive advantages. We also compete by using our intellectual property, ability to scale, product quality, on-time delivery, and technical support. We believe that our vertical integration, manufacturing facilities and equipment, experienced technical and manufacturing employees, and worldwide marketing and distribution channels provide us with competitive advantages. In addition to competitors who manufacture products similar to those we produce, there are other technologies and products available that may compete with our technologies and products.",
+   "customer_concentration": "One major customer accounted for 20 %, 10 %, and 10 % of consolidated revenue during fiscal 2026, 2025 and 2024, respectively. A second major customer accounted for 12 % of consolidated revenue during fiscal 2026. A third major customer accounted for 12 % of consolidated revenue during fiscal 2025.",
+   "extracted_at": "2026-08-27T13:43:30.967539+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "COIN": {
+   "symbol": "COIN",
+   "cik": "0001679788",
+   "entity_name": "Coinbase Global, Inc.",
+   "industry": "Finance Services",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1679788/000167978826000015/coin-20251231.htm",
+   "language": "en",
+   "business_summary": "We are working to update the century-old financial system by providing a trusted platform that makes it easy for our customers to engage with crypto assets. In December 2025, we took a major step forward to becoming the Everything Exchange—dramatically expanding the assets available to trade on Coinbase, including stocks, commodity futures, perpetual futures, and prediction markets. Our goal is to create a comprehensive, seamless experience for retail users, institutions, and developers to engage in the future of finance. • Trust : We are deeply invested in building the most secure and compliant platform. We hold customer assets one-to-one at all times. • Ease of use : We build easy-to-use products that our customers love. We obsess over quality and craft. We strive to make financial transactions easy. • Consumers : Retail customers seeking to hold, invest or trade crypto assets, as well as a growing set of trading offerings such as equities, prediction markets, and derivatives. Consumers use Coinbase as a primary account for crypto-enabled financial services, and to engage onchain.",
+   "competition": "Competition — The crypto industry is highly innovative, rapidly evolving, and characterized by healthy competition, experimentation, changing customer needs, frequent introductions of new products and services, and is subject to uncertain and evolving industry and regulatory requirements. We face significant competition from a variety of companies around the world—ranging from crypto-native companies, including decentralized exchanges, to large traditional financial services incumbents and financial technology providers. 13",
+   "customer_concentration": "Additionally, users are not prohibited from having more than one account and our MTUs metric may overstate the number of unique customers who have registered an account on our platform as one customer may register for, and use, multiple accounts with different email addresses, phone numbers, or usernames.",
+   "extracted_at": "2026-08-27T13:43:35.385682+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "COO": {
+   "symbol": "COO",
+   "cik": "0000711404",
+   "entity_name": "COOPER COMPANIES, INC.",
+   "industry": "Ophthalmic Goods",
+   "form": "10-K",
+   "filed_at": "2025-12-05",
+   "period": "2025-10-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/711404/000162828025055615/coo-20251031.htm",
+   "language": "en",
+   "business_summary": "The Cooper Companies, Inc. (Cooper, we or the Company), is a leading global medical device company focused on helping people experience life's beautiful moments. Headquartered in San Ramon, California, Cooper sells products in over 130 countries and positively impacts over fifty million lives each year. Cooper operates through two business segments, CooperVision and CooperSurgical. Our two business segments elevate standards of care with products and services in the fields of vision, fertility and women’s health. For financial information relating to these business segments, refer to Note 12. Business Segment Information in Item 8. Financial Statements and Supplementary Data of this Annual Report. CooperVision is a global manufacturer providing products for contact lens wearers. CooperVision develops, manufactures and markets a broad range of single-use, two-week and monthly contact lenses, featuring advanced materials and optics. CooperVision designs its products to address vision challenges such as astigmatism, presbyopia and myopia with a broad collection of spherical, toric and m",
+   "competition": "COMPETITION — The markets in which we participate are highly competitive and involve the continual search for technological and scientific innovations. Competitive factors in these markets include technological and scientific advances, product quality and availability, price, customer service including response time and effective communication of product information to clinicians and consumers, and manufacturing processes. Competitors may have greater financial resources, larger research and development budgets, larger sales forces, greater market penetration and/or larger manufacturing capacity. Both CooperVision and CooperSurgical compete predominantly on the basis of product quality and differentiation, technological benefits, price, service levels and reliability.",
+   "customer_concentration": "No customer accounted for 10% or more of our consolidated net revenue in fiscal 2025 and 2024. No customers accounted for 10% or more of our consolidated net revenue in fiscal 2025, 2024 and 2023.",
+   "extracted_at": "2026-08-27T13:43:38.173113+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "COP": {
+   "symbol": "COP",
+   "cik": "0001163165",
+   "entity_name": "CONOCOPHILLIPS",
+   "industry": "Petroleum Refining",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1163165/000116316526000009/cop-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:41.879234+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "COR": {
+   "symbol": "COR",
+   "cik": "0001140859",
+   "entity_name": "Cencora, Inc.",
+   "industry": "Wholesale-Drugs, Proprietaries & Druggists' Sundries",
+   "form": "10-K",
+   "filed_at": "2025-11-25",
+   "period": "2025-09-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1140859/000114085925000131/cor-20250930.htm",
+   "language": "en",
+   "business_summary": "Cencora is one of the largest global pharmaceutical sourcing and distribution services companies, helping both healthcare providers and pharmaceutical and biotech manufacturers improve patient access to products and enhance patient care. We deliver innovative programs and services designed to increase the effectiveness and efficiency of the pharmaceutical supply chain in both human and animal health. More specifically, we distribute a comprehensive offering of brand-name, specialty brand-name, and generic pharmaceuticals, over-the-counter healthcare products, home healthcare supplies and equipment, and related services to a wide variety of healthcare providers located in the United States and select global markets, including acute care hospitals and health systems, independent and chain retail pharmacies, mail order pharmacies, medical clinics, long-term care and alternate site pharmacies, physician practices, medical and dialysis clinics, veterinarians, and other customers. Additionally, we furnish healthcare providers and pharmaceutical manufacturers with an assortment of related s",
+   "competition": "Competition — We operate in a highly competitive global environment in the distribution of pharmaceuticals and related healthcare services. Our largest competitors are McKesson Corporation (“McKesson”), Cardinal Health, Inc. (“Cardinal”), and UPS Logistics, among others. Our U.S. human health distribution businesses compete with both McKesson and Cardinal, as well as national generic distributors and regional distributors within pharmaceutical distribution. In addition, we compete with manufacturers who sell directly to customers, chain drugstores who manage their own warehousing, specialty distributors, and packaging and healthcare technology companies. Alliance Healthcare, MWI Animal Health, World Courier, and our consulting businesses also face competition from a variety of entities. In all areas, competitive factors include price, product offerings, value-added service programs, serv",
+   "customer_concentration": "The bankruptcy, insolvency, or other credit failure of any customer that has a substantial amount owed to us, including our largest customer, could have a material adverse effect on our revenue, results of operations, financial position, and cash flows. Sales, including GLP-1 products, to our two largest customers increased by $6. Evernorth Health Services, the Company’s second largest customer in fiscal 2025, accounted for approximately 13 % of revenue and represented approximately 5 % of accounts receivable as of September 30, 2025.",
+   "extracted_at": "2026-08-27T13:43:44.823863+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "COST": {
+   "symbol": "COST",
+   "cik": "0000909832",
+   "entity_name": "COSTCO WHOLESALE CORP /NEW",
+   "industry": "Retail-Variety Stores",
+   "form": "10-K",
+   "filed_at": "2025-10-08",
+   "period": "2025-08-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983225000101/cost-20250831.htm",
+   "language": "en",
+   "business_summary": "Costco Wholesale Corporation and its subsidiaries (Costco or the Company) began operations in 1983, in Seattle, Washington. We are principally engaged in the operation of membership warehouses in the United States (U.S.) and Puerto Rico, Canada, Mexico, Japan, the United Kingdom (U.K.), Korea, Australia, Taiwan, China, Spain, France, Sweden, Iceland, and New Zealand. Costco operated 914, 890, and 861 warehouses worldwide at August 31, 2025, September 1, 2024, and September 3, 2023. The Company operates e-commerce sites in the U.S., Canada, Mexico, the U.K., Korea, Taiwan, Japan, and Australia. Our common stock trades on the NASDAQ Global Select Market, under the symbol “COST.” We report on a 52/53-week fiscal year, consisting of thirteen four-week periods and ending on the Sunday nearest the end of August. The first three quarters consist of three periods each, and the fourth quarter consists of four periods (five weeks in the thirteenth period in a 53-week year). The material seasonal impact in our operations is increased net sales and earnings during the winter holiday season. Refe",
+   "competition": "Competition — Our industry is highly competitive, based on factors such as price, merchandise quality and selection, location, convenience, distribution strategy, and customer service. We compete on a worldwide basis with global, national, and regional wholesalers and retailers, including supermarkets, supercenters, online retailers, gasoline stations, hard discounters, department and specialty stores, and operators selling a single category or narrow range of merchandise. Walmart, Target, Kroger, and Amazon are among our significant general merchandise retail competitors in the U.S. We also compete with other warehouse clubs, including Walmart’s Sam’s Club and BJ’s Wholesale Club in the U.S. Many of the metropolitan areas in the U.S. and certain of our Other International locations have multiple competing clubs.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:46.453256+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CPAY": {
+   "symbol": "CPAY",
+   "cik": "0001175454",
+   "entity_name": "CORPAY, INC.",
+   "industry": "Services-Business Services, NEC",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1175454/000117545426000018/flt-20251231.htm",
+   "language": "en",
+   "business_summary": "Corpay, Inc. (the \"Company\") is a global corporate payments company that helps businesses and consumers better manage and pay their expenses in a simple, controlled manner. Corpay provides a broad suite of payment and spend management solutions, including accounts payable (AP) automation and cross-border payment solutions (including foreign exchange spot, forward and option transactions), commercial card programs (e.g., purchasing cards, business cards and virtual cards), vehicle payment solutions (e.g., fuel cards, toll payments and related services) and lodging payment solutions (e.g., hotel and extended stay bookings). Since its incorporation in 2000, Corpay has delivered payment and spend solutions with customized controls and robust capabilities that offer our customers a better way to pay. This results in our customers saving time and ultimately instances, businesses lack the proper tools to monitor what is being purchased and employ manual, paper-based, disparate wasted time and money due to unnecessary or unauthorized spending, fraud, receipt collection, data input and consol",
+   "competition": "Competition — Our primary competition is from financial institutions providing a full suite of financial products, including general purpose cards, AP payments (i.e. check and ACH) and cross-border solutions. We also compete with specialized competitive offerings",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:48.963565+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CPB": {
+   "symbol": "CPB",
+   "cik": "0000016732",
+   "entity_name": "CAMPBELL'S Co",
+   "industry": "Food and Kindred Products",
+   "form": "10-K",
+   "filed_at": "2025-09-18",
+   "period": "2025-08-03",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/16732/000001673225000112/cpb-20250803.htm",
+   "language": "en",
+   "business_summary": "Unless otherwise stated, the terms \"we,\" \"us,\" \"our\" and the \"company\" refer to The Campbell's Company and its consolidated subsidiaries. We are a manufacturer and marketer of high-quality, branded food and beverage products. We organized as a business corporation under the laws of New Jersey on November 23, 1922; however, through predecessor organizations, we trace our heritage in the food business back to 1869. Our principal executive offices are in Camden, New Jersey 08103-1799. On March 12, 2024, we completed the acquisition of Sovos Brands, Inc. (Sovos Brands) for total purchase consideration of $2.899 billion. For additional information on this acquisition, see Note 3 to the Consolidated Financial Statements. On May 30, 2023, we completed the sale of our Emerald nuts business. On August 26, 2024, we completed the sale of our Pop Secret popcorn business. On February 24, 2025, we completed the sale of our noosa yoghurt business. For additional information on the divestitures, see Note 4 to the Consolidated Financial Statements. Our operations, including reportable segments, are d",
+   "competition": "Competition — We operate in a highly competitive industry and experience competition in all of our categories. This competition arises from numerous competitors of varying sizes across multiple food and beverage categories, and includes producers of private label products, as well as other branded food and beverage manufacturers. Private label products are generally sold at lower prices than branded products. Competitors market and sell their products through traditional retailers and e-commerce. All of these competitors vie for trade merchandising support and consumer dollars. The number of competitors cannot be reliably estimated. Our principal areas of competition are brand recognition, taste, nutritional value, price, promotion, innovation, shelf space and customer service. 4",
+   "customer_concentration": "Our five largest customers accounted for approximately 47 % of our consolidated net sales in 2025, 2024, and 2023. Our largest customer, Wal-Mart Stores, Inc. No other customer accounted for 10% or more of our consolidated net sales. In 2025, our five largest customers accounted for approximately 47 % of our consolidated net sales, with the largest customer, Wal-Mart Stores, Inc. There can be no assurance that our largest customers will continue to purchase our products in the same mix or quantities, or on the same terms as in the past. During 2025, our largest customer accounted for approximately 21 % of consolidated net sales. Our five largest customers accounted for approximately 47 % of ",
+   "extracted_at": "2026-08-27T13:43:51.928679+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CPRT": {
+   "symbol": "CPRT",
+   "cik": "0000900075",
+   "entity_name": "COPART INC",
+   "industry": "Retail-Auto Dealers & Gasoline Stations",
+   "form": "10-K",
+   "filed_at": "2025-09-26",
+   "period": "2025-07-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/900075/000162828025042946/cprt-20250731.htm",
+   "language": "en",
+   "business_summary": "We were incorporated in California in 1982, became a public company in 1994, and were reincorporated in Delaware in January 2012. Our principal executive offices are located at 14185 Dallas Parkway, Suite 300, Dallas, Texas 75254 and our telephone number is (972) 391-5000. Our website is www.copart.com . The contents of our website are not incorporated by reference into this Form 10-K. We provide free of charge, through a link on our website, access to our Annual Reports on Form 10-K, Quarterly Reports on Form 10-Q and Current Reports on Form 8-K, as well as amendments to those reports, as soon as reasonably practical after the reports are electronically filed with, or furnished to, the SEC. Copart ® , BID4U ® , CI & Design ® , DRIVE Auto Auctions ™ , 1-800 CAR BUYER ® , CA$HFORCARS.COM ® , COPART & DESIGN ® , VB3 & DESIGN ® , VB3 ® , National Powersports Auctions ™ , NPA ™ , Purple Wave Auction ™ , and CrashedToys.com ® are trademarks of Copart, Inc. or one of its direct or indirect wholly-owned subsidiaries. This Form 10-K also includes other trademarks of Copart and of other compa",
+   "competition": "Competition — We face significant competition from other remarketers of both salvage and non-salvage vehicles. Against these other vehicle remarketers, we face competition for long-term contractual commitments and various supply agreements with sellers, in addition to competition for the acquisition of vehicle storage facilities. We believe our principal competitors include vehicle auction and sales companies and vehicle dismantlers. These national, regional, and local competitors may have established relationships with vehicle sellers and buyers and may have financial resources that are greater than ours. The largest national or regional vehicle auctioneers in the U.S. include RB Global (including its subsidiary Insurance Auto Auctions, Inc.), Carvana, Openlane, Manheim, Inc. and ACV Auctions Inc. The largest national dismantler in the U.S. is LKQ Corporation (“LKQ”). LKQ, in addition t",
+   "customer_concentration": "No single customer accounted for more than 10% of our consolidated revenues for fiscal 2025, 2024, or 2023 and our business does not depend on any particular customer to remain profitable. Although no single customer accounted for more than 10% of our consolidated revenues for fiscal 2025, 2024, or 2023, a limited number of vehicle sellers historically have collectively accounted for a substantial portion of our revenues. No single customer accounted for more than 10% of the Company’s consolidated revenues for the years ended July 31, 2025, 2024, and 2023.",
+   "extracted_at": "2026-08-27T13:43:54.176317+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CPT": {
+   "symbol": "CPT",
+   "cik": "0000906345",
+   "entity_name": "CAMDEN PROPERTY TRUST",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/906345/000162828026007697/cpt-20251231.htm",
+   "language": "en",
+   "business_summary": "Formed on May 25, 1993, Camden Property Trust, a Texas real estate investment trust (\"REIT\"), and all consolidated subsidiaries are primarily engaged in the ownership, management, development, reposition, redevelopment, acquisition, and construction of multifamily apartment communities. Unless the context requires otherwise, \"we,\" \"our,\" \"us,\" and the \"Company\" refer to Camden Property Trust and its consolidated subsidiaries. Our multifamily apartment communities are referred to as \"communities,\" \"multifamily communities,\" \"properties,\" or \"multifamily properties\" in the following discussion. Our website is located at www.camdenliving.com and we make available free of charge through our website our annual report on Form 10-K, quarterly reports on Form 10-Q and current reports on Form 8-K, and amendments to such reports, filed or furnished pursuant to Section 13(a) or 15(d) of the Securities Exchange Act of 1934, as amended (the \"Exchange Act\"), as soon as reasonably practicable after we electronically file such material with, or furnish it to, the U.S. Securities and Exchange Commiss",
+   "competition": "Competition — There are numerous housing alternatives which compete with our communities in attracting residents. Our properties compete directly with other multifamily properties as well as condominiums, single-family homes, and third-party providers of short-term rentals, which are available for rent or purchase in the markets in which our communities are located. This competitive environment could have a material adverse effect on our ability to lease apartment homes or on the rents realized at our present properties or any newly-developed or acquired property.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:43:56.502080+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CRH": {
+   "symbol": "CRH",
+   "cik": "0000849395",
+   "entity_name": "CRH PUBLIC LTD CO",
+   "industry": "Cement, Hydraulic",
+   "form": "10-K",
+   "filed_at": "2026-02-18",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/849395/000162828026009043/crh-20251231.htm",
+   "language": "en",
+   "business_summary": "CRH is the leading provider of building materials critical to modernizing infrastructure. With our team of 83,032 people across 3,961 locations, our unmatched scale, connected portfolio, and deep local relationships make us the partner of choice for transportation, water and reindustrialization projects, shaping communities for a better tomorrow. The Company, which has market leadership positions in North America, Europe and Australia, has grown rapidly since formation in 1970 and in 2025 generated $37.4 billion of Total revenues, $3.8 billion of Net income and $7.7 billion of Adjusted EBITDA*. 1 In 2025, 40% of Total revenues came from infrastructure, 32% from residential construction and 28% from non-residential construction. 60% of Total revenues came from sales to new-build construction, while 40% of Total revenues came from repair and remodel activity. CRH’s connected portfolio supplies building materials across the construction value chain, better serving our customers’ needs and driving repeat business while making construction simpler, safer and more sustainable. This custome",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:44:00.079099+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "CRL": {
+   "symbol": "CRL",
+   "cik": "0001100682",
+   "entity_name": "CHARLES RIVER LABORATORIES INTERNATIONAL, INC.",
+   "industry": "Services-Commercial Physical & Biological Research",
+   "form": "10-K",
+   "filed_at": "2026-02-18",
+   "period": "2025-12-27",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1100682/000110068226000022/crl-20251227.htm",
+   "language": "en",
+   "business_summary": "This Annual Report on Form 10-K contains forward-looking statements regarding future events and the future results of Charles River Laboratories International, Inc. that are based on our current expectations, estimates, forecasts and projections about the industries in which we operate and the beliefs and assumptions of our management. Words such as “expect,” “anticipate,” “target,” “goal,” “project,” “intend,” “plan,” “believe,” “seek,” “estimate,” “will,” “likely,” “may,” “designed,” “would,” “future,” “can,” “could” and other similar expressions, which are predictions of, indicate future events and trends or which do not relate to historical matters are intended to identify such forward-looking statements. These statements are based on our current expectations and beliefs and involve a number of risks, uncertainties and assumptions that are difficult to predict. For example, we may use forward-looking statements when addressing topics such as: our expectations regarding the availability of non-human primates and our ability to diversify our non-human primate (NHP) supply chain; th",
+   "competition": "Competition — Our goal is to be a leader in each of the markets in which we participate. We compete in the marketplace based on our therapeutic and scientific expertise in early-stage drug research, quality, reputation, flexibility, responsiveness, pricing, innovation and global capabilities. We offer a unique portfolio of early-stage products and services to support drug discovery and development. We encounter a broad range of competitors of different sizes and capabilities in each of our three business segments. We also face competition from the internal discovery and development resources of our clients. • For RMS, we have four main competitors of which one is a government funded, not-for-profit entity; one is a division of a public company in the U.S.; one is privately held in the U.S, and one is a public company in China. 12",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:44:03.779776+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CRM": {
+   "symbol": "CRM",
+   "cik": "0001108524",
+   "entity_name": "Salesforce, Inc.",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-03-02",
+   "period": "2026-01-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852426000060/crm-20260131.htm",
+   "language": "en",
+   "business_summary": "Salesforce, Inc. (“Salesforce,” the “Company,” “we” or “our”) is a global leader in customer relationship management (“CRM”) technology, helping organizations of any size become agentic enterprises. Founded in 1999, we bring humans, agents, applications, and data together on a trusted, unified platform to unlock growth and innovation. Our artificial intelligence (“AI”) powered Agentforce 360 Platform unites our offerings — spanning sales, service, marketing, commerce, collaboration, data management, integration, analytics, IT service, industry verticals and more — on a single, intelligent platform for trusted enterprise execution. We unify and harmonize across systems, applications and devices to create a complete view of customers. With this single source of customer truth powering agents, teams can be more responsive, productive and efficient and deliver AI-powered, personalized and automated experiences across every channel. With Agentforce, the agentic layer of the Agentforce 360 Platform, our customers can build and deploy always-on digital labor for employees and customers, lev",
+   "competition": "Competition — The market for our service offerings is highly competitive, rapidly evolving and fragmented, and subject to changing technology with low barriers to entry, shifting customer needs and frequent introductions of new products and services.",
+   "customer_concentration": "None of our customers accounted for more than ten percent of our revenues in fiscal years 2026, 2025 or 2024. No single customer accounted for ten percent or more of accounts receivable as of January 31, 2026 and January 31, 2025. No single customer accounted for ten percent or more of total revenue during fiscal 2026 and 2025.",
+   "extracted_at": "2026-08-27T13:44:06.773331+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CRWD": {
+   "symbol": "CRWD",
+   "cik": "0001535527",
+   "entity_name": "CrowdStrike Holdings, Inc.",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-03-05",
+   "period": "2026-01-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1535527/000153552726000010/crwd-20260131.htm",
+   "language": "en",
+   "business_summary": "Founded in 2011, CrowdStrike reinvented cybersecurity for the cloud and artificial intelligence (“AI”) era and transformed the way cybersecurity is delivered and experienced by customers. When we started CrowdStrike, cyberattackers had an asymmetric advantage over legacy cybersecurity products that could not keep pace with rapid changes in adversary tactics, a dynamic that has intensified as adversaries increasingly leverage automation, identity abuse, and AI to operate at machine speed. We took a fundamentally different approach to solve this problem with the AI-native CrowdStrike Falcon cybersecurity platform, which serves as the operating system for cybersecurity. CrowdStrike built the first, true, cloud-native platform with AI at the core, capable of harnessing vast amounts of security and enterprise data to drive real-time security decisions and response – stopping breaches at scale through a single lightweight sensor. The CrowdStrike Falcon platform is designed to be the definitive platform for cybersecurity consolidation, purpose-built to stop breaches. The platform’s single,",
+   "competition": "Competitive Market: Existing Security Solutions Are Limited and Exacerbate Ongoing Trends — We believe the aforementioned trends are exacerbated by the architectural limitations of legacy cybersecurity products and fragmented platforms, which are characterized by: • On-Premise Security and Bolt-On Cloud Products That Lead to Constrained and Impacted Users : On-premise products are siloed, lack integration, and have limited ability to collect, process, and analyze vast amounts of data—attributes that are required to be effective in today’s increasingly dynamic threat landscape. Meanwhile, these solutions often require more sensors on the endpoint as new capabilities are patchworked together, which can have a dramatic negative impact on user performance. Many on-premise vendors have tried to solve this problem by simply extending on-premise products to the cloud. Since their products were ",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:44:11.410515+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "CSCO": {
+   "symbol": "CSCO",
+   "cik": "0000858877",
+   "entity_name": "CISCO SYSTEMS, INC.",
+   "industry": "Computer Communications Equipment",
+   "form": "10-K",
+   "filed_at": "2025-09-03",
+   "period": "2025-07-26",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/858877/000085887725000111/csco-20250726.htm",
+   "language": "en",
+   "business_summary": "Cisco designs and sells a broad range of technologies that help to power, secure, and draw insights from the Internet. We are incorporating artificial intelligence (AI) into our product portfolios across networking, security, collaboration and observability as well as integrating our products more tightly together. We are simplifying how our technology is delivered, managed and optimized and helping customers maximize the business value of their technology investments. We conduct our business globally and manage our business by geography. Our business is organized into the following three geographic segments: Americas; Europe, Middle East, and Africa (EMEA); and Asia Pacific, Japan, and China (APJC). Our products and technologies are grouped into the following categories: Networking, Security, Collaboration and Observability. In addition to our product offerings, we provide a broad range of services over the lifecycle of our products, including technical support services and advanced services. Our customers include businesses of all sizes, public institutions, governments, and servic",
+   "competition": "",
+   "customer_concentration": "No single customer accounted for 10% or more of revenue in fiscal 2025, 2024, and 2023.",
+   "extracted_at": "2026-08-27T13:44:14.473345+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "CSGP": {
+   "symbol": "CSGP",
+   "cik": "0001057352",
+   "entity_name": "COSTAR GROUP, INC.",
+   "industry": "Services-Business Services, NEC",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1057352/000105735226000020/csgp-20251231.htm",
+   "language": "en",
+   "business_summary": "In this Report, the words “we,” “our,” “us,” “CoStar Group,” or the “Company” refer to CoStar Group, Inc. and its direct and indirect wholly-owned subsidiaries. This Report also refers to our websites, but information contained on those sites is not part of this Report. CoStar Group is a leading provider of online real estate marketplaces, information, analytics, and 3D digital twin technology in the property markets. Our mission is to digitize the world's real estate, empowering all people to discover properties, insights, and connections that improve their businesses and lives. We own and operate leading online marketplaces for real estate in the U.S., Australia, Europe, Canada, and Asia-Pacific based on the numbers of unique visitors and site visits per month. We provide more information, analytics, and marketing services than many of our competitors; offer the most comprehensive commercial real estate database available; and have the largest commercial real estate research department in the industry. We have created and compiled a standardized platform of online marketplace servi",
+   "competition": "",
+   "customer_concentration": "We are not presently dependent upon, and we do not anticipate becoming dependent upon, any one customer or a small number of customers. No single customer accounted for more than 5% of the Company’s revenue for each of the years ended December 31, 2025, 2024, and 2023.",
+   "extracted_at": "2026-08-27T13:44:17.579621+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
    }
   }
  }
