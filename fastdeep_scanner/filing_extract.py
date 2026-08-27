@@ -18,7 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from .sec_edgar import SecEdgarError, _sec_contact, _sec_user_agent
+from .sec_edgar import SecEdgarError, _sec_contact, _sec_user_agent, lookup_cik_from_edgar
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -61,23 +61,48 @@ def plain_text(raw: str) -> str:
     return re.sub(r"\n\s*\n+", "\n", text).strip()
 
 
-def item1_body(text: str) -> str:
-    """เนื้อหา Item 1 ตัวจริง
+# แบบของผู้ยื่นต่างชาติใช้หัวข้ออีกชุด ไม่มี Item 1 Business
+SECTION_ANCHORS = (
+    (r"item\s*1\s*[.:\-–—]?\s*(?:business)?\b", r"item\s*1a\s*[.:\-–—]?\s*(?:risk)?\b"),
+    (r"item\s*4\s*[.:\-–—]?\s*information\s+on\s+the\s+company\b", r"item\s*4a\b|item\s*5\s*[.:\-–—]?"),
+    (r"item\s*1\s*[.:\-–—]?\s*business\b", r"item\s*2\s*[.:\-–—]?\s*propert"),
+)
+# ช่วงที่ยาวเกินนี้แปลว่าจับหัวท้ายผิดคู่ ไม่ใช่เนื้อหา Item เดียว
+MAX_SECTION_CHARS = 150_000
+# สั้นกว่านี้คือบรรทัดในสารบัญ ไม่ใช่เนื้อหา แต่ต้องไม่สูงจนตัดเอกสารสั้นจริงทิ้ง
+MIN_SECTION_CHARS = 400
 
-    สารบัญมีคำว่า Item 1 และ Item 1A เหมือนกัน จึงเลือกช่วงที่ยาวที่สุด เพราะ
-    ช่วงในสารบัญห่างกันเพียงไม่กี่สิบตัวอักษร ส่วนเนื้อหาจริงยาวหลักหมื่น
-    """
-    starts = [m.end() for m in re.finditer(r"(?im)^\s*item\s*1\s*[.:\-–—]?\s*(business)?\b", text)]
-    ends = [m.start() for m in re.finditer(r"(?im)^\s*item\s*1a\s*[.:\-–—]?\s*(risk)?\b", text)]
+
+def _longest_span(text: str, start_pattern: str, end_pattern: str, anchored: bool) -> str:
+    prefix = r"(?im)^\s*" if anchored else r"(?i)(?<![a-z])"
+    starts = [m.end() for m in re.finditer(prefix + start_pattern, text)]
+    ends = [m.start() for m in re.finditer(prefix + end_pattern, text)]
     best = ""
     for start in starts:
         following = [end for end in ends if end > start]
         if not following:
             continue
         chunk = text[start : following[0]]
-        if len(chunk) > len(best):
+        if len(best) < len(chunk) <= MAX_SECTION_CHARS:
             best = chunk
     return best.strip()
+
+
+def item1_body(text: str) -> str:
+    """เนื้อหาส่วนที่บรรยายธุรกิจ
+
+    สารบัญมีคำว่า Item 1 และ Item 1A เหมือนกัน จึงเลือกช่วงที่ยาวที่สุด เพราะ
+    ช่วงในสารบัญห่างกันเพียงไม่กี่สิบตัวอักษร ส่วนเนื้อหาจริงยาวหลักหมื่น
+
+    บางเอกสารไม่ได้วางหัวข้อไว้ต้นบรรทัด จึงลองแบบผูกกับต้นบรรทัดก่อน แล้วค่อย
+    ผ่อนเงื่อนไขลง เพื่อไม่ให้เอกสารที่จัดหน้าแบบมาตรฐานเสี่ยงจับผิดโดยไม่จำเป็น
+    """
+    for anchored in (True, False):
+        for start_pattern, end_pattern in SECTION_ANCHORS:
+            body = _longest_span(text, start_pattern, end_pattern, anchored)
+            if len(body) >= MIN_SECTION_CHARS:
+                return body
+    return ""
 
 
 def _substantive_lines(body: str) -> list[str]:
@@ -164,7 +189,16 @@ def latest_annual_filing(cik: str, timeout: int = 45) -> dict[str, Any]:
 
 
 def extract_filing_profile(symbol: str, cik: str, *, timeout: int = 60) -> dict[str, Any]:
-    filing = latest_annual_filing(cik, timeout=timeout)
+    try:
+        filing = latest_annual_filing(cik, timeout=timeout)
+    except (SecEdgarError, OSError, ValueError):
+        # ticker อาจถูกแมปไปยังบริษัทโฮลดิ้งที่เพิ่งตั้งและยังไม่เคยยื่นแบบรายปี
+        # เช่น XOM จึงถาม EDGAR ว่าใครเป็นผู้ยื่น 10-K ภายใต้ ticker นี้จริง
+        fallback = lookup_cik_from_edgar(symbol, timeout=timeout)
+        if not fallback or fallback.zfill(10) == cik.zfill(10):
+            raise
+        cik = fallback
+        filing = latest_annual_filing(cik, timeout=timeout)
     text = plain_text(_download(filing["url"], timeout).decode("utf-8", "replace"))
     body = item1_body(text)
     summary = business_summary(body)

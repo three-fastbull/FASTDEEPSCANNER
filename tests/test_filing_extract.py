@@ -160,5 +160,50 @@ class TierPriorityTest(unittest.TestCase):
         self.assertEqual(business["filing"]["source_url"], "")
 
 
+class SectionAnchorFallbackTest(unittest.TestCase):
+    """เอกสารจริงวางหัวข้อไม่เหมือนกัน จึงต้องมีทางเลือกสำรองแบบมีลำดับ"""
+
+    BODY = (
+        "The group manufactures lithography systems used to print integrated circuits, "
+        "and earns service revenue from the installed base over the life of each machine "
+        "under multi year agreements with its customers worldwide. Systems are assembled "
+        "in the Netherlands from modules supplied by a network of specialised partners, "
+        "and are installed on customer sites by field engineers who then stay with the "
+        "machine for its operating life, which typically runs well beyond a decade."
+    )
+
+    def test_headings_not_at_the_start_of_a_line_are_still_found(self) -> None:
+        text = plain_text(
+            f"<p>Some cover text. Item 1. Business {self.BODY} Item 1A. Risk Factors follow.</p>"
+        )
+        self.assertIn("lithography systems", item1_body(text))
+
+    def test_foreign_filers_use_the_information_on_the_company_heading(self) -> None:
+        text = plain_text(
+            "<div>Item 4. Information on the Company</div>"
+            f"<div>{self.BODY}</div>"
+            "<div>Item 5. Operating and Financial Review</div>"
+        )
+        body = item1_body(text)
+        self.assertIn("lithography systems", body)
+        self.assertNotIn("Operating and Financial Review", body)
+
+    def test_a_cross_reference_index_alone_yields_nothing(self) -> None:
+        """บางบริษัทมีแค่ตารางอ้างอิงหน้า ไม่มีเนื้อหาใต้หัวข้อ Item"""
+        text = plain_text(
+            "<div>Form 10-K Cross Reference Index</div>"
+            "<div>Item 1 Business Page 3</div>"
+            "<div>Item 1A Risk Factors Page 27</div>"
+        )
+        self.assertEqual(item1_body(text), "")
+
+    def test_an_implausibly_long_span_is_rejected(self) -> None:
+        from fastdeep_scanner.filing_extract import MAX_SECTION_CHARS
+
+        filler = "word " * (MAX_SECTION_CHARS // 4)
+        text = plain_text(f"<div>Item 1. Business</div><div>{filler}</div><div>Item 1A. Risk</div>")
+        self.assertEqual(item1_body(text), "")
+
+
 if __name__ == "__main__":
     unittest.main()
