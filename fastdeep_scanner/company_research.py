@@ -11,8 +11,17 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from .filing_extract import load_filing_profiles
+
 
 CATALOG_PATH = Path(__file__).resolve().parent.parent / "data" / "fastdeep_company_profiles.json"
+# ข้อความจากแบบที่ยื่นต่อ SEC เติมได้เฉพาะช่องที่ยกมาตรง ๆ ได้
+# Moat คู่เทียบและความเสี่ยงเป็นการตีความ จึงไม่อยู่ในรายการนี้
+FILING_FIELDS = {
+    "summary": "business_summary",
+    "competitors": "competition",
+    "key_customers": "customer_concentration",
+}
 TEXT_FIELDS = {
     "summary": "business_summary",
     "revenue_model": "revenue_model",
@@ -181,12 +190,40 @@ def build_company_business(
         defaults["moat_evidence"] = entry["moat_summary"]
         defaults["source_urls"] = "\n".join(source["url"] for source in entry["sources"])
 
+    filing = load_filing_profiles().get(symbol) or {}
+    filing_defaults = {
+        key: _text(filing.get(source_key)) for key, source_key in FILING_FIELDS.items()
+    }
+    if filing.get("source_url"):
+        filing_defaults["source_urls"] = _text(filing["source_url"])
+
     business: dict[str, Any] = {"field_origins": {}}
     for key, journal_key in TEXT_FIELDS.items():
         manual = _text(research.get(journal_key))
-        business[key] = manual or defaults[key]
-        business["field_origins"][key] = "journal" if manual else "reference" if defaults[key] else "missing"
+        from_filing = filing_defaults.get(key, "")
+        # ลำดับความน่าเชื่อถือ: บันทึกของนักลงทุน > แคตตาล็อกที่ทบทวนแล้ว > ข้อความจากแบบ
+        business[key] = manual or defaults[key] or from_filing
+        if manual:
+            origin = "journal"
+        elif defaults[key]:
+            origin = "reference"
+        elif from_filing:
+            origin = "filing"
+        else:
+            origin = "missing"
+        business["field_origins"][key] = origin
     business["reference"] = reference
+    business["filing"] = {
+        "available": bool(filing),
+        "entity_name": _text(filing.get("entity_name")),
+        "industry": _text(filing.get("industry")),
+        "form": _text(filing.get("form")),
+        "filed_at": _text(filing.get("filed_at")),
+        "period": _text(filing.get("period")),
+        "source_url": _text(filing.get("source_url")) if _http_url(filing.get("source_url")) else "",
+        "language": _text(filing.get("language")) or "en",
+        "found": filing.get("found") or {},
+    }
     # Reference material never supplies the user's Moat rating, thesis, or approval.
     business["verified"] = bool(research.get("company_profile_verified"))
     business["has_details"] = bool(business["summary"] and business["competitors"])

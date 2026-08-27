@@ -39,6 +39,13 @@ try {
         & $python -m fastdeep_scanner update-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --pause 0.75 --workers 1 --request-timeout 20 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financials: $_" }
         if ($LASTEXITCODE -ne 0) { Write-DailyLog "financials: refresh incomplete, keeping verified cache" }
     }
+    # ข้อความธุรกิจจากแบบที่ยื่น เปลี่ยนปีละครั้งตอนยื่น 10-K ใหม่ จึงพอสัปดาห์ละรอบ
+    # ตัวที่มีอยู่แล้วจะถูกข้าม รอบต่อไปจึงเก็บเฉพาะบริษัทที่เพิ่งยื่นใหม่
+    if ((Get-Date).DayOfWeek -eq [DayOfWeek]::Sunday) {
+        & $python -m fastdeep_scanner update-filing-profiles --universe data\fastdeep_universe.csv --out data\fastdeep_filing_profiles.json --pause 0.2 2>&1 | ForEach-Object { Write-DailyLog "filings: $_" }
+        if ($LASTEXITCODE -ne 0) { Write-DailyLog "filings: extraction incomplete, keeping stored text" }
+    }
+
     & $python -m fastdeep_scanner audit-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financial audit: $_" }
 
     & $python -m fastdeep_scanner daily-scan --out storage\fastdeep_daily_scan_summary.json --timeframe D 2>&1 | ForEach-Object { Write-DailyLog "scan: $_" }

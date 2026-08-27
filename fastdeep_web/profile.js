@@ -101,8 +101,31 @@
     return sources.length ? `<div class="reference-citations">${sourceLinks(sources)}</div>` : "";
   }
 
+  const ORIGIN_MARKERS = {
+    journal: ["journal-marker", "บันทึกของคุณ"],
+    filing: ["filing-marker", "ยกจากแบบที่ยื่น ยังไม่ทบทวน"],
+  };
+
+  // ผู้อ่านต้องแยกออกทันทีว่าข้อความมาจากบันทึกของตัวเอง จากงานวิจัยที่ทบทวนแล้ว
+  // หรือยกมาดิบ ๆ จากเอกสารที่บริษัทยื่น
   function journalMarker(business, key) {
-    return business.field_origins?.[key] === "journal" ? '<small class="journal-marker">บันทึกของคุณ</small>' : "";
+    const marker = ORIGIN_MARKERS[business.field_origins?.[key]];
+    return marker ? `<small class="${marker[0]}">${marker[1]}</small>` : "";
+  }
+
+  function filingNote(business) {
+    const filing = business.filing || {};
+    if (!filing.available || !filing.source_url) return "";
+    const origins = business.field_origins || {};
+    const used = Object.values(origins).filter((origin) => origin === "filing").length;
+    if (!used) return "";
+    const period = filing.period || filing.filed_at || "";
+    return `<div class="filing-note">
+      <strong>ข้อความบางช่องยกมาจากแบบ ${escapeHtml(filing.form || "10-K")} ที่ยื่นต่อ SEC</strong>
+      <span>${escapeHtml(filing.entity_name || "")}${period ? ` · งวด ${escapeHtml(period)}` : ""}${filing.industry ? ` · ${escapeHtml(filing.industry)}` : ""}</span>
+      <span>เป็นข้อความต้นฉบับภาษาอังกฤษที่ยังไม่ผ่านการเรียบเรียงหรือทบทวน ใช้เป็นจุดตั้งต้นเท่านั้น</span>
+      ${sourceLinks([{ url: filing.source_url, title: `เปิดแบบ ${filing.form || "10-K"} ฉบับเต็ม` }])}
+    </div>`;
   }
 
   function renderRevenueBreakdown(business) {
@@ -219,13 +242,18 @@
     const verified = Boolean(business.verified);
     const hasReference = Boolean(reference.available);
     const reviewed = reference.reviewed_at ? new Date(`${reference.reviewed_at}T00:00:00`).toLocaleDateString("th-TH") : "";
+    const filing = business.filing || {};
+    const usesFiling = Object.values(business.field_origins || {}).includes("filing");
     const status = hasReference
       ? (reference.needs_review ? "มีข้อมูลอ้างอิงเดิม · ถึงรอบทบทวน" : "มีข้อมูลธุรกิจอ้างอิงแล้ว")
-      : verified ? "มีบันทึกตรวจธุรกิจครบแล้ว" : "ยังไม่มีข้อมูลธุรกิจอ้างอิง";
+      : verified ? "มีบันทึกตรวจธุรกิจครบแล้ว"
+        : usesFiling ? "มีข้อความจากแบบที่ยื่น · ยังไม่ผ่านการทบทวน"
+          : "ยังไม่มีข้อมูลธุรกิจอ้างอิง";
     const context = hasReference
       ? `${reference.period} · ตรวจแหล่งข้อมูล ${reviewed}`
       : reference.status === "error" ? "ฐานข้อมูลธุรกิจอ่านไม่ได้ · บันทึกส่วนตัวยังอยู่"
-        : `${profile.symbol} ยังไม่อยู่ในฐานวิจัย ${reference.catalog_count || 0} บริษัท`;
+        : usesFiling ? `${profile.symbol} ยังไม่อยู่ในฐานวิจัย ${reference.catalog_count || 0} บริษัท · แสดงข้อความต้นฉบับจาก ${filing.form || "10-K"} แทน`
+          : `${profile.symbol} ยังไม่อยู่ในฐานวิจัย ${reference.catalog_count || 0} บริษัท`;
     elements.business.innerHTML = `
       <div class="research-state" data-verified="${verified}" data-reference="${hasReference}">
         <strong>${status}</strong><span>${escapeHtml(context)}</span>
@@ -237,7 +265,8 @@
         <article><span>ลูกค้าหลัก ${journalMarker(business, "key_customers")}</span><p>${escapeHtml(business.key_customers || "ยังไม่ได้ตรวจลูกค้าหลักและความกระจุกตัว")}</p></article>
       </div>
       ${hasReference ? `<div class="business-sources"><strong>แหล่งอ้างอิงบริษัท</strong>${sourceLinks((reference.sources || []).filter((source) => (reference.source_ids || []).includes(source.id)))}</div>` : ""}
-      ${!hasReference || business.field_origins?.source_urls === "journal" ? `<div class="business-sources"><strong>แหล่งข้อมูลในบันทึก</strong>${sourceLinks(business.source_urls)}</div>` : ""}`;
+      ${business.field_origins?.source_urls === "journal" ? `<div class="business-sources"><strong>แหล่งข้อมูลในบันทึก</strong>${sourceLinks(business.source_urls)}</div>` : ""}
+      ${filingNote(business)}`;
   }
 
   function renderCompetition(profile) {

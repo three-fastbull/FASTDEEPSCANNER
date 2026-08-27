@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -208,6 +209,50 @@ def backtest_command(args: argparse.Namespace) -> None:
         )
 
 
+def update_filing_profiles_command(args: argparse.Namespace) -> None:
+    from .filing_extract import update_filing_profiles
+    from .financials import load_sec_ticker_map
+    from .sec_edgar import lookup_cik_from_edgar
+
+    universe = Path(args.universe)
+    wanted = {value.strip().upper() for value in str(args.symbols).split(",") if value.strip()}
+    groups = {value.strip().upper() for value in str(args.groups).split(",") if value.strip()}
+    rows = list(csv.DictReader(universe.open("r", newline="", encoding="utf-8-sig")))
+    ticker_map = load_sec_ticker_map(args.ticker_cache, timeout=args.request_timeout)
+
+    targets: dict[str, str] = {}
+    for row in rows:
+        symbol = (row.get("symbol") or "").strip().upper()
+        if not symbol or (row.get("market") or "").strip().upper() != "US":
+            continue
+        if wanted and symbol not in wanted:
+            continue
+        if groups and not groups & {
+            item.strip().upper() for item in (row.get("index_groups") or "").split("|") if item.strip()
+        }:
+            continue
+        identity = ticker_map.get(symbol.replace(".", "-"))
+        cik = str(identity["cik"]) if identity else (lookup_cik_from_edgar(symbol) or "")
+        if cik:
+            targets[symbol] = cik
+    if args.limit:
+        targets = dict(list(targets.items())[: args.limit])
+
+    summary = update_filing_profiles(
+        targets,
+        path=args.out,
+        pause=args.pause,
+        timeout=args.request_timeout,
+        refresh=args.refresh,
+    )
+    print(
+        f"filing profiles: {summary['succeeded']} new, {summary['skipped']} skipped, "
+        f"{len(summary['failed'])} failed, {summary['stored']} stored"
+    )
+    for failure in summary["failed"][:10]:
+        print(f"  - {failure}")
+
+
 def update_fx_command(args: argparse.Namespace) -> None:
     from .yahoo_prices import update_fx_rates
 
@@ -338,6 +383,21 @@ def build_parser() -> argparse.ArgumentParser:
     backtest.add_argument("--max-symbols", type=int, default=None)
     backtest.add_argument("--summary-only", action="store_true", help="Drop the per-signal rows from the output")
     backtest.set_defaults(func=backtest_command)
+
+    filing_profiles = subparsers.add_parser(
+        "update-filing-profiles",
+        help="Extract business text from each US company's latest annual SEC filing",
+    )
+    filing_profiles.add_argument("--universe", default="data/fastdeep_universe.csv")
+    filing_profiles.add_argument("--out", default="data/fastdeep_filing_profiles.json")
+    filing_profiles.add_argument("--groups", default="SP500,NASDAQ100")
+    filing_profiles.add_argument("--symbols", default="")
+    filing_profiles.add_argument("--pause", type=float, default=0.2)
+    filing_profiles.add_argument("--request-timeout", type=int, default=60)
+    filing_profiles.add_argument("--ticker-cache", default="data/sec_company_tickers.json")
+    filing_profiles.add_argument("--refresh", action="store_true")
+    filing_profiles.add_argument("--limit", type=int, default=None)
+    filing_profiles.set_defaults(func=update_filing_profiles_command)
 
     update_fx = subparsers.add_parser("update-fx", help="Refresh currency rates used for valuation and liquidity")
     update_fx.add_argument("--out", default="data/fastdeep_fx_rates.json")

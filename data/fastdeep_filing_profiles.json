@@ -1,0 +1,1507 @@
+{
+ "schema_version": 1,
+ "updated_at": "2026-08-27T13:41:16.215192+00:00",
+ "note": "ข้อความยกมาจากแบบที่บริษัทยื่นต่อ SEC โดยไม่ผ่านการเรียบเรียง ใช้เป็นข้อมูลตั้งต้น ไม่ใช่บทวิเคราะห์ที่ทบทวนแล้ว",
+ "profiles": {
+  "A": {
+   "symbol": "A",
+   "cik": "0001090872",
+   "entity_name": "AGILENT TECHNOLOGIES, INC.",
+   "industry": "Laboratory Analytical Instruments",
+   "form": "10-K",
+   "filed_at": "2025-12-22",
+   "period": "2025-10-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1090872/000109087225000087/a-20251031.htm",
+   "language": "en",
+   "business_summary": "Agilent Technologies, Inc. (\"we\", \"Agilent\" or the \"company\"), incorporated in Delaware in May 1999, is a global leader in life sciences, diagnostics and applied markets, providing application focused solutions that include instruments, software, services and consumables for the entire laboratory workflow. In November 2024, we announced a change in our organizational structure to support our market-focused, customer-centric strategy. Our former Diagnostics and Genomics segment combined with our liquid chromatography and liquid chromatography mass spectrometry instrument platforms to form our new Life Sciences and Diagnostics Markets segment. Our chemistries and supplies, laboratory automation, and software and informatics divisions moved from our former Life Sciences and Applied Markets segment to our Agilent CrossLab segment. The remaining divisions in our former Life Sciences and Applied Markets segment which includes our gas chromatography, gas chromatography mass spectrometry, remarketed instruments, spectroscopy and vacuum divisions formed our new Applied Markets segment. Follow",
+   "competition": "",
+   "customer_concentration": "No single customer accounted for more than 10 percent of accounts receivable as of October 31, 2025, or 2024. No customer represented 10 percent or more of our total net revenue in 2025, 2024 or 2023.",
+   "extracted_at": "2026-08-27T13:35:49.042779+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AAPL": {
+   "symbol": "AAPL",
+   "cik": "0000320193",
+   "entity_name": "Apple Inc.",
+   "industry": "Electronic Computers",
+   "form": "10-K",
+   "filed_at": "2025-10-31",
+   "period": "2025-09-27",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+   "language": "en",
+   "business_summary": "The Company designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories, and sells a variety of related services. The Company’s fiscal year is the 52- or 53-week period that ends on the last Saturday of September. iPhone ® is the Company’s line of smartphones based on its iOS operating system. The iPhone line includes iPhone 17 Pro, iPhone Air™, iPhone 17, iPhone 16 and iPhone 16e. Mac ® is the Company’s line of personal computers based on its macOS ® operating system. The Mac line includes laptops MacBook Air ® and MacBook Pro ® , as well as desktops iMac ® , Mac mini ® , Mac Studio ® and Mac Pro ® . iPad ® is the Company’s line of multipurpose tablets based on its iPadOS ® operating system. The iPad line includes iPad Pro ® , iPad Air ® , iPad and iPad mini ® . Wearables includes smartwatches, wireless headphones and spatial computers. The Company’s line of smartwatches, based on its watchOS ® operating system, includes Apple Watch ® Series 11, Apple Watch SE ® 3 and Apple Watch Ultra ® 3. The Company’s line of wireless headphones includes",
+   "competition": "Competition — The markets for the Company’s products and services are highly competitive and are characterized by aggressive price competition, downward pressure on gross margins, continual improvement in product performance, and price sensitivity on the part of consumers and businesses. The markets in which the Company competes are further defined by frequent introduction of new products and services, short product life cycles, evolving industry standards, and rapid adoption of technological advancements by competitors. Many of the Company’s competitors seek to compete primarily through aggressive pricing and very low cost structures, and by imitating the Company’s products and infringing on its intellectual property.",
+   "customer_concentration": "As of September 27, 2025, the Company had one customer that represented 10% or more of total trade receivables, which accounted for 12 %.",
+   "extracted_at": "2026-08-27T13:35:50.865504+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "ABBV": {
+   "symbol": "ABBV",
+   "cik": "0001551152",
+   "entity_name": "AbbVie Inc.",
+   "industry": "Pharmaceutical Preparations",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000008/abbv-20251231.htm",
+   "language": "en",
+   "business_summary": "AbbVie or \"the company\" refer to AbbVie Inc., or AbbVie Inc. and its consolidated subsidiaries, as the context requires. AbbVie is a global, diversified research-based biopharmaceutical company positioned for success with a comprehensive product portfolio that has leadership positions across immunology, neuroscience, oncology and aesthetics. AbbVie uses its expertise, dedicated people and unique approach to innovation to develop and market advanced therapies that address some of the world’s most complex and serious diseases. AbbVie was incorporated in Delaware on April 10, 2012. On January 1, 2013, AbbVie became an independent, publicly-traded company as a result of the distribution by Abbott Laboratories (Abbott) of 100% of the outstanding common stock of AbbVie to Abbott's shareholders. AbbVie operates as a single global business segment dedicated to the research and development, manufacturing, commercialization and sale of innovative medicines and therapies. This operating structure enables the Chief Executive Officer, as Chief Operating Decision Maker (CODM), to allocate resource",
+   "competition": "",
+   "customer_concentration": "AbbVie has no single customer that, if the customer were lost, would have a material adverse effect on the company's business.",
+   "extracted_at": "2026-08-27T13:35:54.334005+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ABNB": {
+   "symbol": "ABNB",
+   "cik": "0001559720",
+   "entity_name": "Airbnb, Inc.",
+   "industry": "Services-To Dwellings & Other Buildings",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1559720/000155972026000004/abnb-20251231.htm",
+   "language": "en",
+   "business_summary": "Airbnb was founded in 2007 when two hosts welcomed three guests to their San Francisco home, and has since grown into a global community of over 5 million hosts who have welcomed over 2.5 billion guest arrivals in almost every country and region across the globe. Every day, hosts offer unique stays, experiences, and services that enable guests to connect with communities in a more authentic way. We operate a global marketplace connecting guests with stays, experiences, and services, collectively in over 220 countries and regions. Our offerings have expanded to include services and redesigned experiences, which launched in May 2025. We operate with five key stakeholders in mind: our employees, shareholders, hosts, guests, and the communities we serve. Our commitment to making long-term decisions that benefit all these stakeholders is fundamental to our sustained success. Our key strategic priorities include making our service better, bringing Airbnb to more parts of the world, and expanding what we offer. Over the past several years, we have introduced hundreds of new features and upg",
+   "competition": "Competition — We operate in a highly competitive environment. As we seek to expand our community globally, we face competition in attracting hosts and guests. Competition for Hosts We compete to attract and retain hosts to and on our platform to list their homes, experiences, and services, as hosts have a range of options for doing so. We compete for hosts based on many factors including the volume of bookings generated by guests, ease of use of our platform, the service fees we charge, host protections, such as those included in AirCover for Hosts, our brand, and community support.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:36:09.342351+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ABT": {
+   "symbol": "ABT",
+   "cik": "0000001800",
+   "entity_name": "ABBOTT LABORATORIES",
+   "industry": "Pharmaceutical Preparations",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1800/000162828026010185/abt-20251231.htm",
+   "language": "en",
+   "business_summary": "Abbott Laboratories is an Illinois corporation, incorporated in 1900. Abbott’s* principal business is the discovery, development, manufacture, and sale of a broad and diversified line of healthcare products. On November 19, 2025, Abbott entered into a definitive agreement to acquire Exact Sciences Corporation (Exact Sciences), which is expected to enable Abbott to enter the cancer diagnostics market. The acquisition is subject to customary closing conditions, including the approval of Exact Sciences shareholders and obtaining the required regulatory clearances. Abbott has four reportable segments: Established Pharmaceutical Products, Diagnostic Products, Nutritional Products, and Medical Devices. These products include a broad line of branded generic pharmaceuticals manufactured worldwide and marketed and sold outside the United States in emerging markets. These products are generally sold directly to wholesalers, distributors, government agencies, healthcare facilities, pharmacies, and independent retailers from Abbott-owned distribution centers or public warehouses, depending on th",
+   "competition": "",
+   "customer_concentration": "Abbott has no single customer that, if the customer was lost, would have a material adverse effect on Abbott.",
+   "extracted_at": "2026-08-27T13:36:12.349026+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ACGL": {
+   "symbol": "ACGL",
+   "cik": "0000947484",
+   "entity_name": "ARCH CAPITAL GROUP LTD.",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/947484/000094748426000017/acgl-20251231.htm",
+   "language": "en",
+   "business_summary": "As used in this report, references to “we,” “us,” “our,” “Arch” or the “Company” refer to the consolidated operations of Arch Capital Group Ltd. (“Arch Capital”) and its subsidiaries. All amounts are in millions, except per share amounts, unless otherwise noted. We refer you to Item 1A “Risk Factors” for a discussion of risk factors relating to our business. Arch Capital is a publicly listed Bermuda exempted company with approximately $26.9 billion in capital at December 31, 2025 and is part of the S&P 500 index. Arch provides insurance, reinsurance and mortgage insurance on a worldwide basis through its wholly owned subsidiaries. While we are positioned to provide a full range of property, casualty and mortgage insurance and reinsurance lines, we focus on writing specialty lines of insurance and reinsurance. For 2025, we wrote $16.5 billion of net premiums and reported net income available to Arch common shareholders of $4.4 billion. Book value per share was $65.11 at December 31, 2025, compared to $53.11 per share at December 31, 2024. Arch Capital’s registered office is located at",
+   "competition": "",
+   "customer_concentration": "No other customer accounted for greater than 3.",
+   "extracted_at": "2026-08-27T13:36:20.157847+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ACN": {
+   "symbol": "ACN",
+   "cik": "0001467373",
+   "entity_name": "Accenture plc",
+   "industry": "Services-Business Services, NEC",
+   "form": "10-K",
+   "filed_at": "2025-10-10",
+   "period": "2025-08-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1467373/000146737325000217/acn-20250831.htm",
+   "language": "en",
+   "business_summary": "Accenture is a leading solutions and global professional services company that helps the world’s leading enterprises reinvent by building their digital core and unleashing the power of AI to create value at speed across the enterprise, bringing together the talent of our approximately 779,000 people, our proprietary assets and platforms, and deep ecosystem relationships. Our strategy is to be the reinvention partner of choice for our clients and to be the most AI-enabled, client-focused, great place to work in the world. Through our Reinvention Services we bring together our capabilities across strategy, consulting, technology, operations, Song and Industry X with our deep industry expertise to create and deliver solutions and services for our clients. Our purpose is to deliver on the promise of technology and human ingenuity, and we measure our success by the 360° value we create for all our stakeholders. We serve clients and manage our business through three geographic markets: Americas, EMEA (Europe, Middle East and Africa) and Asia Pacific. These markets bring together all of our",
+   "competition": "Competition — Accenture operates in a highly competitive and rapidly changing global marketplace. We compete with a variety of organizations that offer solutions and services competitive with those we offer—but we believe no other company offers the full range of services at scale that Accenture does, which uniquely positions us in a highly competitive market. Our clients typically retain us on a non-exclusive basis. Our competitors include large multinational IT service providers, including the services arms of large global technology providers; off-shore IT service providers in lower-cost locations, particularly in India; accounting firms and consultancies that provide consulting, managed services and other IT solutions and services; solution or service providers that compete with us in a specific geographic market, industry or service area, including advertising agency holding compani",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:36:23.038089+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ADBE": {
+   "symbol": "ADBE",
+   "cik": "0000796343",
+   "entity_name": "ADOBE INC.",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-01-15",
+   "period": "2025-11-28",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634326000003/adbe-20251128.htm",
+   "language": "en",
+   "business_summary": "Adobe’s mission is to empower everyone to create. We build innovative platforms and tools that unleash creativity, productivity and personalized customer experiences. For over four decades, our innovations have transformed how people everywhere engage across all types of media. Adobe’s solutions are the foundation of digital experiences, starting with the first creative spark, to the creation and development of all content and media, to the personalized delivery across every channel. Our focus revolves around serving our customer audiences: business professionals, consumers, creators, creative professionals and marketing professionals. The massive opportunity and evolving role of creativity across roles and industries have driven Adobe’s growth over the past four decades and are expected to continue to drive our growth going forward as we evolve our solutions and routes to market to anticipate the growing needs of our customers. In the artificial intelligence (“AI”) era, we are harnessing the power of AI across our solutions by bringing together our commercially safe first-party and",
+   "competition": "COMPETITION — We participate in a highly competitive and rapidly evolving environment where our competitors include companies of various sizes and both public and private companies, including large, global companies and smaller companies with more specialized focuses, new entrants, and AI or cloud-native companies. We compete with software companies, AI companies, hardware manufacturers, operating system developers, and social media companies across our business. The markets for our solutions are characterized by rapid technological innovation, new industry standards, evolving distribution and sales models, limited barriers to entry, short product lifecycles, customer price sensitivity, global economic conditions and the frequent entry of new solutions or competitors. Our future success will depend on our ability to effectively appeal to customers and accurately predict and meet changing",
+   "customer_concentration": "We have a global professional services team dedicated to designing and implementing solutions for our largest customers. For all periods presented, there were no customers that represented at least 10% of net revenue or that were responsible for over 10% of our trade receivables.",
+   "extracted_at": "2026-08-27T13:36:25.695211+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "ADI": {
+   "symbol": "ADI",
+   "cik": "0000006281",
+   "entity_name": "ANALOG DEVICES INC",
+   "industry": "Semiconductors & Related Devices",
+   "form": "10-K",
+   "filed_at": "2025-11-25",
+   "period": "2025-11-01",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/6281/000000628125000153/adi-20251101.htm",
+   "language": "en",
+   "business_summary": "Analog Devices, Inc. (we, Analog Devices or the Company) is a global semiconductor leader dedicated to solving our customers’ most complex engineering challenges. We deliver innovations that connect technology to human breakthroughs and play a critical role at the intersection of the physical and digital worlds by providing the building blocks to sense, measure, interpret, connect and power. We design, manufacture, test and market a broad portfolio of solutions, including integrated circuits (ICs), software and subsystems that leverage high-performance analog, mixed-signal and digital signal processing technologies. Our comprehensive product portfolio, deep domain expertise and advanced manufacturing capabilities extend across high-performance precision and high-speed mixed-signal, power management and processing technologies – including data converters, amplifiers, power management, radio frequency (RF) ICs, edge processors and other sensors. The Intelligent Edge is characterized by ubiquitous sensing, hyper-scale and edge computing, artificial intelligence (AI) and pervasive connec",
+   "competition": "Competition — We believe that competitive performance in the marketplace for integrated circuits depends upon multiple factors, including technological innovation, strength of brand, diversity of product portfolio, product performance, technical support, delivery capabilities, customer service quality, reliability and price, with the relative importance of these factors varying among products, markets and customers. We compete with a number of semiconductor companies in markets that are highly competitive. Many companies have sufficient financial, manufacturing, technical, sales and marketing resources to develop and market products that compete with our products. Some of our competitors may have more advantageous supply or development relationships with our current and potential customers or suppliers. Our competitors also include both emerging companies selling specialized products in ",
+   "customer_concentration": "No other customer accounted for greater than 10% of total revenue in any period presented.",
+   "extracted_at": "2026-08-27T13:36:28.691218+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "ADM": {
+   "symbol": "ADM",
+   "cik": "0000007084",
+   "entity_name": "Archer-Daniels-Midland Co",
+   "industry": "Fats & Oils",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/7084/000000708426000011/adm-20251231.htm",
+   "language": "en",
+   "business_summary": "Archer-Daniels-Midland Company and its subsidiaries (the \"Company\" or \"ADM\") unlocks the power of nature to enrich the quality of life. The Company is an essential global agricultural supply chain manager and processor, providing food security by connecting local needs with global capabilities. ADM is also a premier human and animal nutrition provider, as well as a leader in health and well-being products. The Company partners with thousands of farmers around the world to purchase their crops and uses its integrated global origination, logistics, and manufacturing network to transform many of those raw commodities into an expansive array of products serving the food, feed, fuel, and industrial and consumer products sectors. The Company offers a broad portfolio of food and beverage products, from staple foods to innovative alternatives, such as natural colors and flavors, plant-based proteins, and lower-sugar, fat, and salt solutions. ADM provides human and animal nutrition ingredients and solutions that support health, productivity, and sustainability. It offers a wide range of healt",
+   "competition": "Competition — The Company has significant competition in the markets in which it operates based principally on price, foreign exchange rates, quality, global supply, and alternative products, some of which are made from different raw materials than those utilized by the Company. Given the commodity-based nature of many of its businesses, the Company, on an ongoing basis, focuses on managing unit costs and improving efficiency through technology improvements, productivity enhancements, and regular evaluation of the Company’s asset portfolio. The Company’s Nutrition business is a vertically integrated business that provides ingredients and solutions for humans and animals in a highly competitive environment with a variety of companies offering the same products and services. The industry includes ingredient suppliers, contract manufacturers, global fast moving consumer goods companies, and",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:36:32.049413+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ADP": {
+   "symbol": "ADP",
+   "cik": "0000008670",
+   "entity_name": "AUTOMATIC DATA PROCESSING INC",
+   "industry": "Services-Computer Processing & Data Preparation",
+   "form": "10-K",
+   "filed_at": "2026-08-05",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000030/adp-20260630.htm",
+   "language": "en",
+   "business_summary": "In 1949, our founders established ADP with a simple, innovative idea: help clients focus on their business by solving their payroll challenges. In the 77 years since, we have led the Human Capital Management (“HCM”) industry in innovation. We were the first in HCM to deliver automation, move to the cloud, provide a mobile app, and create an online marketplace. Today, we continue that legacy with artificial intelligence (“AI”), building AI into the very core of how we orchestrate, govern and execute HR and pay processes for real-world outcomes. As AI adds new layers of complexity to managing the workforce infrastructure that makes business possible, our clients need a partner they can trust. As the trusted, service-driven, and AI-enabled partner for HCM, we deliver services powered by deep domain expertise, workforce data, and global scale to help organizations manage their most critical workforce functions with precision, compliance and confidence. Today, we are a global leader in HR and payroll solutions, serving over 1.1 million clients and paying over 42 million workers in over 14",
+   "competition": "COMPETITION — The industries in which we operate are highly competitive and we are one of the largest providers of HCM solutions in the world. HCM Solutions, Global Solutions and HRO Solutions (other than PEO) compete with other business outsourcing companies, companies providing ERP services, providers of cloud-based HCM solutions and financial institutions. Our PEO business competes with other PEOs providing similar services, as well as business outsourcing companies, companies providing ERP services and providers of cloud-based HCM solutions. We also face ongoing competition from companies’ in-house functions, whereby companies install and operate their own HCM system. Competition for business outsourcing solutions is primarily based on product and service quality, reputation, ease of use and accessibility of technology, breadth of offerings, and price. We believe that we are competit",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:36:34.852460+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ADSK": {
+   "symbol": "ADSK",
+   "cik": "0000769397",
+   "entity_name": "Autodesk, Inc.",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-03-03",
+   "period": "2026-01-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/769397/000076939726000015/adsk-20260131.htm",
+   "language": "en",
+   "business_summary": "We are a global leader in 3D design, engineering and entertainment technology solutions, spanning architecture, engineering, construction, product design, manufacturing, media, and entertainment. Our customers design, fabricate, manufacture, and build anything by visualizing, simulating, and analyzing real-world performance early in the design process. These capabilities allow our customers to foster innovation, optimize their designs, streamline their manufacturing and construction processes, save time and money, improve quality, deliver more sustainable outcomes, communicate plans, and collaborate with others. Our professional software products are sold globally through a combination of indirect and direct channels. Our internet address is www.autodesk.com. The information posted on our website is not incorporated into this Annual Report on Form 10-K. Our Annual Report on Form 10-K, Quarterly Reports on Form 10-Q, Current Reports on Form 8-K, and amendments to reports filed or furnished pursuant to Sections 13(a) and 15(d) of the Securities Exchange Act of 1934, as amended, are ava",
+   "competition": "",
+   "customer_concentration": "No other distributor, reseller, or direct customer accounted for 10% or more of our revenue in fiscal 2026. No other customer accounted for more than 10% of Autodesk’s total net revenue or trade accounts receivable for each of the respective periods.",
+   "extracted_at": "2026-08-27T13:36:37.936744+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AEE": {
+   "symbol": "AEE",
+   "cik": "0001002910",
+   "entity_name": "AMEREN CORP",
+   "industry": "Electric & Other Services Combined",
+   "form": "10-K",
+   "filed_at": "2026-02-18",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1002910/000100291026000009/aee-20251231.htm",
+   "language": "en",
+   "business_summary": "Ameren, formed in 1997 and headquartered in St. Louis, Missouri, is a public utility holding company whose primary assets are its equity interests in its subsidiaries. Ameren’s subsidiaries are separate, independent legal entities with separate businesses, assets, and liabilities. Dividends on Ameren’s common stock and the payment of expenses by Ameren depend on distributions made to it by its subsidiaries. Below is a summary description of Ameren’s principal subsidiaries – Ameren Missouri, Ameren Illinois, and ATXI. Ameren also has other subsidiaries that conduct other activities, such as providing shared services. A more detailed description can be found in Note 1 – Summary of Significant Accounting Policies under Part II, Item 8, of this report. • Ameren Missouri operates a rate-regulated electric generation, transmission, and distribution business and a rate-regulated natural gas distribution business in Missouri. • Ameren Illinois operates rate-regulated electric transmission, electric distribution, and natural gas distribution businesses in Illinois. For additional information",
+   "competition": "",
+   "customer_concentration": "At December 31, 2025, no nonaffiliated customer represented more than 10% of our accounts receivable.",
+   "extracted_at": "2026-08-27T13:36:44.596297+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AEP": {
+   "symbol": "AEP",
+   "cik": "0000004904",
+   "entity_name": "AMERICAN ELECTRIC POWER CO INC",
+   "industry": "Electric Services",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/4904/000000490426000013/aep-20251231.htm",
+   "language": "en",
+   "business_summary": "AEP was incorporated under the laws of the State of New York in 1906 and reorganized in 1925. It is a public utility holding company that directly owns all of the outstanding common stock of the public utility subsidiaries identified below. The service areas of AEP’s public utility subsidiaries cover portions of the states of Arkansas, Indiana, Kentucky, Louisiana, Michigan, Ohio, Oklahoma, Tennessee, Texas, Virginia and West Virginia. Transmission networks are interconnected with extensive distribution facilities in the territories served. The public utility subsidiaries of AEP have traditionally provided electric service, consisting of generation, transmission and distribution, on an integrated basis to their retail customers. Restructuring laws in Michigan, Ohio and the ERCOT area of Texas have caused AEP public utility subsidiaries in those states to unbundle previously integrated regulated rates for their retail customers. The member companies of AEP have contractual, financial and other business relationships with the other member companies, such as participation in AEP savings",
+   "competition": "COMPETITION — The Vertically Integrated Utilities primarily generate, transmit and distribute electricity to their retail customers in their service territories. These sales are made at rates approved by the state utility commissions of the states in which they operate, and in some instances, approved by the FERC, and are not subject to competition from other vertically integrated public utilities. Other than AEGCo, the Vertically Integrated Utilities hold franchises or other rights that effectively grant the exclusive ability to provide electric service in various municipalities and regions in their service areas. The Vertically Integrated Utilities compete with self-generation and with distributors of other energy sources, such as natural gas, fuel oil, renewables and coal, within their service areas. The primary factors in such competition are price, reliability of service and the cap",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:36:56.006569+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AES": {
+   "symbol": "AES",
+   "cik": "0000874761",
+   "entity_name": "AES CORP",
+   "industry": "Cogeneration Services & Small Power Producers",
+   "form": "10-K",
+   "filed_at": "2026-03-02",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476126000063/aes-20251231.htm",
+   "language": "en",
+   "business_summary": "Item 1.— Business is an outline of our strategy and our businesses by SBU, including key financial drivers. Additional items that may have an impact on our businesses are discussed in Item 1A.— Risk Factors and Item 3.— Legal Proceedings . Incorporated in 1981, AES is a global energy company accelerating the future of energy. Together with our many stakeholders, we are improving lives by delivering the greener, smarter energy solutions the world needs. Our diverse workforce is committed to continuous innovation and operational excellence, while partnering with our customers on their strategic energy transitions and continuing to meet their energy needs today. AES is the next-generation energy company with over four decades of experience developing, operating, and owning electric generation and utilities. The focus of our strategy is to partner with large corporations to deliver the electricity they need when they need it. We are very well-positioned as a leading provider of renewable energy to data center companies, particularly in the U.S., and to large mining companies outside the",
+   "competition": "",
+   "customer_concentration": "No individual customer accounted for 10% or more of our 2025 total revenue. However, no single customer accounted for 10% or more of total revenue in 2025, 2024 or 2023.",
+   "extracted_at": "2026-08-27T13:37:02.286308+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AFL": {
+   "symbol": "AFL",
+   "cik": "0000004977",
+   "entity_name": "AFLAC INC",
+   "industry": "Accident & Health Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/4977/000162828026011402/afl-20251231.htm",
+   "language": "en",
+   "business_summary": "The Private Securities Litigation Reform Act of 1995 provides a safe harbor to encourage companies to provide prospective information, so long as those informational statements are identified as forward-looking and are accompanied by meaningful cautionary statements identifying important factors that could cause actual results to differ materially from those included in the forward-looking statements. Aflac Incorporated and its subsidiaries (the Company) desire to take advantage of these provisions. This report contains cautionary statements identifying important factors that could cause actual results to differ materially from those projected herein, and in any other statements made by Company officials in communications with the financial community and contained in documents filed with or furnished to the Securities and Exchange Commission (SEC). Forward-looking statements are not based on historical information and relate to future operations, strategies, financial results or other developments. Furthermore, forward-looking information is subject to numerous assumptions, risks and",
+   "competition": "Competitive Markets — The Company competes with other insurance carriers through product design, price, policyholder service, and sales efforts. Since the deregulation of the Japan market in 2001, the number of insurance companies offering stand-alone cancer and medical insurance has increased, intensifying competition. However, based on Aflac Japan's size of annualized premiums in force and diversified distribution network, the Company believes it is well-positioned to continue to adapt to increased competition. Furthermore, the Company believes the continued development and maintenance of operating efficiencies will allow Aflac Japan to offer affordable products that appeal to consumers. The Company believes Aflac Japan will remain a leading provider of third sector products such as cancer and medical insurance coverage in Japan, principally due to its experience in the market, well-kn",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:07.592081+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AIG": {
+   "symbol": "AIG",
+   "cik": "0000005272",
+   "entity_name": "AMERICAN INTERNATIONAL GROUP, INC.",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/5272/000000527226000023/aig-20251231.htm",
+   "language": "en",
+   "business_summary": "American International Group, Inc. (NYSE: AIG) is a leading global insurance organization. AIG provides insurance solutions that help businesses and individuals in over 200 countries and jurisdictions protect their assets and manage risks through AIG operations, licenses and authorizations as well as network partners. executed through franchises that are among the leaders in their geographies and segments, providing differentiated service. including millions of clients in over 200 countries and jurisdictions, ranging from individuals to small and medium-sized businesses to multi-national Fortune 500 companies. of more than 22,000 colleagues committed to taking ownership, setting the standard, winning together, being allies and doing what's right. with approximately $41 billion in shareholders’ equity and AIG Parent liquidity sources of $9.3 billion as of December 31, 2025. In this Annual Report, unless otherwise mentioned or unless the context indicates otherwise, we use the terms “AIG,” the “Company,” “we,” “us” and “our” to refer to American International Group, Inc., a Delaware co",
+   "competition": "COMPETITION — General Insurance operates in a highly competitive industry against global, national and local insurers and reinsurers and underwriting syndicates in specific market areas and product types. Insurance companies compete through a combination of risk acceptance criteria, product pricing, service levels and terms and conditions. General Insurance seeks to differentiate itself in the markets where we participate by providing leading expertise and insight to clients, distribution partners and other stakeholders, delivering underwriting excellence and value-driven insurance solutions and providing high quality, tailored end-to-end support to stakeholders. In doing so, we leverage our world-class global franchise, multinational capabilities, balance sheet strength and financial flexibility. For additional information on our segments, see Note 3 to the Consolidated Financial Statem",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:14.392497+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AIZ": {
+   "symbol": "AIZ",
+   "cik": "0001267238",
+   "entity_name": "ASSURANT, INC.",
+   "industry": "Insurance Carriers, NEC",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1267238/000126723826000010/aiz-20251231.htm",
+   "language": "en",
+   "business_summary": "We are a premier global protection company that partners with the world’s leading brands to safeguard and service connected devices, homes and automobiles. We leverage data-driven technology solutions to provide exceptional customer experiences. We operate in North America, Latin America, Europe and Asia Pacific through two operating segments: Global Lifestyle and Global Housing. Through our Global Lifestyle segment, we provide mobile device solutions, extended service contracts and related services for consumer electronics and appliances, and credit and other insurance products (referred to as “Connected Living”); and vehicle protection services, commercial equipment protection and other related services (referred to as “Global Automotive”). Through our Global Housing segment, we provide lender-placed homeowners, manufactured housing and flood insurance, as well as voluntary manufactured housing, condominium and homeowners insurance (referred to as “Homeowners”); and renters insurance and other products (referred to as “Renters and Other”). Our financial strength and capabilities ac",
+   "competition": "Competition — Our businesses focus on supporting, protecting and connecting major consumer purchases. Although we face global competition in each of our businesses, we believe that no single competitor competes against us in all of our business lines. 9 Across Global Lifestyle and Global Housing, we compete for business, clients, customers, agents and other distribution relationships with many insurance companies, warranty and protection companies, financial services companies, mobile device repair and logistics companies, technology and software companies and specialized competitors that focus on one market, product or service. To remain competitive in many of our businesses, we must anticipate and respond effectively to changes in customer preferences, new industry standards, evolving distribution models, disruptive technology developments and alternate business models. We must respond",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:18.887039+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AJG": {
+   "symbol": "AJG",
+   "cik": "0000354190",
+   "entity_name": "Arthur J. Gallagher & Co.",
+   "industry": "Insurance Agents, Brokers & Service",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/354190/000162828026008662/ajg-20251231.htm",
+   "language": "en",
+   "business_summary": "Arthur J. Gallagher & Co. and its subsidiaries, collectively referred to herein as we, our, us or Gallagher, are engaged in providing insurance brokerage, reinsurance brokerage, consulting, and third-party property/casualty claims settlement and administration services to entities and individuals around the world. We believe that our major strength is our ability to deliver comprehensively structured insurance, reinsurance and risk management solutions, superior claim outcomes and comprehensive consulting services to our clients. Our brokerage segment operations provide brokerage and consulting services to entities of all types, including commercial, nonprofit, public sector entities, insurance companies and insurance capital providers, and to a lesser extent, individuals, in the areas of insurance and reinsurance placements, risk of loss management, and management of employer sponsored benefit programs. Our risk management segment operations provide contract claim settlement, claim administration, loss control services and risk management consulting for commercial, nonprofit, captiv",
+   "competition": "Competition — Brokerage Segment The insurance and reinsurance brokerage and consulting businesses are highly competitive and there are many organizations and individuals throughout the world who actively compete with us in every area of our business. Additionally, we also face competition from insurance and reinsurance carriers that market, distribute and service a portion of their products directly, and in some cases from banks, consulting and accounting firms, and technology companies that can provide alternative risk management products or services. We believe that the primary factors determining our competitive position with other organizations in our industry are the quality of the services we offer, the personalized attention we provide, the individual and corporate expertise providing the actual service to the client, the data analytics and technology capabilities we have built, t",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:23.213247+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AKAM": {
+   "symbol": "AKAM",
+   "cik": "0001086222",
+   "entity_name": "AKAMAI TECHNOLOGIES INC",
+   "industry": "Services-Business Services, NEC",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1086222/000108622226000022/akam-20251231.htm",
+   "language": "en",
+   "business_summary": "Since 1998, Akamai has developed and provided solutions for global enterprises to build, secure and accelerate their applications and digital experiences. As of December 31, 2025, our massively distributed global infrastructure was comprised of core and distributed compute sites, more than 4,300 edge points-of-presence in over 130 countries and approximately 700 cities, and our underlying global network integrated with roughly 1,200 network partners. With this scale and distribution, Akamai has visibility and insight into traffic volumes, congestion, attack patterns, vulnerabilities and other activities across the internet's complex intersections of networks and systems. Leveraging these insights, Akamai offers solutions designed to protect our customers from threats and attacks, along with full-stack compute solutions to build and deliver high-performance, low-latency applications across our uniquely distributed architecture and edge network. Today, billions of people go online to work, learn, shop, bank, communicate and more. We firmly believe that the internet’s role in transformi",
+   "competition": "",
+   "customer_concentration": "No customer accounted for 10% or more of total revenue for any of the years ended December 31, 2025, 2024 and 2023. As of December 31, 2025, there was one customer with an accounts receivable balance greater than 10% of total accounts receivable. As of December 31, 2024, no customer had an accounts receivable balance greater than 10% of total accounts receivable. For the years ended December 31, 2025, 2024 and 2023, no customer accounted for more than 10% of total revenue. As of December 31, 2025, there was one customer with an accounts receivable balance greater than 10 % of total accounts receivable. As of December 31, 2024, no customer had an accounts receivable balance greater than 10 % ",
+   "extracted_at": "2026-08-27T13:37:26.168343+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ALB": {
+   "symbol": "ALB",
+   "cik": "0000915913",
+   "entity_name": "ALBEMARLE CORP",
+   "industry": "Plastic Materials, Synth Resins & Nonvulcan Elastomers",
+   "form": "10-K",
+   "filed_at": "2026-02-11",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/915913/000091591326000018/alb-20251231.htm",
+   "language": "en",
+   "business_summary": "Albemarle Corporation was incorporated in Virginia in 1993. Our principal executive offices are located at 4250 Congress Street, Suite 900, Charlotte, North Carolina 28209. Unless the context otherwise indicates, the terms “Albemarle,” “we,” “us,” “our” or “the Company” mean Albemarle Corporation and its consolidated subsidiaries. Albemarle is a world leader in transforming essential resources into critical ingredients for mobility, energy, connectivity, and health. Our purpose is to enable a more resilient world. We partner to pioneer new ways to move, power, connect, and protect. The end markets we serve include grid storage, automotive, aerospace, conventional energy, electronics, construction, agriculture and food, pharmaceuticals and medical devices. We believe that our world-class resources with reliable and consistent supply, our leading process chemistry, high-impact innovation, customer centricity and focus on people and planet will enable us to maintain a leading position in the industries in which we operate. We and our joint ventures currently operate more than 25 product",
+   "competition": "Competition — The global lithium market is highly competitive and growing very rapidly. It is characterized by aggressive expansion and entry from existing and new players, including automotive OEMs, commodity traders, junior miners, and large, well-capitalized diversified miners. Producers are primarily located in the Americas, Africa, Asia and Australia. Major competitors in lithium compounds include Sociedad Quimica y Minera de Chile S.A., Sichuan Tianqi Lithium, Jiangxi Ganfeng Lithium, Rio Tinto plc, Pilbara Minerals, Tesla and a large number of additional Chinese companies. Competition in the global lithium market is increasingly based on index-based market pricing and differentiated via product quality, product diversity, reliability of supply and customer service. 3",
+   "customer_concentration": "During the years ended December 31, 2025 and 2024, no customer represented greater than 10% of the Company’s consolidated net sales. During the year ended December 31, 2023, one customer in the Energy Storage business represented approximately 12 % of the Company’s consolidated net sales.",
+   "extracted_at": "2026-08-27T13:37:30.316829+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "ALGN": {
+   "symbol": "ALGN",
+   "cik": "0001097149",
+   "entity_name": "ALIGN TECHNOLOGY INC",
+   "industry": "Orthopedic, Prosthetic & Surgical Appliances & Supplies",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1097149/000109714926000014/algn-20251231.htm",
+   "language": "en",
+   "business_summary": "Align Technology, Inc. (“we,” “us,” “our,” “Align” or the “Company”) is a global medical device company primarily engaged in the design, manufacture and marketing of Invisalign ® clear aligners for the treatment of malocclusions, or the misalignment of teeth, by orthodontists and general dental practitioners (“GPs”), Vivera TM retainers for retention, iTero TM intraoral scanners and services for dentistry, and exocad TM computer-aided design and computer-aided manufacturing (“CAD/CAM”) software for dental laboratories and dental practitioners. Our vision and strategy is to revolutionize orthodontic and restorative dentistry through digital treatment planning and implementation using the Align TM Digital Platform, an integrated suite of proprietary technologies and services designed to deliver a seamless, end-to-end solution for patients, consumers, orthodontists, GPs and lab partners. We strive to achieve our vision and strategy through key objectives made possible with the proprietary technologies and services of the Align TM Digital Platform to establish: clear aligners as the prin",
+   "competition": "",
+   "customer_concentration": "No individual customer accounted for 10% or more of our accounts receivable, net balance at December 31, 2025 or 2024 nor net revenues for the years ended December 31, 2025, 2024 or 2023.",
+   "extracted_at": "2026-08-27T13:37:33.573062+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ALL": {
+   "symbol": "ALL",
+   "cik": "0000899051",
+   "entity_name": "ALLSTATE CORP",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/899051/000089905126000031/all-20251231.htm",
+   "language": "en",
+   "business_summary": "of the State of Delaware on November 5, 1992, to serve as the holding company for Allstate Insurance Company. Its business The Allstate Corporation is one of the largest publicly held personal lines insurers in the United States. Allstate’s strategy is to increase market share in personal property-liability and broaden protection offerings. The Allstate brand is widely known through the “You’re In Good Hands With Allstate®” slogan. Offers private passenger auto, homeowners, other personal lines and commercial insurance through exclusive agents, independent agents, contact centers and online under the Allstate, National General, Direct Auto and Answer Financial brands Protection Services Protection Plans, Roadside, Dealer Services, Identity Protection and Arity provide consumer product protection plans, roadside assistance, automotive protection and insurance products, identity protection and restoration, and mobility intelligence services and analytic solutions using automotive telematics information In this Annual Report on Form 10-K, we occasionally refer to statutory financial inf",
+   "competition": "Competition — The personal lines insurance markets, including private passenger auto and homeowners insurance, are highly competitive. The following charts provide Allstate Protection’s combined market share compared to our principal U.S. competitors using statutory direct written premium for the year ended December 31, 2024, according to A.M. Best. Personal lines insurance Private passenger auto insurance Homeowners insurance",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:38.617321+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ALLE": {
+   "symbol": "ALLE",
+   "cik": "0001579241",
+   "entity_name": "Allegion plc",
+   "industry": "Services-Detective, Guard & Armored Car Services",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1579241/000157924126000007/alle-20251231.htm",
+   "language": "en",
+   "business_summary": "Allegion plc (\"Allegion,\" \"we,\" \"us\" or \"the Company\") is a leading global provider of security products and solutions that keep people and assets safe and secure in the places they live, learn, work and connect. We pioneer safety and security to create a safer and more accessible world. Both developing and partnering are central to our work to create ecosystems that enable seamless access experiences and an uninterrupted and secure flow of people and assets. We offer an extensive and versatile portfolio of security and access control products and solutions across a range of market-leading brands. Our experts around the world deliver high-quality hardware, software, services and systems, and we use our deep expertise to serve as trusted partners to end-users who seek customized solutions to their security needs. We offer the following extensive and versatile portfolio of security and access control products and solutions across a range of market-leading brands: • Door controls, door control systems, and exit devices : An extensive portfolio of life-safety products and solutions gener",
+   "competition": "",
+   "customer_concentration": "Our 10 largest customers represented approximately 26% of our total Net revenues in 2025. No single customer represented 10% or more of our total Net revenues in 2025. We have significant customers, particularly major retailers, although no one customer represented 10% or more of our total Net revenues in any of the past three fiscal years. In fiscal years 2025, 2024 and 2023, no customer exceeded 10% of consolidated Net revenues.",
+   "extracted_at": "2026-08-27T13:37:41.268282+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ALNY": {
+   "symbol": "ALNY",
+   "cik": "0001178670",
+   "entity_name": "ALNYLAM PHARMACEUTICALS, INC.",
+   "industry": "Pharmaceutical Preparations",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1178670/000162828026007497/alny-20251231.htm",
+   "language": "en",
+   "business_summary": "“Alnylam,” AMVUTTRA ® , ONPATTRO ® , GIVLAARI ® , OXLUMO ® , Alnylam Act ® , GEMINI™, IKARIA™ and siRELIS™ are trademarks and registered trademarks of Alnylam Pharmaceuticals, Inc. Our logo, trademarks and service marks are property of Alnylam. All other trademarks or service marks appearing in this Annual Report on Form 10-K are the property of their respective holders. This Annual Report on Form 10-K contains forward-looking statements within the meaning of Section 27A of the Securities Act of 1933, as amended, and Section 21E of the Securities Exchange Act of 1934, as amended. We intend these forward-looking statements to be covered by the safe harbor provisions for forward-looking statements contained in the Private Securities Litigation Reform Act of 1995 and are including this statement for purposes of complying with those safe harbor provisions. All statements other than statements of historical fact contained in this Annual Report on Form 10-K are forward-looking statements. In some cases, you can identify forward-looking statements by terminology such as “may,” “will,” “shou",
+   "competition": "Competition — Competition in the pharmaceutical marketplace remains intense, with hundreds of companies competing to discover, develop, and market new drugs. For our marketed and discovery assets, we face a broad spectrum of current and potential competitors, ranging from very large, global pharmaceutical companies with significant resources, to biotechnology companies with resources and expertise comparable to our own, to smaller biotechnology companies with fewer resources and less expertise than those we currently possess. We believe that for most or all of our drug development programs, there will be one or more competing programs being marketed and/or under development at other companies.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:46.547274+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AMAT": {
+   "symbol": "AMAT",
+   "cik": "0000006951",
+   "entity_name": "APPLIED MATERIALS INC /DE",
+   "industry": "Semiconductors & Related Devices",
+   "form": "10-K",
+   "filed_at": "2025-12-12",
+   "period": "2025-10-26",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+   "language": "en",
+   "business_summary": "Applied Materials, Inc. is the leader in the materials engineering solutions used to produce virtually every semiconductor in the world. Semiconductors provide the foundation for advances in technology that are reshaping the global economy, including artificial intelligence, the internet of things, robotics, electric and autonomous vehicles, and clean energy. We are experts in the design, development, production, and servicing of the critical wafer fabrication tools our customers need to manufacture semiconductors. Our customers’ products are used across personal computing devices, mobile phones, artificial intelligence (AI) and data center servers, automobiles, connected devices, industrial applications and consumer electronics. We are well positioned to address the increasing complexity in manufacturing semiconductors, by leveraging the semiconductor capital equipment industry’s most comprehensive portfolio of products to connect and co-optimize our technologies. This enables our customers to evolve their semiconductor technology roadmaps and achieve superior results in their produ",
+   "competition": "Competition — The industries in which we operate are highly competitive and characterized by rapid technological change. Our ability to compete generally depends on our ability to commercialize our technology in a timely manner, continually improve our products, and develop new products that meet constantly evolving customer requirements. Significant competitive factors include technical capability and differentiation, productivity, cost-effectiveness and the ability to support a global customer base. The importance of these factors varies according to customers’ needs, including product mix and respective product requirements, applications, and the timing and circumstances of purchasing decisions. Substantial competition exists across all the segments of our business. Competitors range from small companies that compete in a single region, which may benefit from policies and regulations ",
+   "customer_concentration": "During fiscal 2025, two customers accounted for approximately 19% and 15%, respectively, of our net revenue. During fiscal 2025, two customers accounted for approximately 19 % and 15 %, respectively, of our net revenue. During fiscal 2024, two customers accounted for approximately 12 % and 11 %, respectively, of our net revenue. During fiscal 2023, two customers accounted for approximately 19 % and 15 %, respectively, of our net revenue.",
+   "extracted_at": "2026-08-27T13:37:48.998730+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AMCR": {
+   "symbol": "AMCR",
+   "cik": "0001748790",
+   "entity_name": "Amcor plc",
+   "industry": "Miscellaneous Manufacturing Industries",
+   "form": "10-K",
+   "filed_at": "2026-08-14",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1748790/000174879026000022/amcr-20260630.htm",
+   "language": "en",
+   "business_summary": "Amcor plc (ARBN 630 385 278) is a public limited company incorporated under the Laws of the Bailiwick of Jersey. Our history dates back more than 150 years, with origins in both Australia and the United States of America. Today, we are the global leader in developing and producing responsible primary consumer packaging and dispensing solutions across a variety of materials for nutrition, health, beauty and wellness categories. Our global product innovation and sustainability expertise enables us to solve packaging challenges around the world every day, producing a range of packaging and dispensing solutions that are more sustainable, functional and appealing for our customers and their consumers. We are guided by our purpose of elevating customers, shaping lives and protecting the future. On April 30, 2025, we completed our merger (\"Merger\") with Berry Global Group, Inc. (\"Berry\"), a global manufacturer of rigid and flexible packaging products pursuant to the Agreement and Plan of Merger (the “Merger Agreement”) between Amcor, Aurora Spirit, Inc., a Delaware corporation and wholly ow",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:37:52.129728+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "AMD": {
+   "symbol": "AMD",
+   "cik": "0000002488",
+   "entity_name": "ADVANCED MICRO DEVICES INC",
+   "industry": "Semiconductors & Related Devices",
+   "form": "10-K",
+   "filed_at": "2026-02-04",
+   "period": "2025-12-27",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248826000018/amd-20251227.htm",
+   "language": "en",
+   "business_summary": "The statements in this report include forward-looking statements within the meaning of the Private Securities Litigation Reform Act of 1995. These forward-looking statements are based on current expectations and beliefs and involve numerous risks and uncertainties that could cause actual results to differ materially from expectations. These forward-looking statements speak only as of the date hereof or as of the dates indicated in the statements and should not be relied upon as predictions of future events, as we cannot assure you that the events or circumstances reflected in these statements will be achieved or will occur. You can identify forward-looking statements by the use of forward-looking terminology including “believes,” “expects,” “may,” “will,” “should,” “seeks,” “intends,” “plans,” “pro forma,” “estimates,” “anticipates,” or the negative of these words and phrases, other variations of these words and phrases or comparable terminology. The forward-looking statements relate to, among other things: possible impact of future accounting rules on AMD’s consolidated financial st",
+   "competition": "Competition — The markets in which our products are sold are highly competitive and rapidly evolving and delivering the latest and best products to market on time is critical to revenue growth. The competitiveness of our products depends on a number of factors including, performance, total cost of ownership, timely product introductions, product quality and reliability, product features and capabilities, energy efficiency (including power consumption and battery life, given their impact on total cost of ownership), size (or form factor), selling price, cost, adherence to industry standards (and the creation of open industry standards), level of integration, software and hardware compatibility, ease of use and functionality of software design tools, completeness of applicable software solutions, security and stability, brand recognition and availability. Competition is expected to remain ",
+   "customer_concentration": "No customer accounted for at least 10% of the Company’s consolidated net revenue in fiscal years 2025 and 2024. One Client and Gaming segment customer accounted for 18 % of consolidated net revenue in fiscal year 2023. One customer accounted for approximately 11 % and another customer accounted for 24 % of the total consolidated accounts receivable balance as of December 27, 2025 and December 28, 2024, respectively.",
+   "extracted_at": "2026-08-27T13:37:55.097915+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AME": {
+   "symbol": "AME",
+   "cik": "0001037868",
+   "entity_name": "AMETEK INC/",
+   "industry": "Industrial Instruments For Measurement, Display, and Control",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1037868/000103786826000016/ame-20251231.htm",
+   "language": "en",
+   "business_summary": "AMETEK, Inc. (“AMETEK” or the “Company”) is incorporated in Delaware. Its predecessor was originally incorporated in Delaware in 1930 under the name American Machine and Metals, Inc. AMETEK is a leading global manufacturer of electronic instruments and electromechanical devices with operations in North America, Europe, Asia and South America. AMETEK maintains its principal executive offices at 1100 Cassatt Road, Berwyn, Pennsylvania, 19312. Listed on the New York Stock Exchange (symbol: AME), the common stock of AMETEK is a component of the Standard and Poor’s 500 and the Russell 1000 Indices. AMETEK’s products are marketed and sold worldwide through two operating groups: Electronic Instruments (“EIG”) and Electromechanical (“EMG”). Electronic Instruments is a leader in the design and manufacture of advanced instruments for the process, power and industrial, and aerospace markets. Electromechanical is a differentiated supplier of precision motion control solutions, highly engineered medical components and devices, thermal management systems, specialty metals and electrical interconne",
+   "competition": "Competitive Strengths — Management believes AMETEK has significant competitive advantages that help strengthen and sustain its market positions. Those advantages include: Strong Market Share . AMETEK maintains strong market share in a number of targeted niche markets through its ability to produce and deliver high-quality, differentiated products at competitive prices. EIG has strong market positions in niche segments of the process, power and industrial, and aerospace markets. EMG holds strong positions in niche segments of the aerospace and defense, automation and medical markets. Technological and Development Capabilities . AMETEK believes it has certain technological advantages over its competitors that allow it to maintain its leading market positions. Historically, the Company has demonstrated an ability to develop innovative new products and solutions that support customer needs. ",
+   "customer_concentration": "Approximately 4% of EIG’s 2025 net sales were made to its five largest customers. No single customer comprises more than 2% of net sales. Approximately 15% of EMG’s 2025 net sales were made to its five largest customers. No single customer comprises greater than 5% of net sales.",
+   "extracted_at": "2026-08-27T13:37:57.334893+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AMGN": {
+   "symbol": "AMGN",
+   "cik": "0000318154",
+   "entity_name": "AMGEN INC",
+   "industry": "Biological Products, (No Diagnostic Substances)",
+   "form": "10-K",
+   "filed_at": "2026-02-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/318154/000031815426000010/amgn-20251231.htm",
+   "language": "en",
+   "business_summary": "Amgen Inc. (including its subsidiaries, referred to as “Amgen,” “the Company,” “we,” “our” or “us”) discovers, develops, manufactures and delivers innovative medicines to fight some of the world’s toughest diseases. We focus on areas of high unmet medical need and leverage our expertise to strive for solutions that dramatically improve people’s lives, while also reducing the social and economic burden of disease. We helped launch the biotechnology industry more than 45 years ago and have grown to be one of the world’s leading independent biotechnology companies. Our robust pipeline includes potential first-in-class medicines at all stages of development. We have a presence in approximately 100 countries worldwide. Amgen was incorporated in California in 1980 and became a Delaware corporation in 1987. Amgen operates in one operating segment: human therapeutics. Following is a summary of significant developments affecting our business that have occurred and that we have reported since the filing of our Annual Report on Form 10-K for the year ended December 31, 2024. In August 2025, we",
+   "competition": "",
+   "customer_concentration": "For the year ended December 31, 2025, on a combined basis, these customers accounted for 77 % of total gross revenues as shown in the following table.",
+   "extracted_at": "2026-08-27T13:38:01.834714+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AMP": {
+   "symbol": "AMP",
+   "cik": "0000820027",
+   "entity_name": "AMERIPRISE FINANCIAL INC",
+   "industry": "Investment Advice",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/820027/000082002726000011/amp-20251231.htm",
+   "language": "en",
+   "business_summary": "Ameriprise Financial, Inc. is a diversified financial services company with a more than 130-year history of providing solutions to help clients confidently achieve their financial objectives. Ameriprise Financial, Inc. is a holding company incorporated in Delaware that primarily engages in business through its subsidiaries. Accordingly, references to “Ameriprise,” “Ameriprise Financial,” the “Company,” “we,” “us,” and “our” may refer to Ameriprise Financial, Inc. exclusively, to our entire family of companies, or to one or more of our subsidiaries. We are a long-standing leader in financial planning and advice offering a broad range of products and services designed to assist individual and institutional clients achieve their financial objectives. Our strategy is centered on helping clients confidently achieve their goals by providing holistic advice and by managing and protecting their assets and income. We carry out our strategy through two primary go-to-market approaches: Wealth Management and Asset Management. Our wealth management business is the primary growth engine of Ameripr",
+   "competition": "Competition — We operate in a highly competitive global industry. As a diversified financial services firm, we compete directly with a variety of financial institutions, including registered investment advisers, securities brokers, asset managers, banks and insurance companies. We directly compete for the provision of products and services to clients, as well as for our financial advisors and investment management 7",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:38:10.540138+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AMT": {
+   "symbol": "AMT",
+   "cik": "0001053507",
+   "entity_name": "AMERICAN TOWER CORP /MA/",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-24",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1053507/000105350726000035/amt-20251231.htm",
+   "language": "en",
+   "business_summary": "We are one of the largest global real estate investment trusts and a leading independent owner, operator and developer of multitenant communications real estate. Our primary business is the leasing of space on communications sites to wireless service providers, radio and television broadcast companies, wireless data providers, government agencies and municipalities and tenants in a number of other industries. We refer to this business, inclusive of our data center business discussed below, as our property operations, which accounted for 97% of our total revenues for the year ended December 31, 2025. We also offer tower-related services in the United States, which we refer to as our services operations. These services include site application, zoning and permitting, structural and mount analyses, and construction management services, together with program management offerings that support customer deployment needs from project scoping through construction. Our services operations primarily support our site leasing business, including the addition of new tenants and equipment on our si",
+   "competition": "Competition — Our industry is highly competitive. There are frequently new market participants that create additional competition. We compete, both for new business and for the acquisition of assets, with other public tower companies, such as Crown Castle International Corp., SBA Communications Corporation, Vertical Bridge, Telesites S.A.B. de C.V. and Cellnex Telecom, S.A., wireless carrier tower consortia and private tower companies, private equity sponsored firms, carrier-affiliated tower companies, independent wireless carriers, tower owners, broadcasters and owners of non-communications sites, including rooftops, utility towers, water towers and other alternative structures. Our data center business also competes with a variety of companies offering similar data center solutions and services, including space, power, interconnection and development services. We believe that location ",
+   "customer_concentration": "In the third quarter of 2022, one of our largest customers in India, Vodafone Idea Limited (“VIL”), communicated that it would make partial payments of its contractual amounts owed to us (the “VIL Shortfall”).",
+   "extracted_at": "2026-08-27T13:38:14.493124+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AMZN": {
+   "symbol": "AMZN",
+   "cik": "0001018724",
+   "entity_name": "AMAZON COM INC",
+   "industry": "Retail-Catalog & Mail-Order Houses",
+   "form": "10-K",
+   "filed_at": "2026-02-06",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm",
+   "language": "en",
+   "business_summary": "This Annual Report on Form 10-K and the documents incorporated herein by reference contain forward-looking statements based on expectations, estimates, and projections as of the date of this filing. Actual results and outcomes may differ materially from those expressed in forward-looking statements. See Item 1A of Part I — “Risk Factors.” As used herein, “Amazon.com,” “we,” “our,” and similar terms include Amazon.com, Inc. and its subsidiaries, unless the context indicates otherwise. We seek to be Earth’s most customer-centric company. We are guided by four principles: customer obsession rather than competitor focus, passion for invention, commitment to operational excellence, and long-term thinking. In each of our segments, we serve our primary customer sets, consisting of consumers, sellers, developers, enterprises, content creators, advertisers, and employees. We have organized our operations into three segments: North America, International, and Amazon Web Services (“AWS”). These segments reflect the way the Company evaluates its business performance and manages its operations. I",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:38:16.816883+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "ANET": {
+   "symbol": "ANET",
+   "cik": "0001596532",
+   "entity_name": "Arista Networks, Inc.",
+   "industry": "Computer Communications Equipment",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1596532/000159653226000013/anet-20251231.htm",
+   "language": "en",
+   "business_summary": "In a world where data is increasingly a precious commodity and competitive differentiator, Arista was founded to enable our customers to access all their centers of data in the quickest, most reliable, and secure manner. Over the last two decades, we have emerged as an industry leader, delivering data-driven, client-to-cloud networking-as-a-service. Our “Centers of Data” strategy is a fundamental pivot from legacy networking approaches that create incongruent silos to a unified, data-driven approach in which the network is a service that interconnects four primary domains: AI Centers, Data Centers, Campus Centers, and WAN Centers. Anchored by Arista’s state-oriented Extensible Operating System (EOS) and Network Data Lake (NetDL), our network-as-a-service platform delivers a seamless, consolidated networking experience regardless of data location. • offer uncompromising reliability derived from the foundation of robust quality assurance capabilities, and a suite of automated diagnostics, This strategy and differentiation have also allowed us to deliver our comprehensive suite of produ",
+   "competition": "Competition — The markets in which we participate are highly competitive and characterized by rapidly transforming technology, changing end-customer needs, evolving industry standards, frequent introductions of new products and services and industry consolidation. We expect competition to intensify in the future as the market for cloud and AI networking expands and existing competitors and new market entrants introduce new products or enhance existing products. The data center and campus networking markets have historically been dominated by Cisco, with competition also coming from other large network equipment and system vendors, including Dell/EMC, Extreme Networks, Hewlett Packard Enterprise, Huawei, Juniper Networks, Nvidia, and white box networking vendors that utilize open-source operating systems. Most of our competitors and some strategic alliance partners have made acquisitions ",
+   "customer_concentration": "Two of our customers accounted for more than 10% of our sales for the year ended December 31, 2025. Sales to these two customers represented 26% and 16% of our total revenue for the year ended December 31, 2025, respectively. For example, sales to one end customer represented 16%, 15%, and 21% of our total revenue, and sales to the other end customer represented 26%, 20%, and 18% of our total revenue for the years ended December 31, 2025, 2024, and 2023, respectively. Cyclical changes in our customers’ demand for our products and services, particularly changes in the demand of our largest customers, could result in fluctuations in our revenue, revenue growth and results of operations. Two of",
+   "extracted_at": "2026-08-27T13:38:19.901170+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AON": {
+   "symbol": "AON",
+   "cik": "0000315293",
+   "entity_name": "Aon plc",
+   "industry": "Insurance Agents, Brokers & Service",
+   "form": "10-K",
+   "filed_at": "2026-02-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/315293/000162828026008116/aon-20251231.htm",
+   "language": "en",
+   "business_summary": "Aon plc (which may be referred to as “Aon,” the “Company,” “we,” “us,” or “our”) is a leading global professional services firm. Through actionable analytic insight, globally integrated Risk Capital and Human Capital expertise and locally relevant solutions, our colleagues provide clients with the clarity and confidence to make better risk and people decisions that protect and grow their businesses. With clients around the world facing growing uncertainty and volatility, we remain focused on accelerating our Aon United strategy to serve clients as one globally connected firm and driving innovation to address unmet and evolving client need. We serve clients in more than 120 countries across all market segments and nearly every industry. This diversification of our client base helps provide our firm with stability in different economic scenarios that could affect specific industries, customer segments, or geographies. We continue to focus our portfolio on higher-margin, capital-light professional services businesses that have high recurring revenue streams and strong cash flow generati",
+   "competition": "Competition — Our business operates in a highly competitive and fragmented environment. We compete with numerous other global insurance brokers and consulting companies, including, among others, Marsh McLennan, Willis Towers Watson, Arthur J Gallagher & Company, and Lockton Companies, Inc., as well as numerous other global, regional, and local firms in almost every area of our business. We also compete with insurance and reinsurance companies that directly market and service their insurance products without the assistance of brokers or agents. Additionally, we compete with other businesses that do not fall into the categories above, including large financial institutions and independent consulting firms and consulting organizations affiliated with accounting, information systems, technology, human resources, and financial services firms.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:38:23.627069+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AOS": {
+   "symbol": "AOS",
+   "cik": "0000091142",
+   "entity_name": "SMITH A O CORP",
+   "industry": "Household Appliances",
+   "form": "10-K",
+   "filed_at": "2026-02-10",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/91142/000009114226000008/aos-20251231.htm",
+   "language": "en",
+   "business_summary": "As used in this annual report on Form 10-K, references to the “Company,” “A. O. Smith,” “AOS,” “we,” “us,” and “our” refer to A. O. Smith and its consolidated subsidiaries. The following discussion should be read in conjunction with our consolidated financial statements and notes thereto under “Item 8 Financial Statements and Supplementary Data” in this annual report on Form 10-K. Our company is comprised of two reporting segments: North America and Rest of World. Both segments manufacture and market comprehensive lines of residential and commercial gas and electric water heaters, boilers, heat pumps, tanks and water treatment products. Both segments primarily manufacture and market in their respective regions of the world. Our Rest of World segment is primarily comprised of China, India, and Europe. Sales in our North America segment accounted for approximately 78 percent of our total sales in 2025. This segment serves residential and commercial end markets with a broad range of products including: Water heaters . Our residential and commercial water heaters primarily come in sizes",
+   "competition": "",
+   "customer_concentration": "Sales to our five largest customers represented approximately 41 percent of our sales in 2025. We cannot assure that we will be able to retain our largest customers. In 2025, sales to the Company's North America segment’s two largest customers were $ 599. In 2024, sales to the Company's North America segment’s two largest customers were $ 586. In 2023, sales to the Company's North America segment’s two largest customers were $ 604.",
+   "extracted_at": "2026-08-27T13:38:25.836655+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "APA": {
+   "symbol": "APA",
+   "cik": "0001841666",
+   "entity_name": "APA Corp",
+   "industry": "Crude Petroleum & Natural Gas",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1841666/000184166626000015/apa-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:38:29.613445+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "APD": {
+   "symbol": "APD",
+   "cik": "0000002969",
+   "entity_name": "Air Products & Chemicals, Inc.",
+   "industry": "Industrial Inorganic Chemicals",
+   "form": "10-K",
+   "filed_at": "2025-11-20",
+   "period": "2025-09-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2969/000000296925000055/apd-20250930.htm",
+   "language": "en",
+   "business_summary": "As used in this report, unless the context indicates otherwise, the terms “we,” “our,” “us,” the “Company,” \"Air Products,\" or “registrant” include our controlled subsidiaries and affiliates. Additional information about Air Products is available on our website at www.airproducts.com. References to our website within this report are inactive textual references only. The content of our website is not incorporated by reference into, and does not form part of, this Annual Report on Form 10-K. Air Products trades on the New York Stock Exchange under the symbol \"APD\". All periodic and current reports, registration statements, proxy statements, and other filings that we are required to file with the Securities and Exchange Commission (\"SEC\"), including our Annual Report on Form 10-K, Quarterly Reports on Form 10-Q, Current Reports on Form 8-K, and amendments to those reports filed or furnished pursuant to Section 13(a) of the Securities Exchange Act of 1934 (the \"Exchange Act\"), are available free of charge through our website as soon as reasonably practicable after electronic filing of th",
+   "competition": "",
+   "customer_concentration": "We do not have a homogeneous customer base or end market, and no single customer accounts for more than 10% of our consolidated sales.",
+   "extracted_at": "2026-08-27T13:38:33.290483+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "APH": {
+   "symbol": "APH",
+   "cik": "0000820313",
+   "entity_name": "AMPHENOL CORP /DE/",
+   "industry": "Electronic Connectors",
+   "form": "10-K",
+   "filed_at": "2026-02-11",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/820313/000110465926013549/aph-20251231x10k.htm",
+   "language": "en",
+   "business_summary": "Amphenol Corporation is one of the world’s largest designers, manufacturers and marketers of electrical, electronic and fiber optic connectors and interconnect systems, antennas, sensors and sensor-based products and coaxial, high-speed, fiber optic and specialty cable. The Company estimates, based on recent reports of industry analysts, that worldwide sales of interconnect, value-add cable assembly, antenna, cable and sensor-related products were approximately $500 billion in 2025. Certain predecessor businesses of the Company were founded in 1932, and the Company was incorporated under the laws of the State of Delaware in 1986. The Company’s Class A Common Stock (“Common Stock”) began trading on the New York Stock Exchange in 1991. The Company’s strategy is to provide our customers with comprehensive design capabilities, a broad selection of products and a high level of quality and service on a worldwide basis, while maintaining continuing programs of productivity improvement and cost control. The Company aligns its businesses into three reportable business segments: (i) Communicat",
+   "competition": "Competition — ​ The Company encounters competition in all areas of its business. The Company competes primarily on the basis of technology innovation, product quality and performance, price, customer service and delivery time. Primary competitors include Aptiv, Belden, Corning, Foxconn Interconnect Technology, Glenair, HUBER+SUHNER, ICT Luxshare, Jonhon, Molex, Rosenberger, Sensata, TE Connectivity and Yazaki, among others. In addition, the Company competes with a large number of smaller companies who compete in specific geographies, markets or products. For a discussion of certain risks related to competition, refer to the risk factor titled “ The Company encounters competition in all areas of our business ” in Part I, Item 1A. Risk Factors herein. ​ 9",
+   "customer_concentration": "No single customer accounted for 10% or more of the Company’s net sales during the years ended December 31, 2025, 2024 and 2023.",
+   "extracted_at": "2026-08-27T13:38:36.813214+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "APO": {
+   "symbol": "APO",
+   "cik": "0001858681",
+   "entity_name": "Apollo Global Management, Inc.",
+   "industry": "Investment Advice",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1858681/000185868126000013/apo-20251231.htm",
+   "language": "en",
+   "business_summary": "Founded in 1990, Apollo is a high-growth, global alternative asset manager and a retirement services provider. Apollo conducts its business primarily in the U.S. through the following three reportable segments: Asset Management, Retirement Services and Principal Investing. These business segments are differentiated based on the investment services they provide as well as varying investing strategies. Our Asset Management segment focuses on credit and equity investing strategies. These strategies reflect the range of investment capabilities across our platform based on relative risk and return. As an asset manager, we earn fees for providing investment management services and expertise to our client base. The amount of fees charged for managing these assets depends on the underlying investment strategy, liquidity profile, and, ultimately, our ability to generate returns for our clients. We also earn capital solutions fees as part of our growing capital solutions business and as part of monitoring and deployment activity alongside our sizable private equity franchise. After expenses, w",
+   "competition": "Competition — 24 Human Capital 25 Regulatory and Compliance Matters 26 Available Information 32 12 Table of Contents Overview Founded in 1990, Apollo is a high-growth, global alternative asset manager and a retirement services provider. Apollo conducts its business primarily in the U.S. through the following three reportable segments: Asset Management, Retirement Services and Principal Investing. These business segments are differentiated based on the investment services they provide as well as varying investing strategies.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:38:50.886194+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "APP": {
+   "symbol": "APP",
+   "cik": "0001751008",
+   "entity_name": "AppLovin Corp",
+   "industry": "Services-Computer Programming, Data Processing, Etc.",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1751008/000175100826000010/app-20251231.htm",
+   "language": "en",
+   "business_summary": "Our mission is to create meaningful connections between companies and their ideal customers. We provide end-to-end artificial intelligence-powered (\"AI\") advertising solutions for businesses to reach, monetize and grow their global audience. Our scaled business model is intricately linked to the advertising ecosystem, providing a durable competitive advantage. We generate revenue when our advertisers achieve their return on advertising spend targets with our advertising solutions, ensuring that their success directly fuels our growth. AppLovin is critical to the success of advertisers and publishers seeking to solve marketing and monetization challenges. Through our technologies and scaled distribution, advertisers are able to better place content so that it is discovered by the right audience, manage, optimize, and analyze their marketing investments, and improve the monetization of their content, and publishers are able to better monetize their gaming apps. Our advertising solutions include a comprehensive suite of tools including: • Axon Ads Manager, our user acquisition solution,",
+   "competition": "Competition — We operate in a fragmented advertising ecosystem composed of divisions of large, well-established companies as well as privately-held companies. The large companies in our advertising and mobile app ecosystems may play multiple different roles given the breadth of their businesses. Advertisers typically engage with several advertising platforms and networks to purchase advertisements on mobile apps, devices, and on CTV, looking to optimize their marketing investments. Such advertising companies vary in size and include Meta, Google, Amazon, and Unity Software, as well as various private companies, several of which are also our partners and clients.",
+   "customer_concentration": "No individual customer represented 10% or more of the Company’s accounts receivable, net as of December 31, 2025 or 2024. No individual customer represented 10% or more of the Company’s total revenue during the years ended December 31, 2025, 2024, or 2023.",
+   "extracted_at": "2026-08-27T13:38:55.964570+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "APTV": {
+   "symbol": "APTV",
+   "cik": "0001521332",
+   "entity_name": "Aptiv PLC",
+   "industry": "Motor Vehicle Parts & Accessories",
+   "form": "10-K",
+   "filed_at": "2026-02-06",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1521332/000152133226000009/aptv-20251231.htm",
+   "language": "en",
+   "business_summary": "In December 2024, Old Aptiv (as defined below), a public limited company formed under the laws of Jersey on May 19, 2011, completed its previously announced reorganization transaction (the “Transaction,” or the “reorganization transaction”), in which Old Aptiv established a new publicly-listed Jersey parent company, Aptiv Holdings Limited (“New Aptiv”), which is resident for tax purposes in Switzerland. As a result of the Transaction, all issued and outstanding ordinary shares of Old Aptiv were exchanged on a one-for-one basis for newly issued ordinary shares of New Aptiv. Following consummation of the Transaction, holders of Old Aptiv shares became ordinary shareholders of New Aptiv, Old Aptiv became a wholly-owned subsidiary of New Aptiv and New Aptiv was renamed “Aptiv PLC.” The previous publicly-listed Jersey parent company, which was an Irish tax resident, is referred to as “Old Aptiv” throughout this Annual Report on Form 10-K. New Aptiv’s ordinary shares are publicly traded on the New York Stock Exchange (“NYSE”) under the symbol “APTV,” the same symbol under which the Old Apt",
+   "competition": "Competition — The automotive technology and components industry remains extremely competitive. Furthermore, the rapidly evolving nature of the markets in which we compete has attracted, and may continue to attract, new entrants, particularly in best cost countries such as China and in areas of evolving vehicle technologies such as intelligent systems software, automated driving and mobility solutions, which has attracted competitors from outside the traditional automotive industry. OEMs rigorously evaluate suppliers on the basis of product quality, price, reliability and timeliness of delivery, product design capability, technical expertise and development capability, new product innovation, financial viability, application of lean principles, operational flexibility, customer service and overall management. In addition, our customers generally require that we demonstrate improved effici",
+   "customer_concentration": "Our ten largest customers accounted for approximately 56% of our total net sales for the year ended December 31, 2025, which included approximately 10% to an individual Global OEM. Declines in the market share or business of our five largest customers may adversely impact our revenues and profitability. Our five largest customers accounted for approximately 42% of our total net sales for the year ended December 31, 2025. Our supply agreements with our OEM customers are generally requirements contracts, and a decline in the production requirements of any of our customers, and in particular our largest customers, could adversely impact our revenues and profitability. GM, Ford and Stellantis ar",
+   "extracted_at": "2026-08-27T13:39:04.659756+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "ARE": {
+   "symbol": "ARE",
+   "cik": "0001035443",
+   "entity_name": "ALEXANDRIA REAL ESTATE EQUITIES, INC.",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-01-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1035443/000103544326000013/are-20251231.htm",
+   "language": "en",
+   "business_summary": "purposes. Alexandria Real Estate Equities, Inc. (NYSE: ARE), an S&P 500 ® company, is a best-in-class, mission-driven life science REIT making a positive and lasting impact on the world. With our founding in 1994, Alexandria pioneered the life science real estate niche. Alexandria is the preeminent and longest-tenured owner, operator, and developer of collaborative Megacampus™ ecosystems in AAA life science innovation cluster locations, including Greater Boston, the San Francisco Bay Area, San Diego, Seattle, Maryland, Research Triangle, and New York City. As of December 31, 2025 , Alexandria has a total market capitalization of $20.75 billion and an asset base in North America that includes 35.9 million RSF of operating properties and 3.5 million RSF of companies to create life-changing scientific and technological innovations. We believe in the utmost professionalism, humility, and teamwork. Our tenants include multinational pharmaceutical companies; public and private biotechnology companies; life science product, service, and medical device companies; digital health, advanced tec",
+   "competition": "Competition — In general, other laboratory and technology properties are located in close proximity to our properties. The amount of rentable space available in any market could have a material effect on our ability to rent space and on the rental rates we can achieve for our properties. In addition, we compete for investment opportunities with other REITs, insurance companies, pension and investment funds, private equity entities, partnerships, developers, investment companies, owners/occupants, and foreign investors. Many of these entities have substantially greater financial resources than we do and may be able to invest more than we can or accept more risk than we are willing to accept. These entities may be less sensitive to risks with respect to the creditworthiness of a tenant or the overall expected returns from real estate investments. In addition, as a result of their financial",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:10.982552+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "ARES": {
+   "symbol": "ARES",
+   "cik": "0001176948",
+   "entity_name": "Ares Management Corp",
+   "industry": "Investment Advice",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/ares-20251231.htm",
+   "language": "en",
+   "business_summary": "Ares is a leading global alternative investment manager with $622.5 billion of assets under management and over 4,250 employees in over 55 o ffices in more than 25 countries . We offer our investors a range of investment strategies and seek to deliver attractive performance to an investor base that includes over 2,850 direct institutional relationships and a significant retail investor base across our publicly-traded funds, sub-advised accounts and perpetual wealth vehicles. Since our inception in 1997, we have adhered to a disciplined investment philosophy that focuses on delivering strong risk-adjusted investment returns through market cycles. Ares believes each of its distinct but complementary investment groups in Credit, Real Assets, Secondaries and Private Equity is a market leader based on assets under management and investment performance. We believe we create value for our stakeholders not only through our investment performance, but also by expanding our product offerings, enhancing our distribution channels, increasing our global presence, investing in our non-investment f",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:20.587138+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "ARM": {
+   "symbol": "ARM",
+   "cik": "0001973239",
+   "entity_name": "ARM HOLDINGS PLC /UK",
+   "industry": "Semiconductors & Related Devices",
+   "form": "20-F",
+   "filed_at": "2026-05-26",
+   "period": "2026-03-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1973239/000197323926000097/arm-20260331.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "In particular, our top five customers (including Arm China and SoftBank Group) collectively accounted for approximately 57%, 56% and 54% of our total revenue for the fiscal years ended March 31, 2026, 2025 and 2024, respectively, and our largest customer individually, Arm China, accounted for approximately 16%, 17% and 21% of our total revenue, respectively, during those fiscal years. For the fiscal year ended March 31, 2026 , the Company had three customers that collectively represented 42 % of total revenue, with the single largest customer accounting for 16 % of total revenue, the second largest customer accounting for 14 % of total revenue, and the third largest customer accounting for 1",
+   "extracted_at": "2026-08-27T13:39:26.115919+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ASML": {
+   "symbol": "ASML",
+   "cik": "0000937966",
+   "entity_name": "ASML HOLDING NV",
+   "industry": "Special Industry Machinery, NEC",
+   "form": "20-F",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "0% of total net sales were made to our two largest customers. products sold to f ive of our largest customers.",
+   "extracted_at": "2026-08-27T13:39:29.483653+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "ATO": {
+   "symbol": "ATO",
+   "cik": "0000731802",
+   "entity_name": "ATMOS ENERGY CORP",
+   "industry": "Natural Gas Distribution",
+   "form": "10-K",
+   "filed_at": "2025-11-14",
+   "period": "2025-09-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/731802/000073180225000056/ato-20250930.htm",
+   "language": "en",
+   "business_summary": "Atmos Energy Corporation, a natural gas-only distributor, is an S&P 500 company headquartered in Dallas and incorporated in Texas and Virginia. We safely deliver reliable, efficient, and abundant natural gas through regulated sales and transportation arrangements to approximately 3.4 million residential, commercial, public authority, and industrial customers in eight states located primarily in the South. We also operate one of the largest intrastate pipelines in Texas based on miles of pipe. Atmos Energy's vision is to be the safest provider of natural gas services. We will be recognized for exceptional customer service, for being a great employer, and for achieving superior financial results. Our operating strategy is focused on modernizing our business and infrastructure while reducing regulatory lag. This operating strategy supports continued investment in safety, innovation, environmental sustainability, and our communities. • The distribution segment is comprised of our regulated natural gas distribution and related sales operations in eight states. • The pipeline and storage s",
+   "competition": "Competition — Although our regulated distribution operations are not currently in significant direct competition with any other distributors of natural gas to residential and commercial customers within our service areas, we do compete with other natural gas suppliers and suppliers of alternative fuels for sales to industrial customers. We compete in all aspects of our business with alternative energy sources, including, in particular, electricity. Electric utilities offer electricity as a rival energy source and compete for the space heating, water heating, and cooking markets. Promotional incentives, improved equipment efficiencies, and promotional rates all contribute to the acceptability of electrical equipment. The principal means to compete against 12",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:32.117110+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AVB": {
+   "symbol": "AVB",
+   "cik": "0000915912",
+   "entity_name": "AVALONBAY COMMUNITIES INC",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/915912/000091591226000004/avb-20251231.htm",
+   "language": "en",
+   "business_summary": "AvalonBay Communities, Inc. (the \"Company,\" \"we,\" \"our\" and \"us\" which terms, unless the context otherwise requires, refer to AvalonBay Communities, Inc. together with its subsidiaries), is a Maryland corporation that has elected to be treated as a real estate investment trust (\"REIT\") for federal income tax purposes. We develop, redevelop, acquire, own and operate apartment communities in New England, the New York/New Jersey metro area, the Mid-Atlantic, the Pacific Northwest, and Northern and Southern California, as well as in our expansion regions of Raleigh-Durham and Charlotte, North Carolina, Southeast Florida, Dallas and Austin, Texas, and Denver, Colorado. We use the term apartment communities to refer to properties that consist of apartment homes or townhomes or a combination of both. We focus on leading metropolitan areas that we believe have offered, and will continue to offer, the opportunity for superior risk-adjusted returns over the long-term on apartment community investments relative to other markets. • 292 operating apartment communities containing 88,768 apartment",
+   "competition": "Competition — We face competition from other real estate investors, including insurance companies, pension and investment funds, private equity, sovereign wealth funds and REITs (both in the multifamily as well as other sectors), to acquire and develop apartment communities and acquire land for future development. As an owner and operator of apartment communities, we also face competition for prospective residents from other operators whose communities may be perceived to offer a better location or better amenities or whose pricing may be perceived as a better value given the quality, location, terms and amenities that the prospective resident seeks. We also compete against other housing options such as single-family homes that are for sale or rent. Although we often compete against large, sophisticated developers and operators for development opportunities and for prospective residents,",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:36.316918+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AVGO": {
+   "symbol": "AVGO",
+   "cik": "0001730168",
+   "entity_name": "Broadcom Inc.",
+   "industry": "Semiconductors & Related Devices",
+   "form": "10-K",
+   "filed_at": "2025-12-18",
+   "period": "2025-11-02",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm",
+   "language": "en",
+   "business_summary": "We are a global technology leader that designs, develops and supplies a broad range of semiconductor and semiconductor-based solutions and infrastructure software solutions. Our more than 60-year history of innovation dates back to our diverse origins from AT&T/Bell Labs, Lucent and Hewlett-Packard Company, and has evolved through acquisitions, including LSI Corporation, Broadcom Corporation, Brocade Communications Systems, Inc., CA, Inc., Symantec Enterprise Security, and VMware, Inc. (“VMware”). Over the years, we have assembled a large team of semiconductor and software design engineers around the world. We maintain design, product and software development engineering expertise and resources at locations primarily in the U.S., Asia, and Europe. We combine global scale, engineering depth, broad product portfolio, superior execution and operational focus to deliver category-leading semiconductor and infrastructure software solutions. Our strategy is focused on sustained technology leadership and developing category-leading solutions to deliver a comprehensive suite of innovative inf",
+   "competition": "Competition — The markets in which we participate are highly competitive. Our competitors range from large international companies offering a wide range of products to smaller companies specializing in narrow markets. We expect the trend toward consolidation within many industries to continue, as some of our competitors have merged with or been acquired by other competitors, while others have begun collaborating with each other. We also expect competition in these markets to continue to increase as existing competitors improve or expand their product offerings and as new companies, including some of our customers, enter the markets. Additionally, our ability to compete effectively depends on a number of factors, including: quality, technical performance, price, product features, product system compatibility, system-level design capability, 8",
+   "customer_concentration": "We believe aggregate sales, through all channels, to our top five end customers accounted for approximately 40% of our net revenue for fiscal year 2025. The potential liabilities associated with such provisions are significant, and in some cases, including in agreements with some of our largest customers, are potentially unlimited. During fiscal years 2025, 2024 and 2023, one customer accounted for 32 %, 28 % and 21 % of our net revenue, respectively. One customer accounted for 44 % and 18 % of our net accounts receivable balance as of November 2, 2025 and November 3, 2024, respectively.",
+   "extracted_at": "2026-08-27T13:39:39.141148+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AVY": {
+   "symbol": "AVY",
+   "cik": "0000008818",
+   "entity_name": "Avery Dennison Corp",
+   "industry": "Converted Paper & Paperboard Prods (No Contaners/Boxes)",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/8818/000000881826000015/avy-20251231.htm",
+   "language": "en",
+   "business_summary": "Avery Dennison Corporation (“Avery Dennison” or the “Company” and generally referred to as “we” or “us”) was founded in 1935 and incorporated in Delaware in 1977 as Avery International Corporation, the successor corporation to a California corporation of the same name incorporated in 1946. In 1990, we merged one of our subsidiaries into Dennison Manufacturing Company (“Dennison”), as a result of which Dennison became our wholly-owned subsidiary and in connection with which we changed our name to Avery Dennison Corporation. You can learn more about us by visiting our website at www.averydennison.com. Our website is not intended to function as a hyperlink and the information on our website is not, nor should it be considered, part of this report or incorporated by reference into this report. We are a global leader in materials science and digital identification solutions. We are Making Possible TM products and solutions that help advance the industries we serve, providing branding and information solutions that optimize labor and supply chain efficiency, reduce waste and mitigate loss,",
+   "competition": "",
+   "customer_concentration": "In 2025, no single customer represented 10% or more of our net sales, with our customer base highly fragmented. In recent years, some of the converter customers served by our Materials Group reportable segment have consolidated and integrated vertically and some of our largest customers have acquired companies with similar or complementary product lines. Industry consolidation could continue to increase the concentration of our business with our largest customers. No single customer represented 10% or more of our net sales in year-end 2025, 2024 or 2023. Our ten largest customers, which include apparel retailers and brand owners, in the aggregate represented approximately 17 % of our net sal",
+   "extracted_at": "2026-08-27T13:39:41.772306+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "AWK": {
+   "symbol": "AWK",
+   "cik": "0001410636",
+   "entity_name": "American Water Works Company, Inc.",
+   "industry": "Water Supply",
+   "form": "10-K",
+   "filed_at": "2026-02-18",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1410636/000141063626000034/awk-20251231.htm",
+   "language": "en",
+   "business_summary": "With a history dating back to 1886, American Water is the largest and most geographically diverse, publicly-traded water and wastewater utility company in the United States, as measured by both operating revenues and population served. A holding company originally incorporated in Delaware in 1936, the Company employs approximately 7,000 professionals who provide drinking water, wastewater and other related services to approximately 14 million people in 24 states. The Company conducts the majority of its business through regulated utilities that provide water and wastewater services, collectively presented as one reportable segment, referred to as the “Regulated Businesses.” The Company also operates other businesses that provide water and wastewater services to the U.S. government on military installations, as well as municipalities. Individually, these other businesses do not meet the criteria of a reportable segment in accordance with generally accepted accounting principles in the United States (“GAAP”), and are collectively presented throughout this Annual Report on Form 10-K wit",
+   "competition": "Competition — The Company’s Regulated Businesses generally do not face direct competition in their existing markets because (i) the Company operates in those markets pursuant to franchises, charters, certificates of public convenience and necessity or similar authorizations (collectively, “CPCNs”) issued by state PUCs or other authorities, and (ii) the high cost of constructing a new water and wastewater system in an existing market creates a significant barrier to market entry. However, the Company’s Regulated Businesses face competition from governmental agencies, other investor-owned utilities, large industrial customers with the ability to provide their own water supply/treatment process and strategic buyers that are entering new markets and/or making strategic acquisitions. When pursuing acquisitions, the Company’s largest investor-owned competitors, based on a comparison of operati",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:47.661459+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "AXON": {
+   "symbol": "AXON",
+   "cik": "0001069183",
+   "entity_name": "AXON ENTERPRISE, INC.",
+   "industry": "Ordnance & Accessories, (No Vehicles/Guided Missiles)",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1069183/000162828026011360/axon-20251231.htm",
+   "language": "en",
+   "business_summary": "Statements contained in this Annual Report on Form 10-K that are not historical are “forward-looking statements” within the meaning of Section 27A of the Securities Act of 1933, as amended (the “Securities Act”), and Section 21E of the Securities Exchange Act of 1934, as amended (the “Exchange Act”), including statements regarding our expectations, beliefs, intentions and strategies regarding the future. We intend that such forward-looking statements be subject to the safe-harbor provided by the Private Securities Litigation Reform Act of 1995. Such statements give our current expectations or forecasts of future events; they do not relate strictly to historical or current facts. Words such as “may,” “will,” “should,” “could,” “would,” “predict,” “potential,” “continue,” “expect,” “anticipate,” “future,” “intend,” “plan,” “believe,” “estimate,” and similar expressions, as well as statements in future tense, identify forward-looking statements. However, not all forward-looking statements contain these identifying words. We cannot guarantee that any forward-looking statement will be rea",
+   "competition": "Competition — Sensors — Connected Cameras and Digital Evidence Management Software: The body camera and in-car video/automatic license plate readers industry is highly competitive. Our competition includes 10-8 Video Systems, 365Labs, Applied Concepts, Axis Communications, Coreforce, Digital Ally, Duress, Genetec, Getac, HALOS Body Cameras, Hikvision, Hytera, Insight LPR, IONODES, i-PRO, Kustom Signals, LensLock, Motorola Solutions, Tait Communications, Oracle, PatrolEyes, Pinnacle Response, Pro-Vision, Recoda, Reveal Media, Safe Fleet, Versaterm, Wireless CCTV, Wolfcom Enterprises, Wrap Technologies and Zepcam. Our fixed automatic license plate recognition (“ALPR”) offerings, including Axon Outpost and Axon Lightpost, together with integrations enabled through our Works with Axon partnership program, compete with providers of fixed and semi-fixed ALPR cameras and associated analytics so",
+   "customer_concentration": "No customer represented more than 10% of total net sales for the years ended December 31, 2025, 2024 or 2023. Our largest customer vertical is U. At December 31, 2025 and 2024, no customer represented more than 10% of the aggregate balance of accounts and notes receivable and contract assets.",
+   "extracted_at": "2026-08-27T13:39:50.863958+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "AXP": {
+   "symbol": "AXP",
+   "cik": "0000004962",
+   "entity_name": "AMERICAN EXPRESS CO",
+   "industry": "Finance Services",
+   "form": "10-K",
+   "filed_at": "2026-02-06",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/4962/000000496226000080/axp-20251231.htm",
+   "language": "en",
+   "business_summary": "American Express is a global payments and premium lifestyle brand powered by technology. Founded in 1850 and headquartered in New York, American Express’ card-issuing, merchant-acquiring and card network businesses offer products and services to a broad range of customers, including consumers, small businesses, mid-sized companies and large corporations around the world. • Credit and charge cards and complementary products and services, including travel, dining, lifestyle and expense management products and services • Merchant acquisition and processing, servicing and settlement, fraud prevention, and point-of-sale marketing and information products and services These products and services are offered through various channels, including mobile and online applications, affiliate marketing, customer referral programs, third-party service providers and business partners, in-house sales teams, direct mail, telephone and direct response advertising. We were founded as a joint stock association and incorporated in 1965 as a New York corporation. American Express Company and its principal o",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:55.532685+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "AZO": {
+   "symbol": "AZO",
+   "cik": "0000866787",
+   "entity_name": "AUTOZONE INC",
+   "industry": "Retail-Auto & Home Supply Stores",
+   "form": "10-K",
+   "filed_at": "2025-10-27",
+   "period": "2025-08-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/866787/000110465925102611/azo-20250830x10k.htm",
+   "language": "en",
+   "business_summary": "AutoZone, Inc. (“AutoZone,” the “Company,” “we,” “our” or “us”) is a leading retailer and distributor of automotive replacement parts and accessories in the Americas. We began operations in 1979 and at August 30, 2025, operated 6,627 stores in the United States (“U.S.”), 883 stores in Mexico and 147 stores in Brazil. Each store carries an extensive product line for cars, sport utility vehicles, vans and light duty trucks, including new and remanufactured automotive hard parts, maintenance items, accessories and non-automotive products. At August 30, 2025, in 6,098 of our domestic stores as well as the vast majority of our stores in Mexico and Brazil, we had a commercial sales program that provides prompt delivery of parts and other products and commercial credit to local, regional and national repair garages, dealers, service stations, fleet owners and other accounts. We also sell automotive hard parts, maintenance items, accessories and non-automotive products through www.autozone.com, and our commercial customers can make purchases through www.autozonepro.com. Additionally, we sell",
+   "competition": "Competition — The sale of automotive parts, accessories and maintenance items is highly competitive. AutoZone competes on the basis of customer service, including the knowledge and expertise of our AutoZoners and our ability to provide prompt delivery to commercial customers; merchandise quality, selection and availability; product warranty; store layouts, location and convenience; price; and the strength of our AutoZone brand name and quality, trademarks and service marks. Our competitors include national, regional and local auto parts chains, independently owned parts stores, online automotive parts stores or marketplaces, wholesale distributors, jobbers, repair shops, car washes and auto dealers, in addition to discount and mass merchandise stores, hardware stores, supermarkets, drugstores, convenience stores, home stores and other retailers that sell aftermarket vehicle parts and sup",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:39:57.626722+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BA": {
+   "symbol": "BA",
+   "cik": "0000012927",
+   "entity_name": "BOEING CO",
+   "industry": "Aircraft",
+   "form": "10-K",
+   "filed_at": "2026-01-30",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/12927/000162828026004357/ba-20251231.htm",
+   "language": "en",
+   "business_summary": "The Boeing Company, together with its subsidiaries (herein referred to as “Boeing,” the “Company,” “we,” “us,” “our”), is one of the world’s major aerospace firms. This segment develops, produces and markets commercial jet aircraft principally to the commercial airline industry worldwide. We are a leading producer of commercial aircraft and offer a family of commercial jetliners designed to meet a broad spectrum of global passenger and cargo requirements of airlines. This family of commercial jet aircraft in production includes the 737 narrow-body model and the 767, 777 and 787 wide-body models. Development continues on the 777X program and the 737-7 and 737-10 derivatives. This segment engages in the research, development, production and modification of manned and unmanned military aircraft and weapons systems for strike, surveillance and mobility, including fighter and trainer aircraft; vertical lift, including rotorcraft and tilt-rotor aircraft; and commercial derivative aircraft, including anti-submarine and tanker aircraft. In addition, this segment engages in the research, deve",
+   "competition": "Competition — The commercial jet aircraft market and the airline industry remain extremely competitive. BCA faces aggressive international competitors who are intent on increasing their market share, such as Airbus and entrants from China. We are focused on improving our products and processes and continuing cost reduction efforts. We intend to continue to compete with other aircraft manufacturers by providing customers with airplanes and services that deliver superior design, safety, quality, efficiency and value to customers around the world. BDS faces strong competition primarily from General Dynamics Corporation, Lockheed Martin Corporation, Northrop Grumman Corporation, RTX Corporation and SpaceX. Non-U.S. companies such as BAE Systems and Airbus Group continue to build a strategic presence in the U.S. market by strengthening their North American operations and partnering with U.S. ",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:01.337020+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BAC": {
+   "symbol": "BAC",
+   "cik": "0000070858",
+   "entity_name": "BANK OF AMERICA CORP /DE/",
+   "industry": "National Commercial Banks",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/70858/000007085826000157/bac-20251231.htm",
+   "language": "en",
+   "business_summary": "Bank of America Corporation is a Delaware corporation, a bank holding company (BHC) and a financial holding company. When used in this report, “Bank of America,” “the Corporation,” “we,” “us” and “our” may refer to Bank of America Corporation individually, Bank of America Corporation and its subsidiaries, or certain of Bank of America Corporation’s subsidiaries or affiliates. As part of our efforts to streamline the Corporation’s organizational structure and reduce complexity and costs, the Corporation has reduced and intends to continue to reduce the number of its corporate subsidiaries, including through intercompany mergers. Bank of America is one of the world’s largest financial institutions, serving individual consumers, small- and middle-market businesses, institutional investors, large corporations and governments with a full range of banking, investing, asset management and other financial and risk management products and services. Our principal executive offices are located in the Bank of America Corporate Center, 100 North Tryon Street, Charlotte, North Carolina 28255. Bank",
+   "competition": "Competition — We operate in a highly competitive environment. Our competitors include banks, thrifts, credit unions, investment banking firms, investment advisory firms, brokerage firms, investment companies, insurance companies, mortgage banking companies, credit card issuers, mutual fund companies, hedge funds, private equity firms, and e-commerce and other internet-based companies, including merchant banks and companies providing nonbank financial services. We compete with some of these competitors globally and with others on a regional or product-specific basis. We are increasingly competing with firms offering products solely over the internet and with nonfinancial companies, including firms utilizing emerging technologies, such as digital assets, rather than, or in addition to, traditional banking products. Competition is based on a number of factors including, among others, custom",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:09.577157+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BALL": {
+   "symbol": "BALL",
+   "cik": "0000009389",
+   "entity_name": "BALL Corp",
+   "industry": "Metal Cans",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/9389/000110465926017410/ball-20251231x10k.htm",
+   "language": "en",
+   "business_summary": "Ball Corporation and its consolidated subsidiaries (collectively, Ball, the company, we or our) is one of the world’s leading suppliers of aluminum packaging for the beverage, personal care and household products industries. The company was organized in 1880 and incorporated in the state of Indiana, United States of America (U.S.), in 1922. Our sustainable, aluminum packaging products are produced for a variety of end uses and are manufactured in facilities around the world. In 2025, our total consolidated net sales were $13.16 billion. Our largest product line is aluminum beverage containers and we also produce extruded aluminum aerosol containers, recloseable aluminum bottles across multiple consumer categories and aluminum slugs. We sell our aluminum packaging products globally to large multinational beverage, personal care and household products companies with which we have developed long-term relationships. This is evidenced by our high customer retention and large number of long-term supply contracts. While we have a diversified customer base, we sell a significant portion of o",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:12.149467+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "BAX": {
+   "symbol": "BAX",
+   "cik": "0000010456",
+   "entity_name": "BAXTER INTERNATIONAL INC",
+   "industry": "Surgical & Medical Instruments & Apparatus",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/10456/000162828026007733/bax-20251231.htm",
+   "language": "en",
+   "business_summary": "Baxter International Inc., through our subsidiaries, provides a broad portfolio of essential healthcare products, including sterile intravenous (IV) solutions; infusion systems and devices; parenteral nutrition therapies; inhaled anesthetics; generic injectable pharmaceuticals; surgical hemostat and sealant products; advanced surgical equipment; smart bed systems; patient monitoring and diagnostic technologies; and respiratory health devices. These products are used by hospitals, nursing homes, rehabilitation centers, ambulatory surgery centers, doctors’ offices, kidney dialysis centers and patients at home under physician supervision. Our global footprint and the critical nature of our products and services play a key role in expanding access to healthcare in emerging and developed countries. As of December 31, 2025, after giving effect to the sale of our Kidney Care business (as discussed below), we manufactured products in over 20 countries and sold them in over 100 countries. Baxter International Inc. was incorporated under Delaware law in 1931. As used in this report, “we\", \"our",
+   "competition": "Competition and Healthcare Cost Containment — Our businesses benefit from a number of competitive advantages, including the breadth and depth of our product offerings and our strong relationships with customers, including hospitals and clinics, GPOs, IDNs, physicians and patients, many of whom self-administer home-based therapies that we supply. We also benefit from efficiencies and cost advantages resulting from shared manufacturing facilities and the technological advantages of our products. Although no single company competes with us in all of our businesses, we face substantial competition in each of our segments from international and domestic healthcare, medical products and pharmaceutical companies and providers of all sizes, and these competitors often differ across our businesses. In addition, global and regional competitors continue to expand their manufacturing capacity and sa",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:16.217271+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BBY": {
+   "symbol": "BBY",
+   "cik": "0000764478",
+   "entity_name": "BEST BUY CO INC",
+   "industry": "Retail-Radio, Tv & Consumer Electronics Stores",
+   "form": "10-K",
+   "filed_at": "2026-03-18",
+   "period": "2026-01-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/764478/000076447826000009/bby-20260131.htm",
+   "language": "en",
+   "business_summary": "Unless the context otherwise requires, the terms “we,” “us,” “our” and the “company” in this Annual Report on Form 10-K refer to Best Buy Co., Inc. and, as applicable, its consolidated subsidiaries. Any references to our website addresses do not constitute incorporation by reference of the information contained on the websites. We were incorporated in the state of Minnesota in 1966. We are driven by our purpose to enrich lives through technology and our vision to personalize and humanize technology solutions for every stage of life. We accomplish this by leveraging our unique combination of tech expertise and a human touch to meet our customers’ everyday needs, whether they come to us online, visit our stores or invite us into their homes. We have operations in the U.S. and Canada. We have two reportable segments: Domestic and International. The Domestic segment is comprised of our operations in all states, districts and territories of the U.S. and our Best Buy Health business, and includes the brand names Best Buy, Best Buy Ads, Best Buy Business, Best Buy Essentials, Best Buy Healt",
+   "competition": "Competition — Our competitors are primarily multi-channel retailers, e-commerce businesses, technology service providers, traditional store-based retailers, vendors and mobile network carriers who offer their products and services directly to customers. We believe our ability to help customers online, in our stores and in their homes, and to connect technology product and solutions with customer needs, provide us key competitive advantages. Some of our competitors have lower cost operating structures and seek to compete for sales primarily on price. We carefully monitor pricing offered by other retailers and service providers, as maintaining price competitiveness is one of our ongoing priorities. In addition, we have price-matching policies that allow customers to request that we match a price offered by certain retail stores and online operators. In order to allow this, we are focused o",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:18.473212+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BDX": {
+   "symbol": "BDX",
+   "cik": "0000010795",
+   "entity_name": "BECTON DICKINSON & CO",
+   "industry": "Surgical & Medical Instruments & Apparatus",
+   "form": "10-K",
+   "filed_at": "2025-11-25",
+   "period": "2025-09-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/10795/000001079525000099/bdx-20250930.htm",
+   "language": "en",
+   "business_summary": "Becton, Dickinson and Company (also referred to herein as \"BD\") was incorporated under the laws of the State of New Jersey in November 1906, as successor to a New York business started in 1897. BD’s executive offices are located at 1 Becton Drive, Franklin Lakes, New Jersey 07417-1880, and its telephone number is (201) 847-6800. All references in this Form 10-K to \"BD\", \"the Company\", \"we\", \"our\" or \"us\" refer to Becton, Dickinson and Company and its domestic and foreign subsidiaries, unless otherwise indicated by the context. BD is a global medical technology company engaged in the development, manufacture and sale of a broad range of medical supplies, devices, laboratory equipment and diagnostic products used by healthcare institutions, physicians, life science researchers, clinical laboratories, the pharmaceutical industry and the general public. We provide customer solutions that are focused on improving medication management and patient safety; supporting infection prevention practices; equipping surgical and interventional procedures; improving drug delivery; aiding anesthesiol",
+   "competition": "Competition — BD operates in the increasingly complex and challenging medical technology marketplace. Technological advances and scientific discoveries have accelerated the pace of change in medical technology, the regulatory environment of medical products is becoming more complex and vigorous, and economic conditions have resulted in a challenging market. Companies of varying sizes compete in the global medical technology field. Some are more specialized than BD with respect to particular markets, and some have greater financial resources than BD. New companies have entered the field, particularly in the areas of molecular diagnostics, non-traditional point of care and at-home testing, safety-engineered devices and in the life sciences. Additionally, established companies have diversified their business activities into the medical technology area. Other firms engaged in the distributio",
+   "customer_concentration": "No customer accounted for 10% or more of revenues in any of the three years presented.",
+   "extracted_at": "2026-08-27T13:40:21.940216+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "BEN": {
+   "symbol": "BEN",
+   "cik": "0000038777",
+   "entity_name": "FRANKLIN RESOURCES INC",
+   "industry": "Investment Advice",
+   "form": "10-K",
+   "filed_at": "2025-11-10",
+   "period": "2025-09-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/38777/000003877725000238/ben-20250930.htm",
+   "language": "en",
+   "business_summary": "Franklin Resources, Inc. (“Franklin”) is a holding company with subsidiaries operating under our Franklin Templeton® and/or subsidiary brand names. Franklin’s common stock is traded on the New York Stock Exchange (the “NYSE”) under the ticker symbol “BEN” and is included in the Standard & Poor’s 500 Index. In this Annual Report, Franklin and its subsidiaries are collectively referred to as the “Company,” and words such as “we,” “us,” “our” and similar terms refer to the Company. We have one operating segment, investment management and related services. We offer our services and products under our various distinct brand names, including, but not limited to, Alcentra ® , Apera ® , Benefit Street Partners ® , Brandywine Global Investment Management ® , Canvas ® , Clarion Partners ® , ClearBridge Investments ® , Fiduciary Trust International™, Franklin ® , Franklin Mutual Series ® , K2 ® , Legg Mason ® , Lexington Partners ® , O’Shaughnessy ® , Putnam ® , Royce ® , Templeton ® and Western Asset Management Company ® . Unless otherwise indicated, our “funds” means the funds offered under o",
+   "competition": "COMPETITION — The financial services industry is a highly competitive global environment. Competition is based on various factors, including, among others, business reputation, investment performance, product mix and offerings, service quality and innovation, distribution relationships, and fees charged. We face strong competition from numerous investment management companies, securities brokerage and investment banking firms, insurance companies, banks, hedge fund firms and other financial management institutions, which offer a wide range of financial and investment management services and products to the same retail, institutional and high-net-worth investors and accounts that we are seeking to attract. We offer a broad product mix that meets a variety of investment goals and needs for different investors, and we may periodically introduce new products to provide investors with additio",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:25.121645+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BF-B": {
+   "symbol": "BF-B",
+   "cik": "0000014693",
+   "entity_name": "BROWN FORMAN CORP",
+   "industry": "Beverages",
+   "form": "10-K",
+   "filed_at": "2026-06-12",
+   "period": "2026-04-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/14693/000001469326000024/bfb-20260430.htm",
+   "language": "en",
+   "business_summary": "Brown-Forman Corporation (the “Company,” “Brown-Forman,” “we,” “us,” or “our” below) was incorporated under the laws of the State of Delaware in 1933, successor to a business founded in 1870 as a partnership and later incorporated under the laws of the Commonwealth of Kentucky in 1901. We primarily manufacture, distill, bottle, import, export, market, and sell a wide variety of beverage alcohol products under recognized brands. We employ approximately 4,900 people (excluding individuals who work on a part-time or temporary basis) on six continents, including approximately 1,900 people in the United States (approximately 7% of whom are represented by a union) and 700 people in Louisville, Kentucky, USA, home of our world headquarters. According to International Wine & Spirit Research (IWSR), we are the largest American-owned premium-plus spirits company. We are a “controlled company” under New York Stock Exchange rules because the Brown family owns more than 50% of our voting stock. For a discussion of recent developments, see “Item 7. Management’s Discussion and Analysis of Financial",
+   "competition": "Competition — Trade information indicates that we are one of the largest global suppliers of premium spirits. According to IWSR, for calendar year 2025, the ten largest global spirits companies controlled over 20% of the total spirits volume sold around the world. While we believe that the overall market environment offers considerable growth opportunities for us, our industry is, and will remain, highly competitive. We compete against many global, regional, and local brands in a variety of categories of beverage alcohol, but our brands compete primarily in the industry’s premium-and-above price points. Our competitors include major global spirits companies, such as Bacardi Limited, Becle S.A.B. de C.V., Davide Campari-Milano N.V., Diageo PLC, LVMH Moët Hennessy Louis Vuitton SE, Pernod Ricard SA, Rémy Cointreau, and Suntory Global Spirits. In addition, particularly in the United States,",
+   "customer_concentration": "In fiscal 2026, our largest customer accounted for approximately 10% of our consolidated net sales. No other customer accounted for 10% or more of our consolidated net sales in fiscal 2026. Our two largest customers accounted for 13 % and 11 % of consolidated net sales in both 2024 and 2025. Our largest customer accounted for 10 % of consolidated net sales in 2026.",
+   "extracted_at": "2026-08-27T13:40:27.484602+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "BG": {
+   "symbol": "BG",
+   "cik": "0001996862",
+   "entity_name": "Bunge Global SA",
+   "industry": "Fats & Oils",
+   "form": "10-K",
+   "filed_at": "2026-02-19",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1996862/000162828026009842/bg-20251231.htm",
+   "language": "en",
+   "business_summary": "We are a premier agribusiness solutions company, connecting farmers to consumers and delivering essential food, feed and fuel to the world. Our dedicated employees, integrated operations and global footprint give us access to key markets and a diverse agricultural network covering major crops. These capabilities help us manage seasonal cycles, weather variability and other risks as we partner with farmers to move crops from where they are grown to where they are needed. • a leading global oilseed processor and producer of vegetable oils and protein meal, based on processing capacity and volume; Our global operations include purchasing, storing, transporting, processing, selling and distributing agricultural commodities and related products. We also provide financial, risk management and logistics services to support our customers and enhance our value chains. The commodities we source and markets we serve are essential to everyday life— from the grains and oilseeds that are part of the food supply chain, to the cotton used in clothing, to the energy products that power industries and",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:31.779705+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "BIIB": {
+   "symbol": "BIIB",
+   "cik": "0000875045",
+   "entity_name": "BIOGEN INC.",
+   "industry": "Biological Products, (No Diagnostic Substances)",
+   "form": "10-K",
+   "filed_at": "2026-02-06",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000013/biib-20251231.htm",
+   "language": "en",
+   "business_summary": "Biogen is a global biopharmaceutical company focused on discovering, developing and delivering innovative therapies for people living with serious and complex diseases. We have a broad portfolio of medicines to treat MS, have introduced the first approved treatment for SMA, co-developed treatments to address a defining pathology of Alzheimer’s disease and launched the first approved treatment to target a genetic cause of ALS. We market the first and only drug approved in the U.S., the E.U. and certain international markets for the treatment of FA in adults and adolescents aged 16 years and older. We are focused on advancing our pipeline in neurology, specialized immunology and rare diseases. We support our drug discovery and development efforts through internal research and development programs, external collaborations and acquisitions. Our marketed products include VUMERITY, TYSABRI, TECFIDERA, AVONEX and PLEGRIDY for the treatment of MS; SPINRAZA for the treatment of SMA; SKYCLARYS for the treatment of FA; and QALSODY for the treatment of ALS. We also have collaborations with Eisai",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:36.387850+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "BKNG": {
+   "symbol": "BKNG",
+   "cik": "0001075531",
+   "entity_name": "Booking Holdings Inc.",
+   "industry": "Transportation Services",
+   "form": "10-K",
+   "filed_at": "2026-02-18",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1075531/000107553126000009/bkng-20251231.htm",
+   "language": "en",
+   "business_summary": "Our mission is to make it easier for everyone to experience the world. We aim to provide consumers with a best-in-class experience with tailored planning, payment, language, and other options seamlessly connecting them with our travel service provider partners. We offer these services through five primary consumer-facing brands: Booking.com, Priceline, Agoda, KAYAK, and OpenTable: We are proud of the meaningful progress we are making on our strategic initiatives as we continue to create more value for our consumers and partners, including: • integrating new generative artificial intelligence (\"Gen AI\") features to enhance the consumer and partner experience and drive efficiencies in our operations; • continued advancement towards our Connected Trip vision to make planning, booking, and traveling simpler, more personalized, and seamless; • expanding Booking.com's Genius loyalty program across verticals and continuing to improve loyalty programs across our brands to provide a more personalized experience for consumers and incremental value to partners; • executing on our Transformation",
+   "competition": "Competition — We compete globally with both online and traditional travel and restaurant reservation and related services. The markets for the services we offer are intensely competitive and constantly evolving. Competing offerings can be launched at a relatively low cost, with the pace of innovation increasing and the cost to do so decreasing as a result of Gen AI. Our current and potential competitors include the largest global technology companies, which have significantly more consumers, consumer data, and resources than we do, and may be able to leverage other aspects of their businesses to compete more effectively with us.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:39.151847+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BKR": {
+   "symbol": "BKR",
+   "cik": "0001701605",
+   "entity_name": "Baker Hughes Co",
+   "industry": "Oil & Gas Field Machinery & Equipment",
+   "form": "10-K",
+   "filed_at": "2026-02-05",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1701605/000170160526000007/bkr-20251231.htm",
+   "language": "en",
+   "business_summary": "Baker Hughes Company (\"Baker Hughes,\" \"the Company,\" \"we,\" \"us,\" or \"our\") is an energy technology company with a diversified portfolio of technologies and services that span the energy and industrial value chain. Built on a century of experience and conducting business in over 120 countries, our innovative technologies and services are taking energy forward. With our diverse portfolio, leading technology and clear purpose to make energy safer, cleaner and more efficient, Baker Hughes is well positioned to deliver solutions across industrial and energy markets. By integrating health, safety & environment (\"HSE\") into everything we do, we protect our people, our customers, and the environment. The global energy landscape is undergoing a period of structural transformation, with sustained demand growth driven by population expansion, rising living standards, industrialization, electrification, and the rapid proliferation of digital infrastructure. Meeting this increasing demand will require a diversified and integrated energy system that draws on the full spectrum of energy sources. Wi",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:42.061543+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "BLDR": {
+   "symbol": "BLDR",
+   "cik": "0001316835",
+   "entity_name": "Builders FirstSource, Inc.",
+   "industry": "Retail-Lumber & Other Building Materials Dealers",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1316835/000119312526054643/bldr-20251231.htm",
+   "language": "en",
+   "business_summary": "",
+   "competition": "",
+   "customer_concentration": "For the year ended December 31, 2025, our top 10 customers accounted for 14% of net sales, with our largest customer accounting for 4% of net sales. Our largest customers are comprised primarily of the largest national production homebuilders, including D. While our largest single supplier represents only 8% of our total materials purchases for the year ended December 31, 2025, we believe we are one of the largest customers for many suppliers, and therefore have significant purchasing leverage. Our ten largest customers generated 14% of our net sales for the year ended December 31, 2025. Because our customers are dispersed among our various markets, our credit risk to any one customer or geo",
+   "extracted_at": "2026-08-27T13:40:44.376905+00:00",
+   "found": {
+    "business_summary": false,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "BLK": {
+   "symbol": "BLK",
+   "cik": "0002012383",
+   "entity_name": "BlackRock, Inc.",
+   "industry": "Security Brokers, Dealers & Flotation Companies",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2012383/000119312526071966/blk-20251231.htm",
+   "language": "en",
+   "business_summary": "BlackRock, Inc. (together, with its subsidiaries, unless the context otherwise indicates, “BlackRock” or the “Company”) is a leading publicly traded investment management firm with $14.0 trillion of assets under management (“AUM”) at December 31, 2025. With approximately 24,900 employees in more than 30 countries who serve clients in over 100 countries across the globe, BlackRock provides a broad range of investment management and technology and subscription services to institutional and retail clients worldwide. On July 1, 2025, BlackRock completed the acquisition of 100% of the business and assets of HPS Investment Partners (the \"HPS Transaction\" or \"HPS\"), a leading global credit investment manager, with substantially all consideration paid in Class B-2 common units (\"Subco Units\") of BlackRock Saturn Subco, LLC (\"Subco\"), a consolidated subsidiary of the Company. Concurrent with the acquisition, BlackRock Finance, Inc., Global Infrastructure Management, LLC (\"GIP\"), HPS, and their respective subsidiaries became wholly owned subsidiaries of Subco. For additional information on the",
+   "competition": "COMPETITION — BlackRock competes with investment management firms, mutual fund complexes, insurance companies, banks, brokerage firms, financial technology providers and other financial institutions that offer products that are similar to, or alternatives to, those offered by BlackRock. In order to grow its business, BlackRock must be able to compete effectively for AUM. Key competitive factors include investment performance track records, the efficient delivery of beta for index products, investment style and discipline, price, client service and brand name recognition. Historically, the Company has competed principally on the basis of its long-term investment performance track record, its investment process, its risk management and analytic capabilities and the quality of its client service.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:49.216495+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BMY": {
+   "symbol": "BMY",
+   "cik": "0000014272",
+   "entity_name": "BRISTOL MYERS SQUIBB CO",
+   "industry": "Pharmaceutical Preparations",
+   "form": "10-K",
+   "filed_at": "2026-02-11",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/14272/000001427226000004/bmy-20251231.htm",
+   "language": "en",
+   "business_summary": "Bristol-Myers Squibb Company (\"we\", the \"Company\", \"Bristol Myers Squibb\", or \"BMS\") was incorporated under the laws of the State of Delaware in August 1933 under the name Bristol-Myers Company, as successor to a New York business started in 1887. In 1989, Bristol-Myers Company changed its name to Bristol-Myers Squibb Company as a result of a merger. We operate in a single segment engaged in the discovery, development, licensing, manufacturing, marketing, distribution and sale of innovative medicines that help patients prevail over serious diseases. Our principal strategy is to combine the resources, scale and capability of a large pharmaceutical company with the speed, agility and focus on innovation typically found in the biotech industry. Our focus as a biopharmaceutical company is on discovering, developing and delivering transformational medicines for patients facing serious diseases in areas where we believe that we have an opportunity to make a meaningful difference: oncology, hematology, immunology, cardiovascular, neuroscience and other areas where we can also create long-te",
+   "competition": "",
+   "customer_concentration": "Receivables from the three largest customers in the U.",
+   "extracted_at": "2026-08-27T13:40:53.051158+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": true
+   }
+  },
+  "BNY": {
+   "symbol": "BNY",
+   "cik": "0001390777",
+   "entity_name": "Bank of New York Mellon Corp",
+   "industry": "State Commercial Banks",
+   "form": "10-K",
+   "filed_at": "2026-02-25",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1390777/000139077726000033/bk-20251231.htm",
+   "language": "en",
+   "business_summary": "The Bank of New York Mellon Corporation, a Delaware corporation (NYSE symbol: BK), is a global financial services platforms company headquartered in New York, New York, with $59.3 trillion in assets under custody and/or administration and $2.2 trillion in assets under management as of Dec. 31, 2025. With its subsidiaries, BNY has been in business since 1784. We divide our businesses into three principal business segments: Securities Services, Market and Wealth Services and Investment and Wealth Management. We also have an Other segment, which includes the corporate treasury activities (including our securities portfolio), tax credit investments and other corporate investments, corporate and bank-owned life insurance, derivatives and other trading activity, and certain business exits. For a further discussion of BNY’s lines of business, products and services, see the “Overview,” “Summary of financial highlights,” “Fee and other revenue,” “Review of business segments” and “International operations” sections in the MD&A section in the Annual Report and Notes 23 and 24 of the Notes to Co",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:56.035335+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  },
+  "BR": {
+   "symbol": "BR",
+   "cik": "0001383312",
+   "entity_name": "BROADRIDGE FINANCIAL SOLUTIONS, INC.",
+   "industry": "Services-Business Services, NEC",
+   "form": "10-K",
+   "filed_at": "2026-08-04",
+   "period": "2026-06-30",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1383312/000162828026052243/br-20260630.htm",
+   "language": "en",
+   "business_summary": "Broadridge, a Delaware corporation, is a global financial technology leader powering investing, corporate governance, and communications. We deliver technology-driven solutions to banks, broker-dealers, asset and wealth managers, public companies, investors, and mutual funds, that enable our clients to operate, innovate and grow. Our trusted expertise and transformative technology solutions help financial services companies enhance investor engagement, optimize trading and investing, and digitize communications. We operate our business in two reportable segments: Investor Communication Solutions and Global Technology and Operations. Our Regulatory Solutions, Data-Driven Fund Solutions, Corporate Issuer Solutions, and Customer Communications Solutions are provided as part of the Investor Communication Solutions segment. The Investor Communication Solutions segment is the larger of our two business segments and its revenues represented approximately 74% and 74% of our total Revenues in fiscal years 2026 and 2025, respectively, including the foreign exchange impact from revenues generat",
+   "competition": "Competition — We operate in a highly competitive industry. Our Investor Communication Solutions business competes with companies that provide investor communication and corporate governance solutions, as well as our clients’ in-house operations. This includes independent proxy distribution service providers, transfer agents, proxy advisory firms, proxy solicitation firms, firms that process proxy votes, and financial printers. We also face competition from numerous firms in the compiling, printing and electronic distribution of statements, bills and other customer communications. Within our Global Technology and Operations business, our capital markets solutions compete with in-house operations as well as vendors that provide trade processing, back-office record keeping, and sell-side order and execution management systems. Similarly, our wealth management solutions compete with service ",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:40:59.041978+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BRK-B": {
+   "symbol": "BRK-B",
+   "cik": "0001067983",
+   "entity_name": "BERKSHIRE HATHAWAY INC",
+   "industry": "Fire, Marine & Casualty Insurance",
+   "form": "10-K",
+   "filed_at": "2026-03-02",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1067983/000119312526083899/brka-20251231.htm",
+   "language": "en",
+   "business_summary": "Berkshire Hathaway Inc. (“Berkshire,” “Company” or “Registrant”) is a holding company owning subsidiaries engaged in numerous diverse business activities. The most important of these are insurance businesses, conducted on both a primary basis and a reinsurance basis, a freight rail transportation business and a group of utility and energy generation and distribution businesses. Berkshire also owns and operates numerous other businesses engaged in a variety of manufacturing, services and retailing activities. Berkshire is domiciled in the state of Delaware, and its corporate headquarters is in Omaha, Nebraska. Berkshire’s operating subsidiaries are managed on an unusually decentralized basis. There are few centralized or integrated business functions. Berkshire’s Chief Executive Officer is ultimately responsible for significant capital allocation decisions and investment activities. Berkshire’s Chief Executive Officer is also ultimately responsible for evaluating the operating performance of the operating businesses. Berkshire’s senior corporate management is responsible for establish",
+   "competition": "Competition — The business environment in which BNSF Railway operates is highly competitive. Depending on the specific market, deregulated motor carriers and other railroads, as well as river barges, ships and pipelines, may exert pressure on price and service levels. The presence of advanced, high service truck lines with expedited delivery, subsidized infrastructure and minimal empty mileage continues to affect the market for non-bulk, time-sensitive freight. The potential expansion of longer combination vehicles could further encroach upon markets traditionally served by railroads. To remain competitive, BNSF Railway and other railroads seek to develop and implement operating efficiencies to improve productivity. As railroads streamline, rationalize and otherwise enhance their franchises, competition among rail carriers intensifies. BNSF Railway’s primary rail competitor in the Wester",
+   "customer_concentration": "Some of Lubrizol’s largest customers also may be suppliers, although no single customer represented more than 10% of Lubrizol’s consolidated revenues in 2025.",
+   "extracted_at": "2026-08-27T13:41:03.406578+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "BRO": {
+   "symbol": "BRO",
+   "cik": "0000079282",
+   "entity_name": "BROWN & BROWN, INC.",
+   "industry": "Insurance Agents, Brokers & Service",
+   "form": "10-K",
+   "filed_at": "2026-02-12",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/79282/000119312526046984/bro-20251231.htm",
+   "language": "en",
+   "business_summary": "Brown & Brown, Inc., a Florida corporation, and its subsidiaries (collectively, “Brown & Brown” or the “Company”) is a diversified insurance agency, wholesale brokerage, insurance programs and service organization that markets and sells insurance products and services, primarily in the property, casualty and employee benefits areas. The Company primarily operates as an agent or broker not assuming underwriting risks. However, we also operate and/or participate in various ancillary insurance operations, including (1) reinsurance companies and stand-alone captives that assume underwriting risk; (2) series captive insurance companies (“SCICs”); (3) protected cell companies; (4) segregated account companies; (5) a quota share captive and (6) an excess of loss layer captive (collectively, the \"Captives\"). These ancillary insurance operations facilitate additional underwriting capacity, generate incremental revenues and/or enable the Company to participate in certain underwriting results. The Company also operates a write-your-own flood insurance carrier, Wright National Flood Insurance Co",
+   "competition": "Competition — The insurance intermediary business is highly competitive, and numerous firms actively compete with us for customers and insurance markets. Competition in the insurance business is largely based upon innovation, knowledge, understanding of terms and conditions of coverage, quality of service and price. A number of firms with substantially greater resources and market presence compete with us. A number of insurance companies directly sell insurance, primarily to individuals or small enterprises, and as a result do not pay commissions to third-party agents and brokers. In addition, internet and startup technology companies continue to be a source for direct placement of personal lines or small business insurance. We have our own technology capabilities to also serve personal lines and small businesses. While it is difficult to quantify the impact on our business from individu",
+   "customer_concentration": "During 2025, commissions and fees from our largest single Retail segment customer represented 0. Our largest Specialty Distribution segment customer represented approximately 7.",
+   "extracted_at": "2026-08-27T13:41:06.529654+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "BSX": {
+   "symbol": "BSX",
+   "cik": "0000885725",
+   "entity_name": "BOSTON SCIENTIFIC CORP",
+   "industry": "Surgical & Medical Instruments & Apparatus",
+   "form": "10-K",
+   "filed_at": "2026-02-17",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/885725/000088572526000010/bsx-20251231.htm",
+   "language": "en",
+   "business_summary": "Boston Scientific Corporation is a global developer, manufacturer and marketer of medical devices that are used in a broad range of interventional medical specialties. Our mission is to transform lives through innovative medical solutions that improve the health of patients around the world. As a medical technology leader for more than 45 years, we have advanced the practice of less-invasive medicine by helping physicians and other medical professionals diagnose and treat a wide range of diseases and medical conditions and improve patients’ quality of life by providing alternatives to surgery and other medical procedures that are typically traumatic to the body. We advance science for life by providing a broad range of high-performance solutions to address unmet patient needs and reduce the cost of health care. When used in this report, the terms \"we,\" \"us,\" \"our\" and \"the Company\" mean Boston Scientific Corporation and its divisions and subsidiaries. We operate pursuant to five strategic imperatives. We aim to: Strengthen Category Leadership, Expand into High Growth Adjacencies, Dri",
+   "competition": "Competition — We encounter significant competition across our business segments, product lines and markets, from global and local competitors. Our primary competitors include large manufacturers with multiple lines of business and competing products, as well as a wide range of medical device companies that sell a single or limited number of competitive products or participate in only a specific market segment. We also encounter competition from the entry of low-cost manufacturers, which may lead to increased pricing pressure. In certain countries, and particularly in China, we face competition from domestic medical device companies that may benefit from their status as local suppliers. We also face competition from non-medical device companies, which may offer alternative therapies for disease states that could also be treated using our products, or from companies offering technologies t",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:10.020609+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "BX": {
+   "symbol": "BX",
+   "cik": "0001393818",
+   "entity_name": "Blackstone Inc.",
+   "industry": "Investment Advice",
+   "form": "10-K",
+   "filed_at": "2026-02-27",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1393818/000119312526082531/d48618d10k.htm",
+   "language": "en",
+   "business_summary": "Blackstone is the world’s largest alternative asset manager. We seek to deliver compelling returns for institutional and individual investors by strengthening the companies and assets in which we invest. Our more than $1.3 trillion in Total Assets Under Management as of December 31, 2025 include global investment strategies focused on real estate, private equity, infrastructure, life sciences, growth equity, credit, real assets, secondaries and hedge funds. Our businesses use a solutions-oriented approach to drive better performance. We believe our scale, diversified business, long record of investment performance, rigorous investment process and strong client relationships position us to continue to perform well in a variety of market conditions, expand our assets under management, and innovate. We invest across asset classes on behalf of our investors, including pension funds, insurance companies and individual investors. Our mission is to fulfill our fiduciary duty by creating long-term value for our investors. We aim to do this by strengthening the companies, real estate assets a",
+   "competition": "",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-27T13:41:16.215192+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": false,
+    "customer_concentration": false
+   }
+  }
+ }
+}
