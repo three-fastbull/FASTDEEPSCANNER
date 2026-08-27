@@ -46,10 +46,82 @@ def _cagr(last: float | None, first: float | None, years: int) -> float | None:
     return ((last / first) ** (1 / years) - 1) * 100
 
 
-def _growth_years(values: list[float | None]) -> int:
+def _period_years(annual: list[dict[str, Any]]) -> list[int]:
+    return [int(period.get("fiscal_year") or str(period.get("period_end"))[:4]) for period in annual]
+
+
+def _known_period_values(
+    values: list[float | None], period_years: list[int] | None = None
+) -> list[tuple[int, float]]:
+    return [
+        (period_years[index] if period_years else index, value)
+        for index, value in enumerate(values)
+        if value is not None
+    ]
+
+
+def _growth_stat(values: list[float | None], period_years: list[int] | None = None) -> dict[str, Any]:
+    known = _known_period_values(values, period_years)
+    if len(known) < 2:
+        return {"available": False, "years": 0, "cagr_pct": None, "total_change_pct": None}
+    first_year, first = known[0]
+    last_year, last = known[-1]
+    years = last_year - first_year
+    if first <= 0 or last <= 0 or years <= 0:
+        return {"available": False, "years": years, "cagr_pct": None, "total_change_pct": None}
+    return {
+        "available": True,
+        "years": years,
+        "cagr_pct": round(_cagr(last, first, years) or 0.0, 2),
+        "total_change_pct": round((last / first - 1) * 100, 2),
+    }
+
+
+def _historical_price_return(candles: list[StockCandle]) -> dict[str, Any]:
+    uses_adjusted = bool(candles) and all(
+        candle.adjusted_close is not None and candle.adjusted_close > 0 for candle in candles
+    )
+    points = sorted(
+        (
+            candle.date,
+            float(candle.adjusted_close if uses_adjusted else candle.close),
+        )
+        for candle in candles
+        if (candle.adjusted_close if uses_adjusted else candle.close) > 0
+    )
+    if len(points) < 2:
+        return {"available": False}
+    first_date, first_price = points[0]
+    last_date, last_price = points[-1]
+    years = (last_date - first_date).days / 365.2425
+    if years <= 0 or first_price <= 0:
+        return {"available": False}
+    total_return = (last_price / first_price - 1) * 100
+    annualized = ((last_price / first_price) ** (1 / years) - 1) * 100
+    peak = 0.0
+    worst = 0.0
+    for _, price in points:
+        peak = max(peak, price)
+        if peak:
+            worst = min(worst, price / peak - 1)
+    return {
+        "available": True,
+        "start_date": first_date.isoformat(),
+        "end_date": last_date.isoformat(),
+        "years": round(years, 2),
+        "total_return_pct": round(total_return, 2),
+        "annualized_return_pct": round(annualized, 2),
+        "max_drawdown_pct": round(abs(worst) * 100, 2),
+        "basis": "adjusted_close" if uses_adjusted else "close",
+    }
+
+
+def _growth_years(values: list[float | None], period_years: list[int] | None = None) -> int:
     """จำนวนปีติดต่อกันล่าสุดที่ค่าเพิ่มขึ้นจากปีก่อนหน้า"""
     streak = 0
     for index in range(len(values) - 1, 0, -1):
+        if period_years and period_years[index] - period_years[index - 1] != 1:
+            break
         current, previous = values[index], values[index - 1]
         if current is None or previous is None or current <= previous:
             break
@@ -148,17 +220,22 @@ def _historical_pe(
     return output
 
 
-def _trend_cagr(values: list[float | None], label_unit: str = "") -> dict[str, Any]:
+def _trend_cagr(
+    values: list[float | None], label_unit: str = "", period_years: list[int] | None = None
+) -> dict[str, Any]:
     """อัตราเติบโตเฉลี่ยต่อปีของรายการที่เป็นจำนวนเงิน
 
     ใช้ปีแรกและปีล่าสุดที่มีข้อมูลจริง ถ้าช่วงนั้นมีปีที่ติดลบ การคิดเป็นอัตรา
     ทบต้นจะให้ตัวเลขที่ไม่มีความหมาย จึงบอกทิศทางเป็นคำแทน
     """
-    known = [value for value in values if value is not None]
+    known = _known_period_values(values, period_years)
     if len(known) < 2:
         return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
-    first, last = known[0], known[-1]
-    span = len(known) - 1
+    first_year, first = known[0]
+    last_year, last = known[-1]
+    span = last_year - first_year
+    if span <= 0:
+        return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
     if first <= 0 and last > 0:
         return {"kind": "turn", "label": f"พลิกจากติดลบเป็นบวกใน {span} ปี", "value": None, "tone": "ok", "years": span}
     if first > 0 and last <= 0:
@@ -186,18 +263,21 @@ def _trend_change(
     values: list[float | None],
     unit: str = "จุด",
     higher_is_better: bool = True,
+    period_years: list[int] | None = None,
 ) -> dict[str, Any]:
     """การเปลี่ยนแปลงของอัตราส่วน วัดเป็นส่วนต่าง ไม่ใช่อัตราทบต้น
 
     ROE ที่ขยับจาก 10% เป็น 15% เพิ่มขึ้น 5 จุด การรายงานว่าโต 50% ต่อปี
     จะทำให้เข้าใจผิดว่าเป็นการเติบโตแบบทบต้น
     """
-    known = [value for value in values if value is not None]
+    known = _known_period_values(values, period_years)
     if len(known) < 2:
         return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
-    span = len(known) - 1
-    latest = known[-1]
-    change = latest - known[0]
+    span = known[-1][0] - known[0][0]
+    if span <= 0:
+        return {"kind": "none", "label": "ข้อมูลไม่พอเทียบ", "value": None, "tone": "unknown", "years": 0}
+    latest = known[-1][1]
+    change = latest - known[0][1]
     latest_text = f"{latest:,.1f}{'%' if unit == 'จุด' else ' เท่า'}"
     threshold = 0.5 if unit == "จุด" else 0.05
     if abs(change) < threshold:
@@ -231,6 +311,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
     gross_margin = _ratio_series(annual, "gross_margin")
     net_margin = _ratio_series(annual, "net_margin")
     debt_to_equity = _ratio_series(annual, "debt_to_equity")
+    period_years = _period_years(annual)
 
     return [
         {
@@ -239,7 +320,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": f"ล้าน {reporting}",
             "format": "millions",
             "values": revenue,
-            "trend": _trend_cagr(revenue),
+            "trend": _trend_cagr(revenue, period_years=period_years),
         },
         {
             "key": "net_income",
@@ -247,7 +328,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": f"ล้าน {reporting}",
             "format": "millions",
             "values": net_income,
-            "trend": _trend_cagr(net_income),
+            "trend": _trend_cagr(net_income, period_years=period_years),
         },
         {
             "key": "eps",
@@ -255,7 +336,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": f"{reporting} ต่อหุ้น",
             "format": "decimal",
             "values": eps,
-            "trend": _trend_cagr(eps),
+            "trend": _trend_cagr(eps, period_years=period_years),
         },
         {
             "key": "operating_cash_flow",
@@ -263,7 +344,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": f"ล้าน {reporting}",
             "format": "millions",
             "values": cash_flow,
-            "trend": _trend_cagr(cash_flow),
+            "trend": _trend_cagr(cash_flow, period_years=period_years),
         },
         {
             "key": "roe",
@@ -271,7 +352,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": "%",
             "format": "percent",
             "values": roe,
-            "trend": _trend_change(roe, "จุด", higher_is_better=True),
+            "trend": _trend_change(roe, "จุด", higher_is_better=True, period_years=period_years),
         },
         {
             "key": "gross_margin",
@@ -279,7 +360,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": "%",
             "format": "percent",
             "values": gross_margin,
-            "trend": _trend_change(gross_margin, "จุด", higher_is_better=True),
+            "trend": _trend_change(gross_margin, "จุด", higher_is_better=True, period_years=period_years),
         },
         {
             "key": "net_margin",
@@ -287,7 +368,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": "%",
             "format": "percent",
             "values": net_margin,
-            "trend": _trend_change(net_margin, "จุด", higher_is_better=True),
+            "trend": _trend_change(net_margin, "จุด", higher_is_better=True, period_years=period_years),
         },
         {
             "key": "debt_to_equity",
@@ -295,7 +376,7 @@ def _series_summary(annual: list[dict[str, Any]], reporting: str) -> list[dict[s
             "unit": "เท่า",
             "format": "multiple",
             "values": debt_to_equity,
-            "trend": _trend_change(debt_to_equity, "เท่า", higher_is_better=False),
+            "trend": _trend_change(debt_to_equity, "เท่า", higher_is_better=False, period_years=period_years),
         },
     ]
 
@@ -425,6 +506,7 @@ def _criterion(
 
 
 def _stage_growth(annual: list[dict[str, Any]], years: int) -> dict[str, Any]:
+    period_years = _period_years(annual)
     revenue = _series(annual, "total_revenue")
     eps = _series(annual, "basic_eps")
     profit = _series(annual, "net_income")
@@ -434,24 +516,24 @@ def _stage_growth(annual: list[dict[str, Any]], years: int) -> dict[str, Any]:
     criteria = [
         _criterion(
             "Revenue - รายได้เติบโตต่อเนื่อง",
-            _growth_years(revenue) >= GROWTH_YEARS_REQUIRED,
-            f"โตติดต่อกัน {_growth_years(revenue)} ปี"
+            _growth_years(revenue, period_years) >= GROWTH_YEARS_REQUIRED,
+            f"โตติดต่อกัน {_growth_years(revenue, period_years)} ปี"
             + (f" · CAGR {revenue_cagr:.1f}%" if revenue_cagr is not None else ""),
             f"เติบโตต่อเนื่องอย่างน้อย {GROWTH_YEARS_REQUIRED} ปี",
             "รายได้คือจุดเริ่มต้นของทุกอย่าง ถ้ารายได้ไม่โต กำไรที่โตมักมาจากการลดต้นทุนซึ่งทำได้จำกัด",
         ),
         _criterion(
             "EPS - กำไรต่อหุ้นเติบโต",
-            _growth_years(eps) >= GROWTH_YEARS_REQUIRED,
-            f"โตติดต่อกัน {_growth_years(eps)} ปี"
+            _growth_years(eps, period_years) >= GROWTH_YEARS_REQUIRED,
+            f"โตติดต่อกัน {_growth_years(eps, period_years)} ปี"
             + (f" · CAGR {eps_cagr:.1f}%" if eps_cagr is not None else ""),
             f"เติบโตต่อเนื่องอย่างน้อย {GROWTH_YEARS_REQUIRED} ปี",
             "EPS โตแปลว่าผู้ถือหุ้นเดิมได้ประโยชน์จริง ไม่ถูกเจือจางจากการเพิ่มทุน",
         ),
         _criterion(
             "Profit - กำไรสุทธิเติบโต",
-            _growth_years(profit) >= GROWTH_YEARS_REQUIRED,
-            f"โตติดต่อกัน {_growth_years(profit)} ปี"
+            _growth_years(profit, period_years) >= GROWTH_YEARS_REQUIRED,
+            f"โตติดต่อกัน {_growth_years(profit, period_years)} ปี"
             + (f" · CAGR {profit_cagr:.1f}%" if profit_cagr is not None else ""),
             f"เติบโตต่อเนื่องอย่างน้อย {GROWTH_YEARS_REQUIRED} ปี",
             "กำไรต้องโตพร้อมรายได้ จึงจะเรียกว่าธุรกิจขยายตัวอย่างมีคุณภาพ",
@@ -617,8 +699,8 @@ def _stage_management(annual: list[dict[str, Any]], years: int) -> dict[str, Any
         "key": "management",
         "number": 4,
         "title": "MANAGEMENT",
-        "subtitle": "ผู้บริหารและการจัดการที่เชื่อถือได้",
-        "goal": "เลือกหุ้นที่ผู้บริหารไว้ใจได้ บริหารธุรกิจอย่างมีธรรมาภิบาล",
+        "subtitle": "การเพิ่มทุนและผลต่อผู้ถือหุ้น",
+        "goal": "ตรวจการเจือจางจากตัวเลขงบ ส่วนธรรมาภิบาลและพฤติกรรมผู้บริหารยังต้องตรวจเอกสารเพิ่มเติม",
         "criteria": criteria,
         "passed": bool(known_criteria) and all(item["passed"] for item in known_criteria),
         "needs_manual_check": True,
@@ -688,7 +770,7 @@ def _valuation_methods(
                 "name": "มูลค่าทางบัญชีต่อหุ้น",
                 "fair_value": round(book_per_share, 4),
                 "detail": f"ส่วนของผู้ถือหุ้นหารด้วยจำนวนหุ้น ได้ {book_per_share:.2f} ต่อหุ้น",
-                "note": "เป็นพื้นราคาขั้นต่ำ ไม่ใช่มูลค่าที่เหมาะสม ใช้เตือนว่าราคาลงได้ลึกแค่ไหนก่อนถึงมูลค่าสินทรัพย์",
+                "note": "มูลค่าตามบัญชีไม่ใช่ราคาขั้นต่ำของหุ้น และไม่ใช่เงินที่จะได้รับจริงหากขายสินทรัพย์ทั้งหมด",
                 "is_floor": True,
             }
         )
@@ -722,6 +804,7 @@ def build_stock_profile(
     trading = trading_currency(symbol, market)
     last_price = candles[-1].close if candles else 0.0
     price_as_of = candles[-1].date.isoformat() if candles else ""
+    historical_return = _historical_price_return(candles)
 
     profile: dict[str, Any] = {
         "symbol": symbol,
@@ -732,6 +815,7 @@ def build_stock_profile(
         "trading_currency_label": currency_label(trading),
         "last_price": round(last_price, 4),
         "price_as_of": price_as_of,
+        "historical_return": historical_return,
         "megatrend": _megatrend(sector),
         "qualitative": {
             "moat": research.get("moat") or "",
@@ -740,6 +824,21 @@ def build_stock_profile(
             "status": research.get("status") or "Watch",
             "note": research.get("note") or "",
             "recorded": bool(research.get("research_verified")),
+            "company_profile_verified": bool(research.get("company_profile_verified")),
+            "updated_at": research.get("updated_at"),
+        },
+        "business": {
+            "summary": research.get("business_summary") or "",
+            "revenue_model": research.get("revenue_model") or "",
+            "revenue_segments": research.get("revenue_segments") or "",
+            "key_customers": research.get("key_customers") or "",
+            "competitors": research.get("competitors") or "",
+            "moat_evidence": research.get("moat_evidence") or "",
+            "catalysts": research.get("catalysts") or "",
+            "risks": research.get("risks") or "",
+            "invalidation": research.get("invalidation") or "",
+            "source_urls": research.get("source_urls") or "",
+            "verified": bool(research.get("company_profile_verified")),
         },
         "five_forces": FIVE_FORCES,
         "flow": FINANCIAL_QUALITY_FLOW,
@@ -759,7 +858,8 @@ def build_stock_profile(
         return profile
 
     reporting = str((financials or {}).get("currency") or "").upper()
-    years = max(1, len(annual) - 1)
+    period_years = _period_years(annual)
+    years = max(1, period_years[-1] - period_years[0])
     eps_series = _series(annual, "basic_eps")
     profit_series = _series(annual, "net_income")
     revenue_series = _series(annual, "total_revenue")
@@ -833,16 +933,24 @@ def build_stock_profile(
 
     failed = [stage["title"] for stage in stages if not stage["passed"]]
     quality_ok = not failed
+    business_ok = bool(research.get("company_profile_verified"))
     price_ok = (
         margin_of_safety is not None
         and margin_of_safety >= MARGIN_OF_SAFETY_TARGET
         and estimates_agree
     )
+    valuation_reliable = bool(fair_value and estimates_agree)
     if not quality_ok:
         verdict_key, verdict = "avoid", "ยังไม่ผ่านคุณภาพ - ข้าม"
         verdict_note = (
             f"ตกด่าน {', '.join(failed)} ธุรกิจยังไม่ผ่าน Financial Quality Filter "
             "ราคาถูกแค่ไหนก็ยังไม่ใช่เหตุผลให้ซื้อ"
+        )
+    elif not business_ok:
+        verdict_key, verdict = "research", "ตัวเลขผ่าน - รอตรวจธุรกิจ"
+        verdict_note = (
+            "งบผ่านเกณฑ์เชิงปริมาณ แต่ยังไม่มีหลักฐานเรื่องแหล่งรายได้ คู่แข่ง Moat ความเสี่ยง "
+            "และเงื่อนไขที่ทำให้ Thesis ผิด จึงยังไม่ใช่สัญญาณซื้อ"
         )
     elif margin_of_safety is None:
         verdict_key, verdict = "wait", "คุณภาพผ่าน แต่ประเมินมูลค่าไม่ได้ - รอ"
@@ -854,35 +962,35 @@ def build_stock_profile(
             "ต้องเลือกวิธีที่เหมาะกับหุ้นประเภทนี้ก่อน"
         )
     elif price_ok:
-        verdict_key, verdict = "buy", "บริษัทดี ราคาดี - เข้าเงื่อนไขซื้อ"
-        verdict_note = "ผ่านทั้งคุณภาพธุรกิจและส่วนลดความปลอดภัย เหลือเพียงตรวจเชิงคุณภาพและจังหวะเข้า"
+        verdict_key, verdict = "buy", "ผ่านเกณฑ์สำหรับวางแผนเข้าซื้อ"
+        verdict_note = "ผ่านทั้งงบ งานวิจัยธุรกิจ และส่วนลดความปลอดภัย เหลือกำหนดขนาดสถานะ จุดตัดขาดทุน และจังหวะเข้า"
     else:
         verdict_key, verdict = "wait", "บริษัทดี แต่แพง - รอ"
         verdict_note = "คุณภาพผ่านแล้ว แต่ราคายังไม่ให้ส่วนลดพอ การรอไม่ใช่การพลาดโอกาส"
 
     checklist = [
         {
-            "label": "คุณภาพธุรกิจดี ผ่าน Financial Quality Filter",
+            "label": "งบการเงินผ่าน Financial Quality Filter",
             "passed": quality_ok,
-            "detail": f"ผ่าน {passed_stages} จาก {len(stages)} ด่าน"
+            "detail": f"ด่านย่อยข้อ 1: ผ่าน {passed_stages} จาก {len(stages)} ด่าน"
             + (f" · ตกด่าน {', '.join(failed)}" if failed else ""),
         },
         {
-            "label": "การเงินแข็งแกร่ง เติบโตต่อเนื่อง",
-            "passed": stages[0]["passed"] and stages[1]["passed"],
-            "detail": "ดูจากด่าน Growth และ Quality",
+            "label": "งานวิจัยธุรกิจครบและมีแหล่งอ้างอิง",
+            "passed": business_ok,
+            "detail": "ธุรกิจ รายได้ ลูกค้า คู่แข่ง Moat Thesis และความเสี่ยง",
         },
         {
-            "label": "ราคาต่ำกว่ามูลค่าที่เหมาะสม",
-            "passed": bool(margin_of_safety is not None and margin_of_safety > 0),
+            "label": "มีข้อมูลพอประเมินมูลค่าเบื้องต้น",
+            "passed": valuation_reliable,
             "detail": (
-                f"ราคา {price_in_reporting:.2f} เทียบมูลค่า {fair_value:.2f} {reporting}"
-                if fair_value and price_in_reporting
-                else "ประเมินมูลค่าไม่ได้"
+                f"วิธีประเมินให้ช่วง {min(estimates):.2f}-{max(estimates):.2f} {reporting}"
+                if estimates and estimates_agree
+                else "ยังไม่มีมูลค่า หรือวิธีประเมินให้ผลห่างกันเกินไป"
             ),
         },
         {
-            "label": f"Margin of Safety มากกว่า {MARGIN_OF_SAFETY_TARGET:.0f}%",
+            "label": f"Margin of Safety อย่างน้อย {MARGIN_OF_SAFETY_TARGET:.0f}%",
             "passed": bool(price_ok),
             "detail": (
                 f"ตอนนี้อยู่ที่ {margin_of_safety:.1f}%"
@@ -891,6 +999,7 @@ def build_stock_profile(
             ),
         },
     ]
+    decision_passed = sum(1 for item in checklist if item["passed"])
 
     profile.update(
         {
@@ -914,6 +1023,13 @@ def build_stock_profile(
             "passed_stages": passed_stages,
             "total_stages": len(stages),
             "series_summary": _series_summary(annual, reporting),
+            "growth_snapshot": {
+                "period_years": years,
+                "revenue": _growth_stat(revenue_series, period_years),
+                "net_income": _growth_stat(profit_series, period_years),
+                "eps": _growth_stat(eps_series, period_years),
+                "stock_return": historical_return,
+            },
             "series": {
                 "years": [str(period.get("period_end"))[:4] for period in annual],
                 "revenue": revenue_series,
@@ -954,6 +1070,8 @@ def build_stock_profile(
                 "label": verdict,
                 "note": verdict_note,
                 "checklist": checklist,
+                "passed_checks": decision_passed,
+                "total_checks": len(checklist),
             },
         }
     )

@@ -61,6 +61,8 @@ def _read_price_csv(path: Path) -> dict[str, list[StockCandle]]:
             symbol = _value(row, "symbol", "ticker", "symbol_name", default=fallback_symbol).strip()
             if not symbol:
                 continue
+            adjusted_close = _value(row, "adjusted_close", "adj_close", "Adj Close")
+            adjusted_open = _value(row, "adjusted_open")
             candle = StockCandle(
                 date=_parse_date(_value(row, "date", "timestamp", "time", "datetime")),
                 symbol=symbol,
@@ -69,6 +71,8 @@ def _read_price_csv(path: Path) -> dict[str, list[StockCandle]]:
                 low=float(_value(row, "low", "Low")),
                 close=float(_value(row, "close", "Close")),
                 volume=float(_value(row, "volume", "Volume", default="0")),
+                adjusted_close=float(adjusted_close) if adjusted_close else None,
+                adjusted_open=float(adjusted_open) if adjusted_open else None,
             )
             grouped.setdefault(symbol, []).append(candle)
     for symbol in list(grouped):

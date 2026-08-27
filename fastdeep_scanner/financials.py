@@ -322,6 +322,10 @@ def _quarterly_by_year(
         if "Q4" not in quarters:
             q4_metrics: dict[str, float] = {}
             for metric, annual_value in annual["metrics"].items():
+                annual_value = _safe_number(annual_value)
+                # EPS uses period-specific weighted shares, not annual minus quarterly EPS.
+                if annual_value is None or METRIC_UNITS.get(metric) == "per_share":
+                    continue
                 if metric in FLOW_METRICS:
                     prior_values = [
                         _value(quarters.get(quarter, {}).get("metrics", {}), metric)
@@ -350,7 +354,7 @@ def _quarterly_by_year(
 
 
 def _growth(current: float | None, previous: float | None) -> float | None:
-    if current is None or previous in {None, 0}:
+    if current is None or previous is None or previous <= 0 or current < 0:
         return None
     return (current / previous - 1) * 100
 
@@ -361,18 +365,26 @@ def _cagr(current: float | None, first: float | None, years: int) -> float | Non
     return ((current / first) ** (1 / years) - 1) * 100
 
 
+def _difference(current: float | None, previous: float | None) -> float | None:
+    if current is None or previous is None:
+        return None
+    return current - previous
+
+
 def _vi_summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
     if not periods:
         return {"available": False, "reason": "ยังไม่มีงบการเงินจากผู้ให้บริการ"}
 
     first = periods[0]
     latest = periods[-1]
-    elapsed_years = max(1, len(periods) - 1)
+    period_years = [int(period.get("fiscal_year") or period["period_end"][:4]) for period in periods]
+    elapsed_years = period_years[-1] - period_years[0]
     latest_metrics = latest["metrics"]
     latest_ratios = latest["ratios"]
+    first_ratios = first["ratios"] if elapsed_years > 0 else {}
     yearly = []
     for index, period in enumerate(periods):
-        previous = periods[index - 1] if index else None
+        previous = periods[index - 1] if index and period_years[index] - period_years[index - 1] == 1 else None
         yearly.append(
             {
                 "year": str(period.get("fiscal_year") or period["period_end"][:4]),
@@ -415,23 +427,26 @@ def _vi_summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
             "key": "net_margin",
             "label": "อัตรากำไรสุทธิ",
             "value": latest_ratios.get("net_margin"),
-            "change": _growth(
-                latest_ratios.get("net_margin"), first["ratios"].get("net_margin"),
+            "change": _difference(
+                latest_ratios.get("net_margin"), first_ratios.get("net_margin"),
             ),
+            "change_unit": "percentage_points",
         },
         {
             "key": "roe",
             "label": "ROE",
             "value": latest_ratios.get("roe"),
-            "change": _growth(latest_ratios.get("roe"), first["ratios"].get("roe")),
+            "change": _difference(latest_ratios.get("roe"), first_ratios.get("roe")),
+            "change_unit": "percentage_points",
         },
         {
             "key": "debt_to_equity",
             "label": "หนี้สินต่อทุน",
             "value": latest_ratios.get("debt_to_equity"),
-            "change": _growth(
-                latest_ratios.get("debt_to_equity"), first["ratios"].get("debt_to_equity"),
+            "change": _difference(
+                latest_ratios.get("debt_to_equity"), first_ratios.get("debt_to_equity"),
             ),
+            "change_unit": "multiple",
         },
         {
             "key": "free_cash_flow",
@@ -510,6 +525,14 @@ def _with_currency_presentation(payload: dict[str, Any]) -> dict[str, Any]:
     payload["unit_label"] = f"ล้าน {currency}"
     payload["per_share_unit"] = f"{currency} ต่อหุ้น"
     payload["metric_units"] = METRIC_UNITS
+    payload["vi_summary"] = _vi_summary(payload.get("annual") or [])
+    for periods in (payload.get("quarterly_by_year") or {}).values():
+        for period in periods:
+            if period.get("derived_from_annual"):
+                period["metrics"] = {
+                    metric: value for metric, value in period.get("metrics", {}).items()
+                    if METRIC_UNITS.get(metric) != "per_share"
+                }
     return payload
 
 

@@ -177,6 +177,12 @@ def financial_data_health(
     coverage = _read_json(Path(coverage_path))
     sec_status = _read_json(Path(sec_status_path))
     files = list(cache_dir.glob("*.json")) if cache_dir.exists() else []
+    covered_symbols = {item.get("symbol") for item in coverage.get("items", []) if item.get("symbol")}
+    if covered_symbols:
+        from .financials import _cache_path
+
+        covered_files = {_cache_path(symbol, cache_dir) for symbol in covered_symbols}
+        files = [path for path in files if path in covered_files]
     fresh_cutoff = datetime.now().timestamp() - 8 * 24 * 3600
     fresh = sum(path.stat().st_mtime >= fresh_cutoff for path in files)
     requested = int(coverage.get("symbols_requested") or status.get("symbols_requested") or 697)

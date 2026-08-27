@@ -14,6 +14,8 @@ class StockCandle:
     low: float
     close: float
     volume: float
+    adjusted_close: float | None = None
+    adjusted_open: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -23,6 +25,8 @@ class StockCandle:
             "high": round(self.high, 4),
             "low": round(self.low, 4),
             "close": round(self.close, 4),
+            "adjusted_close": round(self.adjusted_close, 4) if self.adjusted_close is not None else None,
+            "adjusted_open": round(self.adjusted_open, 4) if self.adjusted_open is not None else None,
             "volume": round(self.volume, 2),
         }
 

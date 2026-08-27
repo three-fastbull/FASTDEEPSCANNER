@@ -14,6 +14,10 @@ tmp/
 data/fastdeep_prices.csv
 data/.fastdeep_prices.csv.*.tmp
 data/fastdeep_prices_source.json
+data/fastdeep_hall_prices.csv
+data/fastdeep_hall_prices_source.json
+data/fastdeep_hall_prices_update_status.json
+data/fastdeep_hall_prices_update.lock/
 data/financial_cache/
 data/fastdeep_price_update.lock/
 data/fastdeep_price_update_status.json

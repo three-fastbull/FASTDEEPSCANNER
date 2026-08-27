@@ -107,10 +107,32 @@ class ProfileAvailabilityTest(unittest.TestCase):
         self.assertIn("ยังไม่มีงบการเงิน", profile["reason"])
         self.assertEqual(profile["stages"], [])
 
+    def test_price_return_uses_adjusted_prices_and_reports_annualized_return(self) -> None:
+        candles = [
+            StockCandle(date(2023, 1, 1), "TEST", 100, 100, 100, 100, 1_000, adjusted_close=100),
+            StockCandle(date(2024, 1, 1), "TEST", 120, 120, 120, 120, 1_000, adjusted_close=120),
+            StockCandle(date(2025, 1, 1), "TEST", 144, 144, 144, 144, 1_000, adjusted_close=144),
+        ]
+        profile = build_stock_profile("TEST", None, candles, _snapshot(), {}, RATES)
+        result = profile["historical_return"]
+        self.assertTrue(result["available"])
+        self.assertEqual(result["basis"], "adjusted_close")
+        self.assertAlmostEqual(result["total_return_pct"], 44.0, places=1)
+        self.assertAlmostEqual(result["annualized_return_pct"], 20.0, delta=0.1)
+
     def test_single_year_of_statements_is_not_enough(self) -> None:
         financials = _financials([_year(2025, revenue=100, net_income=10, eps=1.0, equity=50)])
         profile = build_stock_profile("TEST", financials, _candles(50.0), _snapshot(), {}, RATES)
         self.assertFalse(profile["available"])
+
+    def test_return_does_not_mix_adjusted_and_raw_price_bases(self) -> None:
+        candles = [
+            StockCandle(date(2023, 1, 1), "TEST", 100, 100, 100, 100, 1_000, adjusted_close=50),
+            StockCandle(date(2025, 1, 1), "TEST", 120, 120, 120, 120, 1_000),
+        ]
+        result = build_stock_profile("TEST", None, candles, _snapshot(), {}, RATES)["historical_return"]
+        self.assertEqual(result["basis"], "close")
+        self.assertAlmostEqual(result["total_return_pct"], 20.0)
 
 
 class QualityFilterTest(unittest.TestCase):
@@ -203,7 +225,22 @@ class LynchTypeTest(unittest.TestCase):
 class ValuationTest(unittest.TestCase):
     def test_margin_of_safety_below_target_reads_as_wait(self) -> None:
         # ราคาสูงจนแทบไม่เหลือส่วนลด แม้ธุรกิจจะผ่านทุกด่าน
-        profile = build_stock_profile("TEST", _growing_company(), _candles(60.0), _snapshot(), {}, RATES)
+        research = {
+            "moat": "wide",
+            "ai_trend": "leader",
+            "company_profile_verified": True,
+            "business_summary": "ธุรกิจตัวอย่าง",
+            "revenue_model": "ขายบริการแบบสมาชิก",
+            "revenue_segments": "สมาชิก 100%",
+            "key_customers": "ลูกค้ากระจายตัว",
+            "competitors": "PEER",
+            "moat_evidence": "ลูกค้าย้ายระบบได้ยาก",
+            "risks": "การแข่งขัน",
+            "invalidation": "ลูกค้าลดลงต่อเนื่อง",
+            "source_urls": "https://example.com/annual-report",
+            "thesis": "รายได้ประจำเติบโต",
+        }
+        profile = build_stock_profile("TEST", _growing_company(), _candles(60.0), _snapshot(), research, RATES)
         self.assertEqual(profile["passed_stages"], 4)
         self.assertEqual(profile["verdict"]["key"], "wait")
         self.assertLess(profile["valuation"]["margin_of_safety_pct"], 20)
@@ -246,6 +283,14 @@ class ValuationTest(unittest.TestCase):
 
 
 class QualitativeTest(unittest.TestCase):
+    def test_quantitative_pass_is_not_a_buy_before_company_research(self) -> None:
+        profile = build_stock_profile("TEST", _growing_company(), _candles(20.0), _snapshot(), {}, RATES)
+        self.assertEqual(profile["passed_stages"], 4)
+        self.assertEqual(profile["verdict"]["key"], "research")
+        self.assertEqual(profile["verdict"]["total_checks"], 4)
+        self.assertEqual(len(profile["verdict"]["checklist"]), 4)
+        self.assertIn("งบการเงิน", profile["verdict"]["checklist"][0]["label"])
+
     def test_recorded_analyst_review_is_surfaced(self) -> None:
         review = {
             "moat": "wide",
@@ -281,6 +326,35 @@ class TrendSummaryTest(unittest.TestCase):
         self.assertIn("โตเฉลี่ย", revenue["label"])
         self.assertIn("ต่อปี", revenue["label"])
         self.assertEqual(revenue["tone"], "ok")
+
+    def test_growth_snapshot_reports_compound_and_total_growth_separately(self) -> None:
+        profile = build_stock_profile("TEST", _growing_company(), _candles(20.0), _snapshot(), {}, RATES)
+        revenue = profile["growth_snapshot"]["revenue"]
+        self.assertTrue(revenue["available"])
+        self.assertGreater(revenue["cagr_pct"], 20)
+        self.assertGreater(revenue["total_change_pct"], revenue["cagr_pct"])
+
+    def test_missing_year_uses_calendar_span_and_breaks_growth_streak(self) -> None:
+        financials = _growing_company()
+        financials["annual"].pop(1)
+        profile = build_stock_profile("TEST", financials, _candles(20.0), _snapshot(), {}, RATES)
+        growth = profile["growth_snapshot"]["revenue"]
+        self.assertEqual(growth["years"], 3)
+        self.assertAlmostEqual(growth["cagr_pct"], (1.95 ** (1 / 3) - 1) * 100, places=2)
+        self.assertFalse(profile["stages"][0]["passed"])
+
+    def test_missing_metric_keeps_the_original_year_spacing(self) -> None:
+        financials = _growing_company()
+        financials["annual"][1]["metrics"]["total_revenue"] = None
+        revenue = self._summary(financials)["revenue"]["trend"]
+        self.assertEqual(revenue["years"], 3)
+        self.assertAlmostEqual(revenue["value"], (1.95 ** (1 / 3) - 1) * 100, places=2)
+
+    def test_duplicate_year_does_not_report_a_zero_year_cagr(self) -> None:
+        from fastdeep_scanner.stock_profile import _growth_stat, _trend_cagr
+
+        self.assertFalse(_growth_stat([100, 120], [2025, 2025])["available"])
+        self.assertEqual(_trend_cagr([100, 120], period_years=[2025, 2025])["kind"], "none")
 
     def test_shrinking_revenue_is_reported_as_getting_worse(self) -> None:
         financials = _financials(

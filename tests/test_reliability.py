@@ -6,7 +6,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from fastdeep_scanner.data_health import price_data_health
+from fastdeep_scanner.data_health import financial_data_health, price_data_health
 from fastdeep_scanner.models import ScanCriteria, StockCandle
 from fastdeep_scanner.backtest import run_event_study
 from fastdeep_scanner.timeframes import aggregate_candles
@@ -14,6 +14,25 @@ from fastdeep_scanner.research_journal import get_research, save_research
 
 
 class ReliabilityTest(unittest.TestCase):
+    def test_financial_freshness_excludes_symbols_outside_the_coverage_universe(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            cache = root / "cache"
+            cache.mkdir()
+            for symbol in ("AAPL", "DOHOME_BK", "OUTSIDE"):
+                (cache / f"{symbol}.json").write_text("{}", encoding="utf-8")
+            coverage = root / "coverage.json"
+            coverage.write_text(json.dumps({
+                "symbols_requested": 2, "cached_symbols": 2,
+                "items": [{"symbol": "AAPL"}, {"symbol": "DOHOME.BK"}],
+            }), encoding="utf-8")
+            health = financial_data_health(
+                cache, coverage_path=coverage, status_path=root / "status.json",
+                sec_status_path=root / "sec.json",
+            )
+            self.assertEqual(health["fresh_symbols"], 2)
+            self.assertEqual(health["cached_symbols"], 2)
+
     def test_weekly_aggregation_keeps_ohlcv_semantics(self) -> None:
         candles = [
             StockCandle(date(2026, 8, 3), "TEST", 10, 12, 9, 11, 100),

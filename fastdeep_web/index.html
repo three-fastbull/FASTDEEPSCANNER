@@ -22,6 +22,7 @@
 
   <nav class="app-navigation" aria-label="FastDeep views">
     <button class="nav-tab is-active" type="button" data-view-target="scannerView">Scanner</button>
+    <button class="nav-tab" type="button" data-view-target="hallView">Hall of Fame</button>
     <button class="nav-tab" type="button" data-view-target="profileView">ข้อมูลบริษัท</button>
     <button class="nav-tab" type="button" data-view-target="financialsView">งบการเงิน 5 ปี</button>
     <button class="nav-tab" type="button" data-view-target="viView">VI Thesis</button>
@@ -96,28 +97,25 @@
       </div>
     </section>
 
-    <details class="image-match-panel" aria-label="Chart image matching">
-      <summary>ค้นหาหุ้นจากรูปกราฟ <span>เครื่องมือเสริม</span></summary>
-      <div class="image-match-content">
-        <div class="image-tools">
-          <div>
-            <h2>แนบรูปกราฟเพื่อหา asset คล้ายกัน</h2>
-            <p>ระบบเทียบรูปทรงราคาเท่านั้น ควรใช้เป็นจุดเริ่มต้นในการค้นหา ไม่ใช่สัญญาณซื้อขาย</p>
-          </div>
-          <input id="chartImageInput" class="file-input" type="file" accept="image/*">
-          <button id="imageScanButton" class="primary-button">Scan รูปกราฟ</button>
-        </div>
-        <div class="image-preview-area">
-          <img id="chartImagePreview" alt="ตัวอย่างรูปกราฟที่แนบ">
-          <div>
-            <h3>ผลลัพธ์รูปที่คล้าย</h3>
-            <div id="imageMatches" class="image-matches">
-              <p>ยังไม่ได้แนบรูป</p>
-            </div>
-          </div>
-        </div>
+    <section class="pattern-search-panel" aria-label="ค้นหาหุ้นจากรูปกราฟ">
+      <div class="pattern-search-copy">
+        <p class="section-kicker">ค้นจากภาพ</p>
+        <h2>มีรูปกราฟหรือ Pattern อยู่แล้ว?</h2>
+        <p>วางรูปหรือลากไฟล์เข้ามา ระบบจะหาแนวราคาที่คล้ายกันจากตลาดและ Universe ที่เลือกด้านบน</p>
+        <small>ใช้เพื่อค้นหารายชื่อไปศึกษาต่อ ไม่ใช่สัญญาณซื้อขาย</small>
       </div>
-    </details>
+      <label class="chart-drop-zone" id="chartDropZone" for="chartImageInput">
+        <input id="chartImageInput" class="file-input" type="file" accept="image/*">
+        <img id="chartImagePreview" alt="รูปกราฟที่แนบ">
+        <span class="drop-zone-title">ลากรูปมาวาง หรือกดเพื่อเลือกไฟล์</span>
+        <small id="chartFileName">รองรับ JPG, PNG และภาพหน้าจอกราฟ</small>
+      </label>
+      <button id="imageScanButton" class="primary-button pattern-scan-button" type="button">ค้นหาหุ้นที่ทรงกราฟคล้ายกัน</button>
+      <div class="pattern-results">
+        <h3>ผลลัพธ์ที่คล้าย</h3>
+        <div id="imageMatches" class="image-matches"><p>แนบรูปเพื่อเริ่มค้นหา</p></div>
+      </div>
+    </section>
 
     <section class="workspace">
       <div class="table-panel">
@@ -204,7 +202,7 @@
             <button id="researchSaveButton" class="ghost-button" type="button">บันทึก</button>
             <span id="researchSavedAt">ยังไม่ได้บันทึก</span>
           </section>
-          <p class="hint">ต้องกรอก Moat และแนวโน้มธุรกิจก่อน จึงจะเปลี่ยนสถานะเป็น Approved หรือ Owned ได้ และคะแนนจึงจะถอดคำนำหน้า T- ออก</p>
+          <p class="hint">สถานะ Approved หรือ Owned ต้องมีข้อมูลธุรกิจ รายได้ ลูกค้า คู่แข่ง หลักฐาน Moat Thesis ความเสี่ยง เงื่อนไขยกเลิก และลิงก์อ้างอิงครบ</p>
         </details>
         <details class="agent-disclosure">
           <summary>ตัวเลขและเหตุผลแบบละเอียด</summary>
@@ -225,6 +223,56 @@
         </details>
       </aside>
     </section>
+  </main>
+
+  <main id="hallView" class="app-shell app-view is-hidden">
+    <header class="hall-heading">
+      <div>
+        <p class="eyebrow">COMPOUND LEADERS</p>
+        <h2>Hall of Fame หุ้นทบต้น 10 ปี</h2>
+        <p>รายชื่อสำหรับเริ่มงานวิจัย จากเงินก้อน 100,000 บาทและ DCA เดือนละ 5,000 บาท</p>
+      </div>
+      <div class="hall-cutoff"><span>เกณฑ์ขั้นต่ำ</span><strong>15%</strong><small>XIRR ต่อปี</small></div>
+    </header>
+
+    <section class="hall-controls" aria-label="Hall of Fame filters">
+      <label>ตลาด
+        <select id="hallMarket">
+          <option value="ALL">ทุกตลาด</option><option value="US">สหรัฐ</option><option value="TH">ไทย</option><option value="CN">จีน</option>
+        </select>
+      </label>
+      <label>Universe
+        <select id="hallUniverse">
+          <option value="ALL">ทั้งหมด</option><option value="SP500">S&amp;P 500</option><option value="NASDAQ100">Nasdaq-100</option>
+          <option value="CHINA50">China 50</option><option value="SET50">SET50</option><option value="SET100">SET100</option><option value="MAI">MAI</option>
+        </select>
+      </label>
+      <label class="hall-search">ค้นหาหุ้น
+        <input id="hallSearch" type="search" placeholder="ชื่อย่อหรือชื่อบริษัท">
+      </label>
+      <button id="hallRefresh" class="ghost-button" type="button">คำนวณใหม่</button>
+      <p id="hallStatus" class="hall-status">กำลังเตรียมข้อมูล...</p>
+    </section>
+
+    <section class="hall-summary" id="hallSummary" aria-label="Hall of Fame summary"></section>
+    <section class="hall-podium" id="hallPodium" aria-label="สามอันดับแรก"></section>
+
+    <section class="hall-table-panel">
+      <div class="panel-head">
+        <div><h2>อันดับทั้งหมด</h2><p id="hallCoverage">แสดงเฉพาะหุ้นที่มีข้อมูลย้อนหลังเพียงพอและ XIRR ตั้งแต่ 15% ต่อปี</p></div>
+      </div>
+      <div class="table-scroll">
+        <table class="hall-table">
+          <thead><tr><th>อันดับ</th><th>หุ้น</th><th>ตลาด</th><th title="ผลตอบแทนต่อปีที่คำนึงถึงเงินที่ทยอยลงทุน">XIRR DCA/ปี</th><th title="อัตราโตแบบทบต้นของราคาปรับแล้ว ไม่ใช่ผลของแผน DCA">ราคาหุ้น CAGR/ปี</th><th>มูลค่าปัจจุบัน</th><th>เงินลงทุน</th><th>กำไรรวม</th><th title="วัดจากราคาปิดรายเดือน ไม่รวมการลดลงระหว่างเดือน">ลดลงสูงสุด<br>รายเดือน</th><th></th></tr></thead>
+          <tbody id="hallBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <details class="methodology-panel">
+      <summary>วิธีคำนวณและข้อจำกัดที่ต้องรู้</summary>
+      <div id="hallMethodology" class="methodology-grid"></div>
+    </details>
   </main>
 
   <main id="financialsView" class="app-shell app-view is-hidden">
@@ -253,13 +301,20 @@
 
     <section id="financialKpis" class="financial-kpis" aria-label="Financial highlights"></section>
 
-    <section class="financial-table-panel">
+    <section class="financial-table-panel" id="annualFinancialPanel">
       <div class="panel-head">
         <div>
           <h2>ผลประกอบการสำคัญ</h2>
-          <p>กดที่ปีเพื่อดูรายละเอียด Q1-Q4 ของปีนั้น</p>
+          <p>งบรายปีและการเปลี่ยนแปลงเทียบปีก่อน</p>
         </div>
-        <span id="financialSource" class="data-source-note">-</span>
+        <div class="financial-table-tools">
+          <label class="trend-toggle"><input id="financialTrendToggle" type="checkbox" checked> แสดงเทียบปีก่อน</label>
+          <span id="financialSource" class="data-source-note">-</span>
+        </div>
+      </div>
+      <div class="financial-change-legend">
+        <span data-tone="ok">● โดยทั่วไปดีขึ้น</span><span data-tone="bad">● ควรตรวจเหตุผล</span><span data-tone="neutral">↕ บอกทิศทางเท่านั้น</span>
+        <p>สีเป็นตัวช่วยอ่านเบื้องต้น ไม่ใช่คำตัดสิน เช่น หนี้เพิ่มอาจเหมาะสมถ้ากำไรและกระแสเงินสดโตเร็วกว่าหนี้</p>
       </div>
       <div class="table-scroll financial-table-scroll">
         <table class="financial-table">
@@ -269,13 +324,17 @@
       </div>
     </section>
 
-    <section class="quarterly-panel">
+    <section class="quarterly-panel" id="quarterlyPanel">
       <div class="panel-head">
         <div>
           <h2 id="quarterlyTitle">รายไตรมาส</h2>
           <p id="quarterlySubtitle">เลือกปีจากตารางด้านบน</p>
         </div>
-        <span id="quarterlyPeriodNote" class="quarterly-note">-</span>
+        <div class="quarterly-controls">
+          <label>ปีบัญชี<select id="quarterlyYearSelect"></select></label>
+          <button id="annualBackButton" type="button" class="ghost-button">กลับงบรายปี</button>
+          <span id="quarterlyPeriodNote" class="quarterly-note">-</span>
+        </div>
       </div>
       <div class="table-scroll financial-table-scroll">
         <table class="financial-table quarterly-table">
@@ -293,13 +352,13 @@
         <h2 id="viTitle">VI Thesis และ Financial Quality</h2>
         <p id="viSubtitle">เลือกหุ้นจากแท็บงบการเงินก่อน</p>
       </div>
-      <div id="viScore" class="vi-score">-</div>
+      <div class="vi-score-summary"><div id="viScore" class="vi-score">-</div><small>เทียบเกณฑ์ Thesis</small></div>
     </section>
 
     <section class="thesis-inputs" aria-label="Thesis targets">
       <div class="section-caption">
         <h2>Thesis เป้าหมาย</h2>
-        <p>ปรับเป้าหมายของคุณ แล้วระบบเทียบกับเส้นทางจริงจากงบการเงิน</p>
+        <p>ผลจริงย้อนหลังเทียบเกณฑ์ที่ตั้งไว้ ไม่ใช่การคาดการณ์ผลตอบแทน</p>
       </div>
       <label>รายได้ CAGR เป้าหมาย (%)<input id="targetRevenueCagr" type="number" min="1" max="80" step="1" value="10"></label>
       <label>กำไรสุทธิ CAGR เป้าหมาย (%)<input id="targetProfitCagr" type="number" min="1" max="100" step="1" value="12"></label>
@@ -338,10 +397,6 @@
     </section>
   </main>
 
-  <footer>
-    Research workflow only. Not financial advice.
-  </footer>
-
   <main id="profileView" class="app-shell app-view is-hidden">
     <header class="profile-head">
       <div>
@@ -360,39 +415,87 @@
       <p class="decision-empty">กดปุ่ม “ข้อมูลบริษัท” จากหน้า Scanner เพื่อดูรายละเอียด</p>
     </section>
 
+    <section class="profile-growth-overview" aria-label="สรุปการเติบโตและผลตอบแทน">
+      <div class="profile-growth-heading">
+        <p class="eyebrow">Growth Snapshot</p>
+        <h3>ธุรกิจโตแค่ไหน และหุ้นให้ผลตอบแทนเท่าไร</h3>
+        <p>CAGR คือค่าเฉลี่ยแบบทบต้นจากต้นช่วงถึงปลายช่วง ไม่ใช่การคาดการณ์อนาคต</p>
+      </div>
+      <div id="profileGrowthSnapshot" class="profile-growth-grid"></div>
+    </section>
+
+    <section class="profile-block" id="profileBusinessBlock">
+      <h3><span class="profile-step">1</span> บริษัททำอะไรและหาเงินอย่างไร</h3>
+      <p class="profile-lead">เริ่มจากเข้าใจสินค้า ลูกค้า และแหล่งรายได้ก่อนดูตัวเลข ถ้าอธิบายธุรกิจไม่ได้ ยังไม่ควรประเมินหุ้น</p>
+      <div id="profileBusiness"></div>
+    </section>
+
+    <section class="profile-block" id="profileCompetitionBlock">
+      <h3><span class="profile-step">2</span> คู่แข่งและความได้เปรียบ</h3>
+      <p class="profile-lead">Moat ต้องมีหลักฐานรองรับและต้องเทียบกับคู่แข่ง ไม่ใช่เพียงเลือกคำว่า wide หรือ strong</p>
+      <div id="profileCompetition"></div>
+    </section>
+
     <section class="profile-block" id="profileIdentityBlock">
-      <h3><span class="profile-step">1</span> บริษัทนี้เป็นหุ้นประเภทไหน</h3>
-      <p class="profile-lead">รู้ประเภทหุ้นก่อน จะได้คาดหวังผลตอบแทนและใช้วิธีประเมินมูลค่าให้ถูกกับหุ้นแต่ละแบบ</p>
+      <h3><span class="profile-step">3</span> ตัวเลขสำคัญและประเภทหุ้น</h3>
+      <p class="profile-lead">ดูเฉพาะแนวโน้มที่ใช้ตัดสินใจ ส่วนงบทุกบรรทัดเปิดดูได้ในหน้า “งบการเงิน 5 ปี”</p>
       <div class="profile-identity" id="profileIdentity"></div>
     </section>
 
     <section class="profile-block" id="profileFilterBlock">
-      <h3><span class="profile-step">2</span> Financial Quality Filter — คัดกรอง 4 ด่าน</h3>
-      <p class="profile-lead">ธุรกิจที่ดีต้องผ่านครบทั้งสี่ด่าน ตกด่านใดด่านหนึ่งแปลว่ายังไม่ใช่หุ้นคุณภาพ ไม่ว่าราคาจะถูกแค่ไหน</p>
+      <h3><span class="profile-step">4</span> Financial Quality Filter — คัดกรอง 4 ด่าน</h3>
+      <p class="profile-lead">เกณฑ์ตัวเลขของระบบ 4 ด้าน ไม่ใช่การรับรองคุณภาพธุรกิจ และอาจไม่เหมาะกับทุกอุตสาหกรรม</p>
       <div class="stage-grid" id="profileStages"></div>
     </section>
 
     <section class="profile-block" id="profileValuationBlock">
-      <h3><span class="profile-step">3</span> ซื้อใน “ราคาที่เหมาะสม” — Margin of Safety</h3>
+      <h3><span class="profile-step">5</span> ราคาที่เหมาะสมและ Margin of Safety</h3>
       <p class="profile-lead">บริษัทดีไม่ได้แปลว่าควรซื้อทุกราคา ต้องมีส่วนลดจากมูลค่าที่แท้จริงไว้กันความผิดพลาด</p>
       <div class="valuation-layout" id="profileValuation"></div>
     </section>
 
-    <section class="profile-block" id="profileQualitativeBlock">
-      <h3><span class="profile-step">4</span> เชิงคุณภาพ — สิ่งที่ตัวเลขบอกไม่ได้</h3>
-      <p class="profile-lead">ส่วนนี้ระบบเติมให้ไม่ได้ ต้องเป็นคนอ่านและบันทึกเอง บันทึกแล้วคะแนนในหน้า Scanner จะถอดคำนำหน้า T- ออก</p>
-      <div class="qualitative-layout" id="profileQualitative"></div>
+    <section class="profile-block" id="profileThesisBlock">
+      <h3><span class="profile-step">6</span> Thesis ตัวเร่ง ความเสี่ยง และจุดที่ต้องยอมรับว่าคิดผิด</h3>
+      <p class="profile-lead">Thesis ที่ดีต้องติดตามได้และมีเงื่อนไขยกเลิก ไม่ใช่เพียงประโยคว่าบริษัทน่าจะเติบโต</p>
+      <div id="profileThesis"></div>
     </section>
 
-    <section class="profile-block" id="profileFlowBlock">
-      <h3><span class="profile-step">5</span> ทบทวนตามลำดับ 8 ขั้น</h3>
-      <p class="profile-lead">ไล่ดูให้ครบทุกขั้นและเชื่อมโยงกันเป็นภาพเดียว จะเห็นว่าธุรกิจนี้แข็งแรงจริงหรือแค่ดูดีบางมุม</p>
+    <details class="profile-research-editor" id="profileResearchEditor">
+      <summary>เพิ่มหรือแก้ไขงานวิจัยบริษัท</summary>
+      <form id="profileResearchForm">
+        <div class="research-form-grid">
+          <label class="span-2">บริษัททำอะไร<textarea id="profileBusinessSummary" maxlength="2500" placeholder="อธิบายสินค้า บริการ และลูกค้าหลักด้วยภาษาง่าย ๆ"></textarea></label>
+          <label>บริษัทหาเงินอย่างไร<textarea id="profileRevenueModel" maxlength="2000" placeholder="เช่น ขายสินค้า ค่าสมาชิก ค่าธรรมเนียม"></textarea></label>
+          <label>รายได้แต่ละทาง<textarea id="profileRevenueSegments" maxlength="2500" placeholder="หนึ่งบรรทัดต่อหนึ่งธุรกิจ เช่น ค้าปลีก 70%"></textarea></label>
+          <label>ลูกค้าหลักและการกระจุกตัว<textarea id="profileKeyCustomers" maxlength="1500" placeholder="ลูกค้าเป็นใคร รายใหญ่พึ่งพามากแค่ไหน"></textarea></label>
+          <label>คู่แข่ง<textarea id="profileCompetitors" maxlength="1500" placeholder="ชื่อคู่แข่งและสิ่งที่แต่ละรายเด่นกว่า"></textarea></label>
+          <label class="span-2">หลักฐานของความได้เปรียบ<textarea id="profileMoatEvidence" maxlength="2500" placeholder="ส่วนแบ่งตลาด Switching cost ต้นทุน แบรนด์ Network effect หรือสิทธิบัตร พร้อมตัวเลขสนับสนุน"></textarea></label>
+          <label>Moat<select id="profileResearchMoat"><option value="">ยังไม่ประเมิน</option><option value="wide">Wide</option><option value="strong">Strong</option><option value="medium">Medium</option><option value="niche">Niche</option><option value="weak">Weak</option></select></label>
+          <label>แนวโน้มธุรกิจ<select id="profileResearchTrend"><option value="">ยังไม่ประเมิน</option><option value="leader">Leader</option><option value="beneficiary">Beneficiary</option><option value="automation">Automation</option><option value="neutral">Neutral</option><option value="laggard">Laggard</option></select></label>
+          <label>สถานะงานวิจัย<select id="profileResearchDecision"><option value="Watch">Watch</option><option value="Research">Research</option><option value="Approved">Approved</option><option value="Owned">Owned</option><option value="Exit">Exit</option></select></label>
+          <label>ตัวเร่งการเติบโต<textarea id="profileCatalysts" maxlength="1800" placeholder="เหตุการณ์ที่อาจทำให้ธุรกิจโตเร็วกว่าคาด"></textarea></label>
+          <label>ความเสี่ยงหลัก<textarea id="profileRisks" maxlength="2500" placeholder="อะไรทำให้รายได้ กำไร หรือ Moat แย่ลง"></textarea></label>
+          <label class="span-2">เงื่อนไขที่ทำให้ Thesis ผิด<textarea id="profileInvalidation" maxlength="1800" placeholder="กำหนดตัวเลขหรือเหตุการณ์ที่เกิดแล้วต้องทบทวนหรือขาย"></textarea></label>
+          <label class="span-2">แหล่งข้อมูล<textarea id="profileSourceUrls" maxlength="2500" placeholder="หนึ่งลิงก์ต่อบรรทัด เช่น Annual Report, 10-K, 56-1 One Report"></textarea></label>
+          <label>Thesis<textarea id="profileResearchThesis" maxlength="2000" placeholder="เหตุผลที่ธุรกิจน่าจะมีมูลค่าเพิ่มในอนาคต"></textarea></label>
+        </div>
+        <div class="research-form-actions"><button id="profileResearchSave" class="primary-button" type="submit">บันทึกงานวิจัย</button><span id="profileResearchStatus"></span></div>
+      </form>
+    </details>
+
+    <details class="profile-review-details" id="profileQualitativeBlock">
+      <summary>Checklist เชิงคุณภาพและ Five Forces</summary>
+      <div class="qualitative-layout" id="profileQualitative"></div>
+    </details>
+
+    <details class="profile-review-details" id="profileFlowBlock">
+      <summary>Checklist ทบทวนงบ 8 ขั้น</summary>
       <ol class="flow-list" id="profileFlow"></ol>
       <div class="profile-footer-actions">
         <a id="reportButton" class="ghost-button" href="#" target="_blank" rel="noreferrer">เปิดรายงานสำหรับพิมพ์</a>
         <a id="profileFinancialLink" class="ghost-button" href="#">ดูงบการเงิน 5 ปี</a>
       </div>
-    </section>
+    </details>
   </main>
 
   <main id="evidenceView" class="app-shell app-view is-hidden">
@@ -451,7 +554,10 @@
     </section>
   </main>
 
+  <footer>ข้อมูลเพื่อการศึกษาและวิจัย ไม่ใช่คำแนะนำซื้อขายหรือการรับประกันผลตอบแทน</footer>
+
   <script src="/app.js"></script>
+  <script src="/hall.js"></script>
   <script src="/financial.js"></script>
   <script src="/profile.js"></script>
 </body>

@@ -129,6 +129,8 @@ def fetch_symbol_prices(
     lows = quote.get("low") or []
     closes = quote.get("close") or []
     volumes = quote.get("volume") or []
+    adjusted = (chart.get("indicators", {}).get("adjclose") or [{}])[0]
+    adjusted_closes = adjusted.get("adjclose") or []
 
     rows: list[dict[str, str | float]] = []
     for idx, timestamp in enumerate(timestamps):
@@ -140,6 +142,16 @@ def fetch_symbol_prices(
         ]
         if any(value is None for value in values):
             continue
+        adjusted_close = (
+            adjusted_closes[idx]
+            if idx < len(adjusted_closes) and adjusted_closes[idx] is not None
+            else None
+        )
+        adjustment_factor = (
+            float(adjusted_close) / float(values[3])
+            if adjusted_close is not None and adjusted_close > 0 and values[3] > 0
+            else None
+        )
         rows.append(
             {
                 "date": datetime.fromtimestamp(int(timestamp)).date().isoformat(),
@@ -148,6 +160,8 @@ def fetch_symbol_prices(
                 "high": round(float(values[1]), 6),
                 "low": round(float(values[2]), 6),
                 "close": round(float(values[3]), 6),
+                "adjusted_open": round(float(values[0]) * adjustment_factor, 6) if adjustment_factor is not None else "",
+                "adjusted_close": round(float(adjusted_close), 6) if adjustment_factor is not None else "",
                 "volume": int(volumes[idx] or 0) if idx < len(volumes) else 0,
             }
         )
@@ -170,8 +184,10 @@ def update_prices_from_yahoo(
         raise RuntimeError(f"No symbols found in {Path(universe_path)}")
 
     output = Path(output_path)
-    status_path = output.with_name(DEFAULT_STATUS.name)
-    lock_path = output.with_name("fastdeep_price_update.lock")
+    status_path = output.with_name(
+        DEFAULT_STATUS.name if output.name == DEFAULT_OUTPUT.name else f"{output.stem}_update_status.json"
+    )
+    lock_path = output.with_name(f"{output.stem}_update.lock")
     _acquire_lock(lock_path, stale_lock_minutes)
     _write_status(status_path, "running", symbols_requested=len(symbols), output=str(output))
 
@@ -256,7 +272,17 @@ def update_prices_from_yahoo(
         with temp_output.open("w", newline="", encoding="utf-8-sig") as handle:
             writer = csv.DictWriter(
                 handle,
-                fieldnames=["date", "symbol", "open", "high", "low", "close", "volume"],
+                fieldnames=[
+                    "date",
+                    "symbol",
+                    "open",
+                    "high",
+                    "low",
+                    "close",
+                    "adjusted_open",
+                    "adjusted_close",
+                    "volume",
+                ],
             )
             writer.writeheader()
             writer.writerows(rows)

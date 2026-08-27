@@ -9,6 +9,7 @@ from fastdeep_scanner.financials import (
     _add_ratios,
     _quarterly_by_year,
     _vi_summary,
+    _with_currency_presentation,
     assess_financial_payload,
     audit_financial_cache,
 )
@@ -61,12 +62,69 @@ class FinancialDataTest(unittest.TestCase):
         self.assertEqual(q4["metrics"]["total_revenue"], 370)
         self.assertEqual(q4["metrics"]["total_assets"], 1800)
 
+    def test_q4_does_not_copy_annual_eps_or_subtract_quarterly_eps(self) -> None:
+        self.annual[-1]["metrics"]["basic_eps"] = 14.64
+        quarterly = [
+            {"period_end": "2024-03-31", "metrics": {"basic_eps": 2.70}},
+            {"period_end": "2024-06-30", "metrics": {"basic_eps": 3.75}},
+            {"period_end": "2024-09-30", "metrics": {"basic_eps": 4.10}},
+        ]
+        q4 = _quarterly_by_year(quarterly, self.annual)["2024"][-1]
+        self.assertNotIn("basic_eps", q4["metrics"])
+
+    def test_legacy_derived_eps_is_removed_but_reported_eps_is_kept(self) -> None:
+        payload = _with_currency_presentation({
+            "symbol": "TEST", "market": "US", "currency": "USD", "annual": [],
+            "quarterly_by_year": {"2024": [
+                {"quarter": "Q3", "metrics": {"basic_eps": 4.10}},
+                {"quarter": "Q4", "derived_from_annual": True, "metrics": {"basic_eps": 14.64, "total_assets": 1800}},
+            ]},
+        })
+        periods = payload["quarterly_by_year"]["2024"]
+        self.assertEqual(periods[0]["metrics"]["basic_eps"], 4.10)
+        self.assertNotIn("basic_eps", periods[1]["metrics"])
+        self.assertEqual(periods[1]["metrics"]["total_assets"], 1800)
+
     def test_vi_summary_reports_growth_period(self) -> None:
         summary = _vi_summary(_add_ratios(self.annual))
         self.assertTrue(summary["available"])
         self.assertEqual(summary["period"], "2023-2024")
         revenue = next(item for item in summary["checks"] if item["key"] == "revenue")
         self.assertAlmostEqual(revenue["cagr"], 20.0)
+
+    def test_vi_ratio_changes_use_points_and_multiples(self) -> None:
+        summary = _vi_summary(_add_ratios(self.annual))
+        checks = {item["key"]: item for item in summary["checks"]}
+        self.assertAlmostEqual(checks["net_margin"]["change"], 2.5)
+        self.assertEqual(checks["net_margin"]["change_unit"], "percentage_points")
+        self.assertAlmostEqual(checks["debt_to_equity"]["change"], -0.1)
+        self.assertEqual(checks["debt_to_equity"]["change_unit"], "multiple")
+
+    def test_vi_ratio_changes_need_two_different_years(self) -> None:
+        summary = _vi_summary(_add_ratios(self.annual[-1:]))
+        checks = {item["key"]: item for item in summary["checks"]}
+        self.assertIsNone(checks["roe"]["change"])
+
+    def test_vi_summary_does_not_treat_a_gap_as_one_year(self) -> None:
+        self.annual[0]["period_end"] = "2022-12-31"
+        summary = _vi_summary(_add_ratios(self.annual))
+        revenue = next(item for item in summary["checks"] if item["key"] == "revenue")
+        self.assertEqual(summary["elapsed_years"], 2)
+        self.assertAlmostEqual(revenue["cagr"], (1.2 ** 0.5 - 1) * 100)
+        self.assertIsNone(summary["yearly"][-1]["revenue_growth"])
+
+    def test_cached_summary_is_recalculated_with_the_current_formula(self) -> None:
+        self.annual[0]["period_end"] = "2022-12-31"
+        payload = _with_currency_presentation({
+            "symbol": "TEST", "market": "US", "currency": "USD",
+            "annual": _add_ratios(self.annual), "vi_summary": {"elapsed_years": 1},
+        })
+        self.assertEqual(payload["vi_summary"]["elapsed_years"], 2)
+
+    def test_profit_recovery_does_not_show_a_negative_growth_percentage(self) -> None:
+        self.annual[0]["metrics"]["net_income"] = -100
+        summary = _vi_summary(_add_ratios(self.annual))
+        self.assertIsNone(summary["yearly"][-1]["profit_growth"])
 
     def test_vi_summary_does_not_emit_complex_cagr_for_a_new_loss(self) -> None:
         annual = [

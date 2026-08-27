@@ -31,6 +31,11 @@ try {
 
     # Yahoo remains the weekly fallback for markets outside SEC coverage.
     if ((Get-Date).DayOfWeek -eq [DayOfWeek]::Saturday) {
+        # Hall of Fame uses compact monthly adjusted prices. Keeping this in a
+        # separate file avoids loading ten years of daily bars into the scanner.
+        & $python -m fastdeep_scanner update-prices --universe data\fastdeep_universe.csv --out data\fastdeep_hall_prices.csv --range 10y --interval 1mo --pause 0.05 --min-success-ratio 0.97 --workers 6 --request-timeout 12 2>&1 | ForEach-Object { Write-DailyLog "hall prices: $_" }
+        if ($LASTEXITCODE -ne 0) { Write-DailyLog "hall prices: refresh failed, keeping previous monthly history" }
+
         & $python -m fastdeep_scanner update-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --pause 0.75 --workers 1 --request-timeout 20 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json 2>&1 | ForEach-Object { Write-DailyLog "financials: $_" }
         if ($LASTEXITCODE -ne 0) { Write-DailyLog "financials: refresh incomplete, keeping verified cache" }
     }

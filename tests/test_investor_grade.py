@@ -180,10 +180,45 @@ class ResearchJournalTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 save_research("TEST", "Approved", "looks good", path)
             record = save_research(
-                "TEST", "Approved", "checked", path, moat="wide", ai_trend="leader", fair_value=120
+                "TEST", "Research", "checked", path, moat="wide", ai_trend="leader", fair_value=120
             )
             self.assertTrue(record["research_verified"])
+            self.assertFalse(record["company_profile_verified"])
             self.assertEqual(get_research("TEST", path)["fair_value"], 120.0)
+
+    def test_company_profile_requires_evidence_and_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "journal.json"
+            record = save_research(
+                "TEST",
+                "Research",
+                path=path,
+                moat="wide",
+                ai_trend="leader",
+                business_summary="บริษัทขายซอฟต์แวร์ให้ธุรกิจ",
+                revenue_model="ค่าสมาชิกรายปี",
+                revenue_segments="Subscription 90%\nServices 10%",
+                key_customers="กระจายตัว ไม่มีลูกค้ารายเดียวเกิน 10%",
+                competitors="PEER1, PEER2",
+                moat_evidence="อัตราต่อสัญญาสูงและต้นทุนย้ายระบบสูง",
+                risks="คู่แข่งลดราคา",
+                invalidation="อัตราต่อสัญญาต่ำกว่า 80%",
+                source_urls="https://example.com/annual-report",
+                thesis="รายได้ประจำเติบโตและรักษาลูกค้าได้",
+            )
+            self.assertTrue(record["company_profile_verified"])
+
+    def test_approved_status_requires_the_complete_company_profile(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "journal.json"
+            with self.assertRaises(ValueError):
+                save_research(
+                    "TEST",
+                    "Approved",
+                    path=path,
+                    moat="wide",
+                    ai_trend="leader",
+                )
 
     def test_watch_status_stays_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

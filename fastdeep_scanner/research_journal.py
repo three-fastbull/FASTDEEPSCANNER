@@ -32,8 +32,19 @@ def _blank(symbol: str) -> dict[str, Any]:
         "ai_trend": "",
         "fair_value": 0.0,
         "thesis": "",
+        "business_summary": "",
+        "revenue_model": "",
+        "revenue_segments": "",
+        "key_customers": "",
+        "competitors": "",
+        "moat_evidence": "",
+        "catalysts": "",
+        "risks": "",
+        "invalidation": "",
+        "source_urls": "",
         "updated_at": None,
         "research_verified": False,
+        "company_profile_verified": False,
     }
 
 
@@ -42,10 +53,44 @@ def _is_verified(item: dict[str, Any]) -> bool:
     return bool(item.get("moat")) and bool(item.get("ai_trend"))
 
 
+def _has_source_url(value: Any) -> bool:
+    return any(
+        line.strip().lower().startswith(("https://", "http://"))
+        for line in str(value or "").splitlines()
+    )
+
+
+def _is_company_profile_verified(item: dict[str, Any]) -> bool:
+    required = (
+        "business_summary",
+        "revenue_model",
+        "revenue_segments",
+        "key_customers",
+        "competitors",
+        "moat_evidence",
+        "risks",
+        "invalidation",
+        "thesis",
+    )
+    return (
+        _is_verified(item)
+        and all(bool(str(item.get(key) or "").strip()) for key in required)
+        and _has_source_url(item.get("source_urls"))
+    )
+
+
+def _with_verification(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **item,
+        "research_verified": _is_verified(item),
+        "company_profile_verified": _is_company_profile_verified(item),
+    }
+
+
 def load_journal(path: str | Path = DEFAULT_PATH) -> dict[str, dict[str, Any]]:
     items = _read(Path(path)).get("items", {})
     return {
-        symbol: {**item, "research_verified": _is_verified(item)}
+        symbol: _with_verification(item)
         for symbol, item in items.items()
         if isinstance(item, dict)
     }
@@ -56,7 +101,7 @@ def get_research(symbol: str, path: str | Path = DEFAULT_PATH) -> dict[str, Any]
     item = _read(Path(path)).get("items", {}).get(symbol)
     if not isinstance(item, dict):
         return _blank(symbol)
-    return {**_blank(symbol), **item, "research_verified": _is_verified(item)}
+    return _with_verification({**_blank(symbol), **item})
 
 
 def save_research(
@@ -69,6 +114,16 @@ def save_research(
     ai_trend: str = "",
     fair_value: float | str | None = None,
     thesis: str = "",
+    business_summary: str | None = None,
+    revenue_model: str | None = None,
+    revenue_segments: str | None = None,
+    key_customers: str | None = None,
+    competitors: str | None = None,
+    moat_evidence: str | None = None,
+    catalysts: str | None = None,
+    risks: str | None = None,
+    invalidation: str | None = None,
+    source_urls: str | None = None,
 ) -> dict[str, Any]:
     symbol = symbol.strip().upper()
     if not symbol:
@@ -87,14 +142,17 @@ def save_research(
         raise ValueError("มูลค่าที่เหมาะสมต้องเป็นตัวเลข") from exc
     if fair < 0:
         raise ValueError("มูลค่าที่เหมาะสมต้องไม่ติดลบ")
-    if status in {"Approved", "Owned"} and not (moat and ai_trend):
-        raise ValueError("ต้องบันทึก Moat และแนวโน้มธุรกิจก่อนเปลี่ยนสถานะเป็น Approved หรือ Owned")
-
     path = Path(path)
     with _LOCK:
         payload = _read(path)
         items = payload.setdefault("items", {})
         previous = items.get(symbol) if isinstance(items.get(symbol), dict) else {}
+
+        def researched_text(key: str, value: str | None, limit: int) -> str:
+            if value is None:
+                return str(previous.get(key) or "")[:limit]
+            return str(value).strip()[:limit]
+
         record = {
             "symbol": symbol,
             "status": status,
@@ -103,9 +161,24 @@ def save_research(
             "ai_trend": ai_trend or str(previous.get("ai_trend") or ""),
             "fair_value": fair or float(previous.get("fair_value") or 0.0),
             "thesis": (thesis.strip() or str(previous.get("thesis") or ""))[:2000],
+            "business_summary": researched_text("business_summary", business_summary, 2500),
+            "revenue_model": researched_text("revenue_model", revenue_model, 2000),
+            "revenue_segments": researched_text("revenue_segments", revenue_segments, 2500),
+            "key_customers": researched_text("key_customers", key_customers, 1500),
+            "competitors": researched_text("competitors", competitors, 1500),
+            "moat_evidence": researched_text("moat_evidence", moat_evidence, 2500),
+            "catalysts": researched_text("catalysts", catalysts, 1800),
+            "risks": researched_text("risks", risks, 2500),
+            "invalidation": researched_text("invalidation", invalidation, 1800),
+            "source_urls": researched_text("source_urls", source_urls, 2500),
             "updated_at": datetime.now(UTC).isoformat(),
         }
-        record["research_verified"] = _is_verified(record)
+        record = _with_verification(record)
+        if status in {"Approved", "Owned"} and not record["company_profile_verified"]:
+            raise ValueError(
+                "ต้องตรวจข้อมูลธุรกิจ รายได้ ลูกค้า คู่แข่ง Moat Thesis ความเสี่ยง "
+                "และแหล่งอ้างอิงให้ครบก่อนเปลี่ยนเป็น Approved หรือ Owned"
+            )
         items[symbol] = record
         path.parent.mkdir(parents=True, exist_ok=True)
         temp = path.with_name(f".{path.name}.{uuid4().hex}.tmp")

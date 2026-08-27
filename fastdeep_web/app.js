@@ -4,6 +4,9 @@ const state = {
   criteriaQuery: "",
   imageIndex: null,
   dataHealth: null,
+  scanRequestId: 0,
+  symbolRequestId: 0,
+  detailPayload: null,
 };
 const MAX_VISIBLE_RESULTS = 50;
 
@@ -34,6 +37,8 @@ const elements = {
   agentNotes: document.getElementById("agentNotes"),
   warningList: document.getElementById("warningList"),
   chartImageInput: document.getElementById("chartImageInput"),
+  chartDropZone: document.getElementById("chartDropZone"),
+  chartFileName: document.getElementById("chartFileName"),
   imageScanButton: document.getElementById("imageScanButton"),
   chartImagePreview: document.getElementById("chartImagePreview"),
   imageMatches: document.getElementById("imageMatches"),
@@ -272,7 +277,10 @@ function renderImageMatches(matches) {
           <span>${match.name} | ${match.market} | ${match.index_groups || "-"}</span>
           <span>${inScan}</span>
         </div>
-        <a class="ghost-button" href="${match.tradingview_url}" target="_blank" rel="noreferrer">TV</a>
+        <div class="image-match-actions">
+          <button class="ghost-button image-profile-button" type="button" data-symbol="${escapeHtml(match.symbol)}">ข้อมูลบริษัท</button>
+          <a class="ghost-button" href="${match.tradingview_url}" target="_blank" rel="noreferrer">TradingView</a>
+        </div>
       </article>
     `;
   }).join("");
@@ -333,10 +341,11 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
     const usTotal = financialHealth.by_market?.US?.symbols || 0;
     const secUpdate = financialHealth.sec_update || {};
     if (usTotal || secUpdate.symbols_requested) {
-      const secTarget = secUpdate.symbols_requested || usTotal;
-      const secValue = secUpdate.state === "running"
-        ? `${secUpdate.symbols_processed || 0}/${secTarget} กำลังอัปเดต`
-        : `${secCount}/${secTarget}${secUpdate.state === "failed" ? " เชื่อมต่อไม่ได้" : ""}`;
+      const secTarget = usTotal || secCount;
+      const progress = secUpdate.state === "running"
+        ? ` · รอบนี้ ${secUpdate.symbols_processed || 0}/${secUpdate.symbols_requested || 0}`
+        : secUpdate.state === "failed" ? " · รอบล่าสุดเชื่อมต่อไม่ได้" : "";
+      const secValue = `${secCount}/${secTarget}${progress}`;
       facts.push(healthFact(
         "งบทางการ SEC ",
         secValue,
@@ -568,15 +577,7 @@ function renderDecisionSummary(result) {
 function renderDetail(payload) {
   const { result, candles, fundamental, tradingview_url } = payload;
   state.selectedSymbol = result.symbol;
-  window.fastDeepSelectedSymbol = result.symbol;
-  window.dispatchEvent(new CustomEvent("fastdeep:symbol-selected", {
-    detail: {
-      symbol: result.symbol,
-      name: result.name,
-      market: result.market,
-      source: "scanner",
-    },
-  }));
+  state.detailPayload = payload;
   document.querySelectorAll("tbody tr").forEach((row) => {
     row.classList.toggle("active", row.dataset.symbol === result.symbol);
   });
@@ -624,15 +625,25 @@ function renderDetail(payload) {
     : "<li>No major warning from scanner</li>";
 }
 
-async function loadSymbol(symbol) {
-  setStatus("Loading");
-  const response = await fetch(`/api/symbol?symbol=${encodeURIComponent(symbol)}&${state.criteriaQuery}`);
-  if (!response.ok) {
-    setStatus("Symbol error");
-    return;
+async function loadSymbol(symbol, { select = true } = {}) {
+  const requestId = ++state.symbolRequestId;
+  if (select) {
+    window.fastDeepSelectedSymbol = symbol;
+    window.dispatchEvent(new CustomEvent("fastdeep:symbol-selected", {
+      detail: { symbol, source: "scanner" },
+    }));
   }
-  renderDetail(await response.json());
-  setStatus("Ready");
+  setStatus("Loading");
+  try {
+    const response = await fetch(`/api/symbol?symbol=${encodeURIComponent(symbol)}&${state.criteriaQuery}`);
+    const payload = await response.json();
+    if (requestId !== state.symbolRequestId || window.fastDeepSelectedSymbol !== symbol) return;
+    if (!response.ok) throw new Error(payload.error || "โหลดหุ้นไม่สำเร็จ");
+    renderDetail(payload);
+    setStatus("Ready");
+  } catch (error) {
+    if (requestId === state.symbolRequestId) setStatus("Symbol error");
+  }
 }
 
 async function savePaperTrade() {
@@ -751,26 +762,32 @@ async function closeTrade(id) {
 }
 
 async function runScan() {
+  const requestId = ++state.scanRequestId;
+  const selectedAtStart = window.fastDeepSelectedSymbol;
   setStatus("Scanning");
   const query = criteriaQuery();
   elements.csvButton.href = `/api/export.csv?${query}`;
-  const response = await fetch(`/api/scan?${query}`);
-  if (!response.ok) {
-    setStatus("Scan error");
-    return;
-  }
-  const payload = await response.json();
-  elements.dataSourceNote.textContent = `Data Source: ${payload.data_source || "unknown"}`;
-  renderDataHealth(payload.data_health, payload.financial_health, payload);
-  state.results = payload.results;
-  renderMetrics(payload.results);
-  renderTable(payload.results);
-  const generatedAt = payload.generated_at ? new Date(payload.generated_at).toLocaleString() : "-";
-  const shown = Math.min(payload.results.length, MAX_VISIBLE_RESULTS);
-  elements.generatedAt.textContent = `${generatedAt} | แสดง ${shown}/${payload.results.length}`;
-  setStatus("Ready");
-  if (payload.results.length) {
-    await loadSymbol(payload.results[0].symbol);
+  try {
+    const response = await fetch(`/api/scan?${query}`);
+    const payload = await response.json();
+    if (requestId !== state.scanRequestId) return;
+    if (!response.ok) throw new Error(payload.error || "สแกนไม่สำเร็จ");
+    elements.dataSourceNote.textContent = `Data Source: ${payload.data_source || "unknown"}`;
+    renderDataHealth(payload.data_health, payload.financial_health, payload);
+    state.results = payload.results;
+    renderMetrics(payload.results);
+    renderTable(payload.results);
+    const generatedAt = payload.generated_at ? new Date(payload.generated_at).toLocaleString() : "-";
+    const shown = Math.min(payload.results.length, MAX_VISIBLE_RESULTS);
+    elements.generatedAt.textContent = `${generatedAt} | แสดง ${shown}/${payload.results.length}`;
+    setStatus("Ready");
+    if (payload.results.length && window.fastDeepSelectedSymbol === selectedAtStart
+        && !document.getElementById("scannerView").classList.contains("is-hidden")) {
+      const preferred = payload.results.find((item) => item.symbol === selectedAtStart) || payload.results[0];
+      await loadSymbol(preferred.symbol);
+    }
+  } catch (error) {
+    if (requestId === state.scanRequestId) setStatus("Scan error");
   }
 }
 
@@ -793,16 +810,58 @@ document.querySelectorAll('[data-view-target="journalView"]').forEach((tab) => {
 elements.researchSaveButton.addEventListener("click", saveResearch);
 window.addEventListener("fastdeep:financials-verified", (event) => {
   const symbol = event.detail?.symbol;
-  if (symbol && symbol === state.selectedSymbol) loadSymbol(symbol);
+  if (symbol && symbol === state.selectedSymbol && symbol === window.fastDeepSelectedSymbol) loadSymbol(symbol, { select: false });
+});
+window.addEventListener("fastdeep:symbol-selected", (event) => {
+  if (event.detail?.source !== "scanner") state.symbolRequestId += 1;
 });
 elements.marketSelect.addEventListener("change", runScan);
 elements.universeSelect.addEventListener("change", runScan);
 elements.timeframeSelect.addEventListener("change", runScan);
-elements.chartImageInput.addEventListener("change", () => {
-  const file = elements.chartImageInput.files && elements.chartImageInput.files[0];
-  if (!file) return;
+function showChartFile(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    elements.imageMatches.innerHTML = "<p>กรุณาเลือกไฟล์รูปภาพ</p>";
+    return;
+  }
   elements.chartImagePreview.src = URL.createObjectURL(file);
-  elements.imageMatches.innerHTML = "<p>แนบรูปแล้ว กด Scan รูปกราฟ</p>";
+  elements.chartDropZone.classList.add("has-image");
+  elements.chartFileName.textContent = file.name;
+  elements.imageMatches.innerHTML = "<p>พร้อมแล้ว กดค้นหาหุ้นที่ทรงกราฟคล้ายกัน</p>";
+}
+
+elements.chartImageInput.addEventListener("change", () => {
+  showChartFile(elements.chartImageInput.files && elements.chartImageInput.files[0]);
+});
+
+for (const eventName of ["dragenter", "dragover"]) {
+  elements.chartDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    elements.chartDropZone.classList.add("is-dragging");
+  });
+}
+for (const eventName of ["dragleave", "drop"]) {
+  elements.chartDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    elements.chartDropZone.classList.remove("is-dragging");
+  });
+}
+elements.chartDropZone.addEventListener("drop", (event) => {
+  const file = event.dataTransfer?.files?.[0];
+  if (!file) return;
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  elements.chartImageInput.files = transfer.files;
+  showChartFile(file);
+});
+
+elements.imageMatches.addEventListener("click", (event) => {
+  const button = event.target.closest(".image-profile-button");
+  if (!button) return;
+  const symbol = button.dataset.symbol;
+  window.fastDeepSelectedSymbol = symbol;
+  window.dispatchEvent(new CustomEvent("fastdeep:symbol-selected", { detail: { symbol, source: "image-match" } }));
+  const profileTab = document.querySelector('[data-view-target="profileView"]');
+  if (profileTab) profileTab.click();
 });
 elements.imageScanButton.addEventListener("click", async () => {
   const file = elements.chartImageInput.files && elements.chartImageInput.files[0];
@@ -831,7 +890,9 @@ document.querySelectorAll(".pattern-controls input").forEach((input) => {
 });
 
 window.addEventListener("resize", () => {
-  if (state.selectedSymbol) loadSymbol(state.selectedSymbol);
+  if (state.detailPayload && !document.getElementById("scannerView").classList.contains("is-hidden")) {
+    drawChart(aggregateCandles(state.detailPayload.candles, elements.timeframeSelect.value), state.detailPayload.result);
+  }
 });
 
 runScan();

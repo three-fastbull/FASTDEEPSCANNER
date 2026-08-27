@@ -12,6 +12,8 @@
     unit: document.getElementById("financialUnit"),
     kpis: document.getElementById("financialKpis"),
     source: document.getElementById("financialSource"),
+    annualPanel: document.getElementById("annualFinancialPanel"),
+    trendToggle: document.getElementById("financialTrendToggle"),
     annualHead: document.getElementById("annualFinancialHead"),
     annualBody: document.getElementById("annualFinancialBody"),
     quarterlyTitle: document.getElementById("quarterlyTitle"),
@@ -19,6 +21,9 @@
     quarterlyNote: document.getElementById("quarterlyPeriodNote"),
     quarterlyHead: document.getElementById("quarterlyFinancialHead"),
     quarterlyBody: document.getElementById("quarterlyFinancialBody"),
+    quarterlyPanel: document.getElementById("quarterlyPanel"),
+    quarterlyYear: document.getElementById("quarterlyYearSelect"),
+    annualBack: document.getElementById("annualBackButton"),
     viTitle: document.getElementById("viTitle"),
     viSubtitle: document.getElementById("viSubtitle"),
     viScore: document.getElementById("viScore"),
@@ -39,6 +44,18 @@
     activeView: "scannerView",
     financialRequestId: 0,
   };
+
+  const GOOD_WHEN_UP = new Set([
+    "stockholders_equity", "cash_and_equivalents", "total_revenue", "gross_profit",
+    "operating_income", "pretax_income", "net_income", "basic_eps",
+    "operating_cash_flow", "free_cash_flow", "roe", "roa", "net_margin",
+    "gross_margin", "fcf_margin",
+  ]);
+  const GOOD_WHEN_DOWN = new Set(["total_debt", "debt_to_equity"]);
+  const PROFIT_LIKE = new Set([
+    "gross_profit", "operating_income", "pretax_income", "net_income",
+    "basic_eps", "operating_cash_flow", "free_cash_flow",
+  ]);
 
   const amountFormatter = new Intl.NumberFormat("th-TH", {
     minimumFractionDigits: 0,
@@ -110,6 +127,7 @@
     for (const tab of elements.navTabs) {
       tab.classList.toggle("is-active", tab.dataset.viewTarget === viewId);
     }
+    document.querySelector(".app-navigation").scrollIntoView({ block: "start" });
     const needsStatements = viewId === "financialsView" || viewId === "viView";
     if (needsStatements && state.financials?.symbol !== normalizedSymbol()) loadFinancials(false);
   }
@@ -153,6 +171,12 @@
       state.selectedYear = fiscalYear(payload.annual.at(-1));
       renderFinancials();
       renderVi();
+      if (window.fastDeepSelectedSymbol !== payload.symbol) {
+        window.fastDeepSelectedSymbol = payload.symbol;
+        window.dispatchEvent(new CustomEvent("fastdeep:symbol-selected", {
+          detail: { symbol: payload.symbol, source: "financials" },
+        }));
+      }
       window.dispatchEvent(new CustomEvent("fastdeep:financials-verified", {
         detail: { symbol: payload.symbol },
       }));
@@ -180,16 +204,58 @@
     return String(period.fiscal_year || period.period_end?.slice(0, 4) || "") || null;
   }
 
-  function financialCell(period, metric) {
-    const year = fiscalYear(period);
-    return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${amount(period.metrics[metric], metric)}</button></td>`;
+  function changeTone(key, change) {
+    if (Math.abs(change) < 0.000001) return "neutral";
+    if (GOOD_WHEN_UP.has(key)) return change > 0 ? "ok" : "bad";
+    if (GOOD_WHEN_DOWN.has(key)) return change < 0 ? "ok" : "bad";
+    return "neutral";
   }
 
-  function ratioCell(period, key) {
+  function changeBadge(currentValue, previousValue, key, ratio = false) {
+    if (currentValue === null || currentValue === undefined || previousValue === null || previousValue === undefined) return "";
+    const current = Number(currentValue);
+    const previous = Number(previousValue);
+    if (!Number.isFinite(current) || !Number.isFinite(previous)) return "";
+    if (PROFIT_LIKE.has(key) && previous <= 0) {
+      if (current === previous) return '<small class="year-change" data-tone="neutral" title="ไม่เปลี่ยนแปลงจากปีก่อน">ทรงตัว</small>';
+      if (previous < 0 && current > 0) return '<small class="year-change" data-tone="ok" title="พลิกจากขาดทุนเป็นกำไร">พลิกเป็นกำไร</small>';
+      if (current === 0) return '<small class="year-change" data-tone="ok" title="จากขาดทุนมาเป็นศูนย์">ถึงจุดคุ้มทุน</small>';
+      if (previous === 0 && current > 0) return '<small class="year-change" data-tone="ok" title="ปีก่อนเป็นศูนย์จึงไม่คำนวณเปอร์เซ็นต์">เริ่มเป็นบวก</small>';
+      if (previous < 0 && current <= 0) {
+        const improved = current > previous;
+        return `<small class="year-change" data-tone="${improved ? "ok" : "bad"}" title="ยังขาดทุนเมื่อเทียบกับปีก่อน">${improved ? "ขาดทุนน้อยลง" : "ขาดทุนเพิ่ม"}</small>`;
+      }
+      return "";
+    }
+    if (PROFIT_LIKE.has(key) && previous >= 0 && current < 0) {
+      return '<small class="year-change" data-tone="bad" title="พลิกจากกำไรเป็นขาดทุน">พลิกเป็นขาดทุน</small>';
+    }
+    if (!ratio && (previous <= 0 || current < 0)) return "";
+    const change = ratio ? current - previous : (current / previous - 1) * 100;
+    const unit = ratio ? (key === "debt_to_equity" ? "x" : " จุด") : "%";
+    const precision = ratio ? 2 : 1;
+    const threshold = ratio ? 0.01 : 0.1;
+    const smallChange = change !== 0 && Math.abs(change) < threshold;
+    const value = smallChange ? `<${threshold}` : `${change > 0 ? "+" : ""}${number(change, precision)}`;
+    const arrow = change > 0 ? "▲" : change < 0 ? "▼" : "●";
+    const direction = change > 0 ? "เพิ่มขึ้น" : change < 0 ? "ลดลง" : "ทรงตัว";
+    const magnitude = smallChange ? `น้อยกว่า ${threshold}` : number(Math.abs(change), precision);
+    return `<small class="year-change" data-tone="${changeTone(key, change)}" title="${direction}จากปีก่อน ${magnitude}${unit}">${arrow} ${escapeHtml(value)}${unit}</small>`;
+  }
+
+  function financialCell(period, metric, previousPeriod) {
+    const year = fiscalYear(period);
+    const value = period.metrics[metric];
+    const previous = previousPeriod && year - fiscalYear(previousPeriod) === 1 ? previousPeriod.metrics?.[metric] : null;
+    return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${amount(value, metric)}${changeBadge(value, previous, metric)}</button></td>`;
+  }
+
+  function ratioCell(period, key, previousPeriod) {
     const year = fiscalYear(period);
     const value = period.ratios[key];
     const formatted = key === "debt_to_equity" ? multiple(value) : percent(value);
-    return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${formatted}</button></td>`;
+    const previous = previousPeriod && year - fiscalYear(previousPeriod) === 1 ? previousPeriod.ratios?.[key] : null;
+    return `<td><button type="button" class="financial-period-button" data-year="${year}" title="ดู Q1-Q4 ปี ${year}">${formatted}${changeBadge(value, previous, key, true)}</button></td>`;
   }
 
   function renderFinancials() {
@@ -230,12 +296,12 @@
     for (const section of data.sections || []) {
       rows.push(`<tr class="financial-section-row"><th colspan="${annual.length + 1}">${escapeHtml(section.title)}</th></tr>`);
       for (const metric of section.metrics) {
-        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}<small>${escapeHtml(metricUnitLabel(metric))}</small></th>${annual.map((period) => financialCell(period, metric)).join("")}</tr>`);
+        rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}<small>${escapeHtml(metricUnitLabel(metric))}</small></th>${annual.map((period, index) => financialCell(period, metric, annual[index - 1])).join("")}</tr>`);
       }
     }
     rows.push(`<tr class="financial-section-row"><th colspan="${annual.length + 1}">อัตราส่วนทางการเงินที่สำคัญ</th></tr>`);
     for (const [key, label] of Object.entries(data.ratio_labels || {})) {
-      rows.push(`<tr><th scope="row">${escapeHtml(label)}</th>${annual.map((period) => ratioCell(period, key)).join("")}</tr>`);
+      rows.push(`<tr><th scope="row">${escapeHtml(label)}</th>${annual.map((period, index) => ratioCell(period, key, annual[index - 1])).join("")}</tr>`);
     }
     elements.annualBody.innerHTML = rows.join("");
     renderQuarterly();
@@ -247,8 +313,12 @@
     const periods = data.quarterly_by_year[state.selectedYear] || [];
     const byQuarter = new Map(periods.map((period) => [period.quarter, period]));
     const quarters = ["Q1", "Q2", "Q3", "Q4"];
+    elements.quarterlyYear.innerHTML = (data.annual || []).map((period) => {
+      const year = fiscalYear(period);
+      return `<option value="${year}" ${String(year) === String(state.selectedYear) ? "selected" : ""}>${year}</option>`;
+    }).join("");
     elements.quarterlyTitle.textContent = `${data.symbol} - รายไตรมาส ปี ${state.selectedYear} (${data.unit_label || ""})`;
-    elements.quarterlySubtitle.textContent = "ตัวเลข Q4* ที่ไม่มีรายงานแยกจะคำนวณจากงบทั้งปีลบ Q1-Q3";
+    elements.quarterlySubtitle.textContent = "Q4*: รายได้และกำไรคำนวณจากทั้งปีลบ Q1-Q3 · งบดุลใช้ยอดสิ้นปี · EPS แสดงเฉพาะงวดที่มีรายงานตรง";
     elements.quarterlyNote.textContent = periods.length ? `${periods.length}/4 งวดจากผู้ให้บริการ` : "ไม่พบข้อมูลงวดรายไตรมาส";
     elements.quarterlyHead.innerHTML = `<tr><th>หัวข้องบการเงิน</th>${quarters.map((quarter) => {
       const period = byQuarter.get(quarter);
@@ -273,9 +343,10 @@
   }
 
   function targetProgress(actual, target, options = {}) {
-    if (actual === null || actual === undefined || target === null || target === undefined || target === 0) return null;
+    if (!Number.isFinite(actual) || !Number.isFinite(target) || target <= 0) return null;
+    if (options.inverse && actual <= 0) return actual === 0 ? 100 : 0;
     const raw = options.inverse ? target / actual * 100 : actual / target * 100;
-    return Math.max(0, Math.min(140, raw));
+    return Math.max(0, Math.min(100, raw));
   }
 
   function qualityLabel(value) {
@@ -291,7 +362,7 @@
       <div><span>${escapeHtml(label)}</span><strong>${actual === null ? "-" : escapeHtml(actual)}${unit}</strong></div>
       <p>เป้าหมาย ${escapeHtml(target)}${unit} <b>${qualityLabel(progress)}</b></p>
       <div class="progress-track"><span style="width:${safeProgress}%"></span></div>
-      <small>${progress === null ? "ไม่มีข้อมูลพอสำหรับประเมิน" : `ความคืบหน้า ${number(progress, 0)}%`}</small>
+      <small>${progress === null ? "ข้อมูลหรือเป้าหมายไม่พร้อมประเมิน" : `เทียบเกณฑ์ ${number(progress, 0)}%`}</small>
     </article>`;
   }
 
@@ -312,12 +383,15 @@
     const roeProgress = targetProgress(summary.latest.roe, targets.roe);
     const debtProgress = targetProgress(summary.latest.debt_to_equity, targets.debt, { inverse: true });
     const availableProgress = [revenueProgress, profitProgress, roeProgress, debtProgress].filter((value) => value !== null);
-    const score = availableProgress.length ? Math.round(availableProgress.reduce((sum, value) => sum + value, 0) / availableProgress.length) : 0;
+    const score = availableProgress.length === 4 ? Math.round(availableProgress.reduce((sum, value) => sum + value, 0) / 4) : null;
 
     elements.viTitle.textContent = `${data.symbol} - VI Thesis และ Financial Quality`;
     elements.viSubtitle.textContent = `${data.name} | งบ ${summary.period} | สกุลเงินของงบ ${data.currency_label || "-"} | เป้าหมายปรับได้จากข้อมูลของคุณ`;
-    elements.viScore.textContent = `${score}%`;
-    elements.viScore.dataset.quality = score >= 100 ? "strong" : score >= 80 ? "watch" : "weak";
+    elements.viScore.textContent = score === null ? "-" : `${score}%`;
+    elements.viScore.title = score === null
+      ? `มีข้อมูลและเป้าหมายพร้อม ${availableProgress.length}/4 เกณฑ์`
+      : "ค่าเฉลี่ยการถึงเกณฑ์ Thesis ทั้ง 4 ข้อ จำกัดแต่ละข้อที่ 100% ไม่ใช่โอกาสได้กำไร";
+    elements.viScore.dataset.quality = score === null ? "pending" : score >= 100 ? "strong" : score >= 80 ? "watch" : "weak";
     elements.thesisProgress.innerHTML = [
       progressCard("Revenue CAGR", revenueCheck.cagr === null || revenueCheck.cagr === undefined ? null : number(revenueCheck.cagr, 1), targets.revenue, revenueProgress, "%"),
       progressCard("Net Profit CAGR", profitCheck.cagr === null || profitCheck.cagr === undefined ? null : number(profitCheck.cagr, 1), targets.profit, profitProgress, "%"),
@@ -334,10 +408,15 @@
           ? multiple(check.value)
           : amount(check.value, check.key);
       const unit = ["net_margin", "roe", "debt_to_equity"].includes(check.key) ? "" : metricUnitLabel(check.key);
+      const trendLabel = trend === null || trend === undefined
+        ? "ข้อมูลไม่พอเทียบช่วงเวลา"
+        : check.change_unit
+          ? `${trend > 0 ? "+" : ""}${number(trend, 2)} ${check.change_unit === "percentage_points" ? "จุดเปอร์เซ็นต์" : "เท่า"} ตลอดช่วง`
+          : `CAGR ${percent(trend)} ต่อปี`;
       return `<article class="vi-check">
         <span>${escapeHtml(check.label)}${unit ? ` <i>${escapeHtml(unit)}</i>` : ""}</span>
         <strong>${displayValue}</strong>
-        <p>${trend === null || trend === undefined ? "ข้อมูลไม่พอเทียบช่วงเวลา" : `${check.cagr !== undefined ? "CAGR" : "เปลี่ยนแปลง"} ${percent(trend)}`}</p>
+        <p>${trendLabel}</p>
       </article>`;
     }).join("");
 
@@ -354,6 +433,9 @@
   elements.navTabs.forEach((tab) => tab.addEventListener("click", () => selectView(tab.dataset.viewTarget)));
   elements.loadButton.addEventListener("click", () => loadFinancials(false));
   elements.refreshButton.addEventListener("click", () => loadFinancials(true));
+  elements.trendToggle.addEventListener("change", () => {
+    elements.annualPanel.classList.toggle("hide-year-changes", !elements.trendToggle.checked);
+  });
   window.addEventListener("fastdeep:symbol-selected", (event) => selectScannerSymbol(event.detail?.symbol));
   elements.symbolInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") loadFinancials(false);
@@ -363,13 +445,20 @@
     if (!button) return;
     state.selectedYear = button.dataset.year;
     renderFinancials();
+    elements.quarterlyPanel.scrollIntoView({ block: "start" });
   });
   elements.annualBody.addEventListener("click", (event) => {
     const button = event.target.closest("[data-year]");
     if (!button) return;
     state.selectedYear = button.dataset.year;
     renderFinancials();
+    elements.quarterlyPanel.scrollIntoView({ block: "start" });
   });
+  elements.quarterlyYear.addEventListener("change", () => {
+    state.selectedYear = elements.quarterlyYear.value;
+    renderFinancials();
+  });
+  elements.annualBack.addEventListener("click", () => elements.annualPanel.scrollIntoView({ block: "start" }));
   [elements.targetRevenueCagr, elements.targetProfitCagr, elements.targetRoe, elements.targetDebtEquity]
     .forEach((input) => input.addEventListener("input", renderVi));
 

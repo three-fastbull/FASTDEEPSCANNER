@@ -1,5 +1,4 @@
-/* หน้า "ข้อมูลบริษัท" — เรียงตามกรอบ ONE Investor
-   ประเภทหุ้น -> Financial Quality Filter 4 ด่าน -> Margin of Safety -> เชิงคุณภาพ */
+/* Company research, growth, financial quality, valuation, and thesis share one selected symbol. */
 (() => {
   const elements = {
     button: document.getElementById("profileButton"),
@@ -10,12 +9,33 @@
     price: document.getElementById("profilePrice"),
     priceNote: document.getElementById("profilePriceNote"),
     verdict: document.getElementById("profileVerdict"),
+    growth: document.getElementById("profileGrowthSnapshot"),
+    business: document.getElementById("profileBusiness"),
+    competition: document.getElementById("profileCompetition"),
     identity: document.getElementById("profileIdentity"),
     stages: document.getElementById("profileStages"),
     valuation: document.getElementById("profileValuation"),
     qualitative: document.getElementById("profileQualitative"),
+    thesis: document.getElementById("profileThesis"),
     flow: document.getElementById("profileFlow"),
     financialLink: document.getElementById("profileFinancialLink"),
+    researchForm: document.getElementById("profileResearchForm"),
+    researchSave: document.getElementById("profileResearchSave"),
+    researchStatus: document.getElementById("profileResearchStatus"),
+    businessSummary: document.getElementById("profileBusinessSummary"),
+    revenueModel: document.getElementById("profileRevenueModel"),
+    revenueSegments: document.getElementById("profileRevenueSegments"),
+    keyCustomers: document.getElementById("profileKeyCustomers"),
+    competitors: document.getElementById("profileCompetitors"),
+    moatEvidence: document.getElementById("profileMoatEvidence"),
+    researchMoat: document.getElementById("profileResearchMoat"),
+    researchTrend: document.getElementById("profileResearchTrend"),
+    researchDecision: document.getElementById("profileResearchDecision"),
+    catalysts: document.getElementById("profileCatalysts"),
+    risks: document.getElementById("profileRisks"),
+    invalidation: document.getElementById("profileInvalidation"),
+    sourceUrls: document.getElementById("profileSourceUrls"),
+    researchThesis: document.getElementById("profileResearchThesis"),
   };
 
   if (!elements.view) return;
@@ -52,17 +72,28 @@
     multiple: (value) => `${num(value, 2)}x`,
   };
 
-  function seriesRow(row) {
-    const format = FORMATTERS[row.format] || FORMATTERS.decimal;
-    const cells = (row.values || [])
-      .map((value) => `<td>${value === null || value === undefined ? "-" : format(value)}</td>`)
-      .join("");
-    const trend = row.trend || {};
-    return `<tr>
-      <th scope="row">${escapeHtml(row.label)}<small>${escapeHtml(row.unit || "")}</small></th>
-      ${cells}
-      <td class="trend-cell" data-tone="${escapeHtml(trend.tone || "unknown")}">${escapeHtml(trend.label || "-")}</td>
-    </tr>`;
+  function splitResearchLines(value) {
+    return String(value || "").split(/\r?\n|;/).map((item) => item.trim()).filter(Boolean);
+  }
+
+  function researchList(value, emptyMessage) {
+    const items = splitResearchLines(value);
+    if (!items.length) return `<p class="research-empty">${escapeHtml(emptyMessage)}</p>`;
+    return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  }
+
+  function sourceLinks(value) {
+    const items = splitResearchLines(value);
+    if (!items.length) return '<p class="research-empty">ยังไม่มีแหล่งข้อมูลอ้างอิง</p>';
+    return `<ul class="source-list">${items.map((item) => {
+      try {
+        const url = new URL(item);
+        if (!["http:", "https:"].includes(url.protocol)) throw new Error("unsupported");
+        return `<li><a href="${escapeHtml(url.href)}" target="_blank" rel="noreferrer">${escapeHtml(url.hostname)}</a></li>`;
+      } catch (_) {
+        return `<li>${escapeHtml(item)}</li>`;
+      }
+    }).join("")}</ul>`;
   }
 
   function renderVerdict(profile) {
@@ -83,11 +114,38 @@
       .join("");
     elements.verdict.innerHTML = `
       <div class="verdict-headline">
-        <span class="verdict-tag">สรุปการตัดสินใจ</span>
+        <span class="verdict-tag">สรุปก่อนพิจารณาซื้อ · ผ่าน ${verdict.passed_checks ?? 0} จาก ${verdict.total_checks ?? 0} เงื่อนไขใหญ่</span>
         <strong>${escapeHtml(verdict.label)}</strong>
         <p>${escapeHtml(verdict.note)}</p>
       </div>
-      <ul class="verdict-checklist">${checks}</ul>`;
+      <ul class="verdict-checklist">${checks}</ul>
+      <p class="verdict-context">Financial Quality Filter 4 ด่านอยู่ภายในเงื่อนไขใหญ่ข้อแรก ไม่ได้นับเป็นด่านตัดสินใจอีกชุดหนึ่ง</p>`;
+  }
+
+  function growthCard(label, item, note = "") {
+    if (!item?.available) {
+      return `<article><span>${escapeHtml(label)}</span><strong>-</strong><small>ข้อมูลไม่พอคำนวณ</small></article>`;
+    }
+    const annualized = item.cagr_pct ?? item.annualized_return_pct;
+    const total = item.total_change_pct ?? item.total_return_pct;
+    const tone = Number(annualized) >= 0 ? "ok" : "bad";
+    return `<article data-tone="${tone}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${Number(annualized) >= 0 ? "+" : ""}${num(annualized, 1)}% <i>ต่อปี</i></strong>
+      <small>รวม ${Number(total) >= 0 ? "+" : ""}${num(total, 1)}% ใน ${num(item.years, 1)} ปี${note ? ` · ${escapeHtml(note)}` : ""}</small>
+    </article>`;
+  }
+
+  function renderGrowth(profile) {
+    const growth = profile.growth_snapshot || {};
+    const stock = growth.stock_return || profile.historical_return || {};
+    const priceNote = stock.basis === "adjusted_close" ? "ราคาปรับสิทธิ" : "ราคาปิด";
+    elements.growth.innerHTML = [
+      growthCard("รายได้โตเฉลี่ย", growth.revenue),
+      growthCard("กำไรสุทธิโตเฉลี่ย", growth.net_income),
+      growthCard("EPS โตเฉลี่ย", growth.eps),
+      growthCard("ผลตอบแทนหุ้นเฉลี่ย", stock, priceNote),
+    ].join("");
   }
 
   function renderIdentity(profile) {
@@ -110,19 +168,80 @@
       <p class="identity-watch"><b>กลุ่มอุตสาหกรรม</b> ${escapeHtml(profile.sector || "-")}</p>
     </article>`);
 
-    const years = (profile.series || {}).years || [];
-    const rows = (profile.series_summary || []).map(seriesRow).join("");
+    const summaries = (profile.series_summary || []).slice(0, 8);
     cards.push(`<article class="identity-card" data-kind="series">
-      <span>ตัวเลขหลักย้อนหลังและอัตราเติบโตเฉลี่ย</span>
-      <div class="table-scroll">
-        <table class="series-table">
-          <thead><tr><th>รายการ</th>${years.map((year) => `<th>${escapeHtml(year)}</th>`).join("")}<th class="trend-head">สรุปแนวโน้ม</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <p class="series-note">รายการที่เป็นจำนวนเงินสรุปเป็นอัตราเติบโตเฉลี่ยต่อปี ส่วนอัตราส่วนสรุปเป็นส่วนต่างที่เปลี่ยนไป เพราะการคิดอัตราส่วนแบบทบต้นจะทำให้เข้าใจผิด</p>
+      <span>ตัวเลขที่ใช้ตัดสินใจ</span>
+      <div class="profile-kpi-grid">${summaries.map((row) => {
+        const format = FORMATTERS[row.format] || FORMATTERS.decimal;
+        const values = (row.values || []).filter((value) => value !== null && value !== undefined);
+        const latest = values.length ? format(values[values.length - 1]) : "-";
+        const trend = row.trend || {};
+        return `<div class="profile-kpi"><small>${escapeHtml(row.label)}</small><strong>${escapeHtml(latest)}</strong><span data-tone="${escapeHtml(trend.tone || "unknown")}">${escapeHtml(trend.label || "-")}</span></div>`;
+      }).join("")}</div>
+      <a class="inline-link" href="#" data-profile-financial-link>เปิดงบย้อนหลังทุกบรรทัด</a>
     </article>`);
     elements.identity.innerHTML = cards.join("");
+  }
+
+  function renderBusiness(profile) {
+    const business = profile.business || {};
+    const verified = Boolean(business.verified);
+    elements.business.innerHTML = `
+      <div class="research-state" data-verified="${verified}">
+        <strong>${verified ? "ตรวจข้อมูลธุรกิจครบแล้ว" : "รอตรวจข้อมูลธุรกิจ"}</strong>
+        <span>${verified ? "มีหลักฐานและแหล่งอ้างอิงครบตามเกณฑ์" : "ช่องว่างจะไม่ถูกเดาหรือเติมด้วยข้อความตัวอย่าง"}</span>
+      </div>
+      <div class="business-layout">
+        <article class="business-summary"><span>บริษัททำอะไร</span><p>${escapeHtml(business.summary || "ยังไม่มีคำอธิบายธุรกิจจากแหล่งข้อมูลที่ตรวจสอบได้")}</p></article>
+        <article><span>บริษัทหาเงินอย่างไร</span><p>${escapeHtml(business.revenue_model || "ยังไม่ได้บันทึกรูปแบบรายได้")}</p></article>
+        <article><span>รายได้แต่ละทาง</span>${researchList(business.revenue_segments, "ยังไม่มีสัดส่วนรายได้แยกตามธุรกิจ")}</article>
+        <article><span>ลูกค้าหลัก</span><p>${escapeHtml(business.key_customers || "ยังไม่ได้ตรวจลูกค้าหลักและความกระจุกตัว")}</p></article>
+      </div>
+      <div class="business-sources"><strong>แหล่งข้อมูล</strong>${sourceLinks(business.source_urls)}</div>`;
+  }
+
+  function renderCompetition(profile) {
+    const business = profile.business || {};
+    const qualitative = profile.qualitative || {};
+    elements.competition.innerHTML = `
+      <div class="competition-layout">
+        <article><span>คู่แข่งที่ต้องเทียบ</span>${researchList(business.competitors, "ยังไม่มีรายชื่อคู่แข่งที่ผ่านการตรวจ")}</article>
+        <article class="moat-evidence"><span>Moat: ${escapeHtml(qualitative.moat || "ยังไม่ประเมิน")}</span><p>${escapeHtml(business.moat_evidence || "ยังไม่มีหลักฐานว่าส่วนแบ่งตลาด ต้นทุน แบรนด์ หรือ Switching cost แข็งแรงกว่าคู่แข่ง")}</p></article>
+      </div>
+      <p class="comparison-note">การมีรายชื่อคู่แข่งอย่างเดียวไม่พอ ควรบันทึกด้วยว่าแต่ละรายชนะกันที่ราคา คุณภาพ ต้นทุน ช่องทาง หรือเทคโนโลยี</p>`;
+  }
+
+  function renderThesis(profile) {
+    const business = profile.business || {};
+    const qualitative = profile.qualitative || {};
+    elements.thesis.innerHTML = `<div class="thesis-case-grid">
+      <article><span>Thesis</span><p>${escapeHtml(qualitative.thesis || "ยังไม่มี Thesis ที่บันทึกไว้")}</p></article>
+      <article data-tone="ok"><span>ตัวเร่งการเติบโต</span>${researchList(business.catalysts, "ยังไม่ได้ระบุตัวเร่ง")}</article>
+      <article data-tone="bad"><span>ความเสี่ยงหลัก</span>${researchList(business.risks, "ยังไม่ได้ระบุความเสี่ยง")}</article>
+      <article data-tone="warn"><span>เมื่อไรต้องยอมรับว่าคิดผิด</span><p>${escapeHtml(business.invalidation || "ยังไม่มีเงื่อนไขยกเลิก Thesis")}</p></article>
+    </div>`;
+  }
+
+  function renderResearchEditor(profile) {
+    const business = profile.business || {};
+    const qualitative = profile.qualitative || {};
+    elements.businessSummary.value = business.summary || "";
+    elements.revenueModel.value = business.revenue_model || "";
+    elements.revenueSegments.value = business.revenue_segments || "";
+    elements.keyCustomers.value = business.key_customers || "";
+    elements.competitors.value = business.competitors || "";
+    elements.moatEvidence.value = business.moat_evidence || "";
+    elements.researchMoat.value = qualitative.moat || "";
+    elements.researchTrend.value = qualitative.ai_trend || "";
+    elements.researchDecision.value = qualitative.status || "Watch";
+    elements.catalysts.value = business.catalysts || "";
+    elements.risks.value = business.risks || "";
+    elements.invalidation.value = business.invalidation || "";
+    elements.sourceUrls.value = business.source_urls || "";
+    elements.researchThesis.value = qualitative.thesis || "";
+    elements.researchStatus.textContent = qualitative.updated_at
+      ? `บันทึกล่าสุด ${new Date(qualitative.updated_at).toLocaleString("th-TH")}`
+      : "ยังไม่ได้บันทึกงานวิจัย";
   }
 
   function renderStages(profile) {
@@ -141,19 +260,20 @@
             </li>`,
           )
           .join("");
-        return `<article class="stage-card" data-passed="${stage.passed}" data-key="${escapeHtml(stage.key)}">
-          <header>
+        return `<details class="stage-card" data-passed="${stage.passed}" data-key="${escapeHtml(stage.key)}" ${stage.passed ? "" : "open"}>
+          <summary>
             <span class="stage-number">${stage.number}</span>
             <div>
               <strong>${escapeHtml(stage.title)}</strong>
               <small>${escapeHtml(stage.subtitle)}</small>
             </div>
-            <span class="stage-badge">${stage.passed ? "ผ่านด่านนี้" : "ไม่ผ่านด่านนี้"}</span>
-          </header>
-          <p class="stage-goal">${escapeHtml(stage.goal)}</p>
-          <ul class="criteria-list">${criteria}</ul>
-          ${stage.needs_manual_check ? '<p class="stage-manual">ด่านนี้มีข้อที่ข้อมูลสาธารณะไม่ครอบคลุม ต้องเปิดเอกสารตรวจเอง</p>' : ""}
-        </article>`;
+            <span class="stage-badge">${stage.passed ? (stage.needs_manual_check ? "ผ่านตัวเลข" : "ผ่านด่านนี้") : "ไม่ผ่านด่านนี้"}</span>
+          </summary>
+          <div class="stage-detail"><p class="stage-goal">${escapeHtml(stage.goal)}</p>
+            <ul class="criteria-list">${criteria}</ul>
+            ${stage.needs_manual_check ? '<p class="stage-manual">ด่านนี้มีข้อที่ข้อมูลสาธารณะไม่ครอบคลุม ต้องเปิดเอกสารตรวจเอง</p>' : ""}
+          </div>
+        </details>`;
       })
       .join("");
   }
@@ -270,12 +390,17 @@
     elements.price.textContent = `${num(profile.last_price)} ${profile.trading_currency || ""}`;
     elements.financialLink.href = "#";
     elements.financialLink.dataset.symbol = profile.symbol;
+    renderBusiness(profile);
+    renderCompetition(profile);
+    renderThesis(profile);
+    renderResearchEditor(profile);
+    renderGrowth(profile);
 
     if (!profile.available) {
       elements.subtitle.textContent = profile.reason || "ยังไม่มีงบการเงินพอสำหรับประเมิน";
       elements.priceNote.textContent = `ราคา ณ ${profile.price_as_of || "-"}`;
       renderVerdict(profile);
-      elements.identity.innerHTML = "";
+      elements.identity.innerHTML = '<p class="decision-empty">ยังไม่มีงบย้อนหลังพอสรุปตัวเลข</p>';
       elements.stages.innerHTML = "";
       elements.valuation.innerHTML = "";
       renderQualitative(profile);
@@ -298,10 +423,61 @@
     renderFlow(profile);
   }
 
+  async function saveCompanyResearch(event) {
+    event.preventDefault();
+    if (!state.symbol || state.profile?.symbol !== state.symbol) return;
+    const savedSymbol = state.symbol;
+    elements.researchSave.disabled = true;
+    elements.researchStatus.textContent = "กำลังบันทึก...";
+    const current = state.profile?.qualitative || {};
+    try {
+      const response = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: savedSymbol,
+          status: elements.researchDecision.value,
+          note: current.note || "",
+          moat: elements.researchMoat.value,
+          ai_trend: elements.researchTrend.value,
+          thesis: elements.researchThesis.value,
+          business_summary: elements.businessSummary.value,
+          revenue_model: elements.revenueModel.value,
+          revenue_segments: elements.revenueSegments.value,
+          key_customers: elements.keyCustomers.value,
+          competitors: elements.competitors.value,
+          moat_evidence: elements.moatEvidence.value,
+          catalysts: elements.catalysts.value,
+          risks: elements.risks.value,
+          invalidation: elements.invalidation.value,
+          source_urls: elements.sourceUrls.value,
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "บันทึกงานวิจัยไม่สำเร็จ");
+      if (state.symbol !== savedSymbol) return;
+      elements.researchStatus.textContent = payload.company_profile_verified
+        ? "บันทึกแล้ว · ข้อมูลธุรกิจผ่านเกณฑ์ตรวจครบ"
+        : "บันทึกแล้ว · ยังมีช่องสำคัญที่ต้องตรวจเพิ่ม";
+      await loadProfile(savedSymbol);
+    } catch (error) {
+      if (state.symbol === savedSymbol) elements.researchStatus.textContent = error.message || "บันทึกงานวิจัยไม่สำเร็จ";
+    } finally {
+      elements.researchSave.disabled = !state.profile;
+    }
+  }
+
   async function loadProfile(symbol) {
     if (!symbol) return;
     const requestId = ++state.requestId;
     state.symbol = symbol;
+    state.profile = null;
+    elements.researchSave.disabled = true;
+    elements.title.textContent = symbol;
+    elements.subtitle.textContent = "กำลังโหลดข้อมูลบริษัท...";
+    elements.price.textContent = "-";
+    elements.priceNote.textContent = "";
+    for (const key of ["business", "competition", "thesis", "growth", "identity", "stages", "valuation", "qualitative", "flow"]) elements[key].textContent = "";
     elements.verdict.innerHTML = `<p class="decision-empty">กำลังประเมิน ${escapeHtml(symbol)} จากงบการเงินจริง...</p>`;
     try {
       const response = await fetch(`/api/stock-profile?symbol=${encodeURIComponent(symbol)}`);
@@ -309,26 +485,22 @@
       if (requestId !== state.requestId) return;
       if (!response.ok) throw new Error(payload.error || "โหลดข้อมูลหุ้นไม่สำเร็จ");
       renderProfile(payload);
+      elements.researchSave.disabled = false;
     } catch (error) {
       if (requestId !== state.requestId) return;
+      elements.subtitle.textContent = "ยังโหลดข้อมูลบริษัทไม่สำเร็จ";
       elements.verdict.innerHTML = `<p class="decision-empty">${escapeHtml(error.message)}</p>`;
     }
   }
 
   function showProfileView() {
-    document.querySelectorAll(".app-view").forEach((view) => {
-      view.classList.toggle("is-hidden", view.id !== "profileView");
-    });
-    document.querySelectorAll(".nav-tab").forEach((tab) => {
-      tab.classList.toggle("is-active", tab.dataset.viewTarget === "profileView");
-    });
+    document.querySelector('[data-view-target="profileView"]').click();
   }
 
   elements.button.addEventListener("click", () => {
     const symbol = window.fastDeepSelectedSymbol;
     if (!symbol) return;
     showProfileView();
-    if (state.symbol !== symbol || !state.profile) loadProfile(symbol);
   });
 
   document.querySelectorAll('[data-view-target="profileView"]').forEach((tab) => {
@@ -343,6 +515,16 @@
     const tab = document.querySelector('[data-view-target="financialsView"]');
     if (tab) tab.click();
   });
+
+  elements.view.addEventListener("click", (event) => {
+    const link = event.target.closest("[data-profile-financial-link]");
+    if (!link) return;
+    event.preventDefault();
+    const tab = document.querySelector('[data-view-target="financialsView"]');
+    if (tab) tab.click();
+  });
+
+  elements.researchForm.addEventListener("submit", saveCompanyResearch);
 
   window.addEventListener("fastdeep:symbol-selected", (event) => {
     const symbol = event.detail?.symbol;

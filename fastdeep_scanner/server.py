@@ -17,6 +17,7 @@ from .data_health import (
 )
 from .data_io import completed_eod_candles, data_source_label, load_market_data
 from .financials import FinancialDataError, fetch_financials
+from .hall_of_fame import build_hall_of_fame
 from .models import ScanCriteria
 from .report import build_report_html
 from .currency import load_fx_rates
@@ -144,6 +145,20 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                     "symbols": symbol_freshness(),
                     "fx": fx_health(),
                 }
+            )
+            return
+
+        if parsed.path == "/api/hall-of-fame":
+            try:
+                minimum = max(0.0, min(1000.0, float(query.get("min_return", ["15"])[0] or 15)))
+            except ValueError:
+                minimum = 15.0
+            self._send_json(
+                build_hall_of_fame(
+                    min_return=minimum,
+                    market=(query.get("market", ["ALL"])[0] or "ALL"),
+                    universe=(query.get("universe", ["ALL"])[0] or "ALL"),
+                )
             )
             return
 
@@ -375,6 +390,16 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             ai_trend=str(payload.get("ai_trend") or ""),
             fair_value=payload.get("fair_value"),
             thesis=str(payload.get("thesis") or ""),
+            business_summary=payload.get("business_summary"),
+            revenue_model=payload.get("revenue_model"),
+            revenue_segments=payload.get("revenue_segments"),
+            key_customers=payload.get("key_customers"),
+            competitors=payload.get("competitors"),
+            moat_evidence=payload.get("moat_evidence"),
+            catalysts=payload.get("catalysts"),
+            risks=payload.get("risks"),
+            invalidation=payload.get("invalidation"),
+            source_urls=payload.get("source_urls"),
         )
         self._send_json(item)
 
