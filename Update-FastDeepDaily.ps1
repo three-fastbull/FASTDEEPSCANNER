@@ -16,6 +16,9 @@ $env:PYTHONUTF8 = "1"
 & git -C $root -c credential.interactive=never pull --ff-only origin main 2>&1 | ForEach-Object { Write-DailyLog "git: $_" }
 
 try {
+    & $python -m fastdeep_scanner update-universe 2>&1 | ForEach-Object { Write-DailyLog "universe: $_" }
+    if ($LASTEXITCODE -ne 0) { Write-DailyLog "universe: one or more sources failed; retained their previous membership" }
+
     & $python -m fastdeep_scanner update-prices --universe data\fastdeep_universe.csv --out data\fastdeep_prices.csv --range 5y --interval 1d --pause 0.05 --min-success-ratio 0.97 --workers 6 --request-timeout 12 2>&1 | ForEach-Object { Write-DailyLog "prices: $_" }
     if ($LASTEXITCODE -ne 0) { throw "Price update failed with exit code $LASTEXITCODE" }
 
@@ -26,7 +29,7 @@ try {
 
     # SEC updates resume daily. Fresh seven-day caches are skipped, so the first
     # successful connection fills the universe and later runs are lightweight.
-    & $python -m fastdeep_scanner update-sec-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --groups SP500,NASDAQ100 --pause 0.20 --request-timeout 30 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json --ticker-cache data\sec_company_tickers.json 2>&1 | ForEach-Object { Write-DailyLog "sec: $_" }
+    & $python -m fastdeep_scanner update-sec-financials --universe data\fastdeep_universe.csv --cache-dir data\financial_cache --groups SP500,NASDAQ100,SP400 --pause 0.20 --request-timeout 30 --cache-max-age-hours 168 --retries 2 --coverage-out data\fastdeep_financial_coverage.json --ticker-cache data\sec_company_tickers.json 2>&1 | ForEach-Object { Write-DailyLog "sec: $_" }
     if ($LASTEXITCODE -ne 0) { Write-DailyLog "sec: refresh unavailable, keeping previous verified cache" }
 
     # Yahoo remains the weekly fallback for markets outside SEC coverage.

@@ -15,6 +15,7 @@ DEFAULT_FINANCIAL_CACHE_DIR = ROOT / "data" / "financial_cache"
 DEFAULT_FINANCIAL_STATUS_PATH = ROOT / "data" / "fastdeep_financial_update_status.json"
 DEFAULT_FINANCIAL_COVERAGE_PATH = ROOT / "data" / "fastdeep_financial_coverage.json"
 DEFAULT_SEC_STATUS_PATH = ROOT / "data" / "fastdeep_sec_update_status.json"
+DEFAULT_UNIVERSE_PATH = ROOT / "data" / "fastdeep_universe.csv"
 
 
 def expected_eod_date(today: date | None = None) -> date:
@@ -55,6 +56,9 @@ def price_data_health(
     *,
     status_path: str | Path = DEFAULT_STATUS_PATH,
     today: date | None = None,
+    universe_path: str | Path | None = None,
+    market: str = "ALL",
+    group: str = "ALL",
 ) -> dict[str, Any]:
     path = Path(price_path)
     metadata_path = path.with_name(f"{path.stem}_source.json")
@@ -85,17 +89,39 @@ def price_data_health(
     requested = int(metadata.get("symbols_requested") or symbol_count)
     failed = metadata.get("failed") or []
     coverage = symbol_count / requested if requested else 0.0
+    missing_count, fresh_count = max(0, requested - symbol_count), None
+    membership = Path(universe_path) if universe_path else (DEFAULT_UNIVERSE_PATH if path.resolve() == DEFAULT_PRICE_PATH.resolve() else None)
+    if membership and membership.exists():
+        from .universe import price_dates, read_universe
+
+        registered = {
+            row["symbol"] for row in read_universe(membership)
+            if (market.upper() == "ALL" or row["market"] == market.upper())
+            and (group.upper() == "ALL" or group.upper() in row.get("index_groups", "").split("|"))
+        }
+        dates = price_dates(path)
+        requested = len(registered)
+        symbol_count = len(registered.intersection(dates))
+        fresh_count = sum(dates.get(symbol, "") >= expected.isoformat() for symbol in registered)
+        missing_count = requested - symbol_count
+        coverage = symbol_count / requested if requested else 0.0
+        failed = [item for item in failed if str(item).split(":", 1)[0] in registered]
+        latest = max((dates[symbol] for symbol in registered if symbol in dates), default=None)
+        is_fresh = bool(latest and latest >= expected.isoformat())
     update_running = status.get("state") == "running"
-    degraded = bool(failed) or coverage < 0.97
+    degraded = bool(failed) or coverage < 0.97 or (fresh_count is not None and fresh_count < requested)
     if update_running:
         state = "updating"
         message = "กำลังอัปเดตราคา - ใช้ข้อมูลชุดก่อนหน้าระหว่างรอ"
+    elif not requested:
+        state = "missing"
+        message = "ไม่พบหุ้นในกลุ่มที่เลือก"
     elif not is_fresh:
         state = "stale"
         message = "ข้อมูลราคาเก่า - หยุดใช้ผลสแกนเพื่อการตัดสินใจ"
     elif degraded:
         state = "degraded"
-        message = "ข้อมูลราคาบางส่วนไม่ครบ - ตรวจสอบรายชื่อที่ล้มเหลว"
+        message = "ข้อมูลราคาบางส่วนไม่ครบหรือไม่ล่าสุด - ตรวจสอบความพร้อมของกลุ่มที่เลือก"
     else:
         state = "ready"
         message = "ข้อมูลราคาพร้อมใช้"
@@ -110,7 +136,11 @@ def price_data_health(
         "scanner_as_of_date": expected.isoformat(),
         "expected_eod_date": expected.isoformat(),
         "symbols_requested": requested,
+        "market": market.upper(),
+        "universe": group.upper(),
         "symbols_succeeded": symbol_count,
+        "symbols_fresh": fresh_count,
+        "missing_count": missing_count,
         "failed_count": len(failed),
         "coverage": round(coverage * 100, 1),
         "update_status": status.get("state") or "unknown",
@@ -171,6 +201,7 @@ def financial_data_health(
     status_path: str | Path = DEFAULT_FINANCIAL_STATUS_PATH,
     coverage_path: str | Path = DEFAULT_FINANCIAL_COVERAGE_PATH,
     sec_status_path: str | Path = DEFAULT_SEC_STATUS_PATH,
+    universe_path: str | Path | None = None,
 ) -> dict[str, Any]:
     cache_dir = Path(cache_dir)
     status = _read_json(Path(status_path))
@@ -185,16 +216,30 @@ def financial_data_health(
         files = [path for path in files if path in covered_files]
     fresh_cutoff = datetime.now().timestamp() - 8 * 24 * 3600
     fresh = sum(path.stat().st_mtime >= fresh_cutoff for path in files)
-    requested = int(coverage.get("symbols_requested") or status.get("symbols_requested") or 697)
+    requested = int(coverage.get("symbols_requested") or status.get("symbols_requested") or len(files))
     cached = int(coverage.get("cached_symbols") or len(files))
+    membership = Path(universe_path) if universe_path else (DEFAULT_UNIVERSE_PATH if cache_dir.resolve() == DEFAULT_FINANCIAL_CACHE_DIR.resolve() else None)
+    if membership and membership.exists():
+        from .financials import _cache_path
+        from .universe import read_universe
+
+        registered = {row["symbol"] for row in read_universe(membership)}
+        items = [item for item in coverage.get("items", []) if item.get("symbol") in registered]
+        requested = len(registered)
+        cached = sum(item.get("status", "missing") != "missing" and not item.get("cache_error") for item in items)
+        fresh = sum(_cache_path(symbol, cache_dir).exists() and _cache_path(symbol, cache_dir).stat().st_mtime >= fresh_cutoff for symbol in registered)
+        annual = sum(bool(item.get("annual_complete")) for item in items)
+        complete = sum(item.get("status") == "complete" for item in items)
+        coverage = {**coverage, "annual_5y_symbols": annual, "complete_symbols": complete, "partial_symbols": cached - complete, "missing_symbols": requested - cached, "cached_coverage_pct": round(cached / requested * 100, 1) if requested else 0, "annual_5y_coverage_pct": round(annual / requested * 100, 1) if requested else 0, "complete_coverage_pct": round(complete / requested * 100, 1) if requested else 0}
     return {
-        "state": status.get("state") or ("ready" if files else "missing"),
+        "state": "updating" if status.get("state") == "running" else ("ready" if requested and int(coverage.get("complete_symbols") or 0) == requested else "partial" if cached else "missing"),
         "cached_symbols": cached,
         "fresh_symbols": fresh,
         "symbols_requested": requested,
         "failed_count": int(status.get("failed_count") or 0),
         "updated_at": status.get("updated_at"),
         "symbols_processed": int(status.get("symbols_processed") or 0),
+        "update_symbols_requested": int(status.get("symbols_requested") or 0),
         "symbols_pending": int(status.get("symbols_pending") or 0),
         "retry_attempt": int(status.get("retry_attempt") or 0),
         "last_symbol": status.get("last_symbol"),

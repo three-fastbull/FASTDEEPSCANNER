@@ -26,6 +26,7 @@ from .scanner import VERIFICATION_LABELS, scan_market
 from .stock_profile import build_stock_profile
 from .timeframes import aggregate_candles, normalize_timeframe
 from .trade_journal import close_trade, journal_summary, list_trades, open_trade
+from .universe import universe_overview
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB_ROOT = ROOT / "fastdeep_web"
@@ -57,6 +58,8 @@ def _json_bytes(payload: dict) -> bytes:
 
 
 def _tradingview_symbol(symbol: str, market: str) -> str:
+    if symbol.upper().endswith(".HK") and symbol[:-3].isdigit():
+        return f"HKEX:{int(symbol[:-3])}"
     if market.upper() == "TH":
         return f"SET:{symbol.replace('.BK', '')}"
     if market.upper() == "CN":
@@ -86,6 +89,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -107,7 +111,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/scan":
             criteria = _criteria_from_query(query)
             results = scan_market(criteria)
-            health = price_data_health()
+            health = price_data_health(market=criteria.market, group=criteria.universe)
             verification_counts: dict[str, int] = {key: 0 for key in VERIFICATION_LABELS}
             for result in results:
                 verification_counts[result.verification_level] = (
@@ -221,17 +225,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/universe":
-            from .data_io import load_universe_metadata
-
-            universe = load_universe_metadata()
-            self._send_json(
-                {
-                    "symbols": [
-                        {"symbol": symbol, **metadata}
-                        for symbol, metadata in sorted(universe.items())
-                    ]
-                }
-            )
+            self._send_json(universe_overview())
             return
 
         if parsed.path == "/api/financials":
@@ -294,20 +288,20 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                     ],
                     "fundamental": snapshot.to_dict(),
                     "tradingview_url": f"https://www.tradingview.com/chart/?symbol={tv_symbol}",
-                    "data_health": price_data_health(),
+                    "data_health": price_data_health(market=criteria.market, group=criteria.universe),
                 }
             )
             return
 
         if parsed.path == "/api/export.csv":
-            health = price_data_health()
+            criteria = _criteria_from_query(query)
+            health = price_data_health(market=criteria.market, group=criteria.universe)
             if not health["can_publish"]:
                 self._send_json(
                     {"error": health["message"], "data_health": health},
                     409,
                 )
                 return
-            criteria = _criteria_from_query(query)
             results = scan_market(criteria)
             output = io.StringIO()
             fieldnames = [
@@ -359,7 +353,7 @@ class FastDeepHandler(BaseHTTPRequestHandler):
                 result,
                 aggregate_candles(completed_eod_candles(candles_by_symbol[symbol]), criteria.timeframe),
                 fundamentals[symbol],
-                data_health=price_data_health(),
+                data_health=price_data_health(market=criteria.market, group=criteria.universe),
             ).encode("utf-8")
             self._send(200, body, "text/html; charset=utf-8")
             return

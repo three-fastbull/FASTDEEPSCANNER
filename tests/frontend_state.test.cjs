@@ -13,6 +13,7 @@ async function appHarness(script = 'app.js') {
       elements.set(id, {
         value: id === 'timeframeSelect' ? 'D' : id === 'scoreRange' ? '70' : 'ALL',
         textContent: '', href: '', dataset: {},
+        closest: (selector) => element(selector),
         addEventListener() {},
         classList: {
           contains: (name) => classes.has(name),
@@ -103,6 +104,26 @@ test('only the latest scan response updates the result table', async () => {
   pending[0].resolve({ results: [{ symbol: 'AAPL' }] });
   await first;
   assert.deepEqual(displayed, ['FIX']);
+});
+
+test('changing filters clears old metrics and hides the old stock while scanning', async () => {
+  const { context, element, window } = await appHarness();
+  window.fastDeepSelectedSymbol = 'AAPL';
+  element('detailTitle').textContent = 'AAPL';
+  element('.detail-panel').dataset.state = 'ready';
+  element('metricCount').textContent = '64';
+  const pending = queuedFetch(context);
+  context.renderDataHealth = () => {};
+  context.renderMetrics = () => {};
+  context.renderTable = () => {};
+  const request = context.runScan();
+  assert.equal(element('metricCount').textContent, '...');
+  assert.equal(element('.detail-panel').dataset.state, 'empty');
+  assert.notEqual(element('detailTitle').textContent, 'AAPL');
+  pending[0].resolve({ results: [] });
+  await request;
+  assert.equal(element('.detail-panel').dataset.state, 'empty');
+  assert.equal(window.fastDeepSelectedSymbol, 'AAPL');
 });
 
 test('resizing only redraws the chart and preserves the shared selected stock', async () => {

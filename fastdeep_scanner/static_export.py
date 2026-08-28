@@ -143,6 +143,7 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
           <option value="TH">TH</option>
           <option value="US">US</option>
           <option value="CN">CN</option>
+          <option value="HK">HK</option>
         </select>
       </label>
       <label>Universe
@@ -150,6 +151,10 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
           <option value="ALL">ALL</option>
           <option value="SP500">S&P 500</option>
           <option value="NASDAQ100">Nasdaq-100</option>
+          <option value="SP400">S&amp;P MidCap 400</option>
+          <option value="CSI300">CSI 300</option>
+          <option value="HSI">Hang Seng Index</option>
+          <option value="HSTECH">Hang Seng Tech</option>
           <option value="CHINA50">China 50</option>
           <option value="SET_SAMPLE">หุ้นไทย</option>
           <option value="SET50">SET50</option>
@@ -318,6 +323,7 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
 
     function tradingViewSymbol(result) {
       if (result.market === 'TH') return `SET:${result.symbol.replace('.BK', '')}`;
+      if (result.symbol.endsWith('.HK')) return `HKEX:${Number(result.symbol.replace('.HK', ''))}`;
       if (result.market === 'CN') {
         if (result.symbol.endsWith('.SS')) return `SSE:${result.symbol.replace('.SS', '')}`;
         if (result.symbol.endsWith('.SZ')) return `SZSE:${result.symbol.replace('.SZ', '')}`;
@@ -327,6 +333,7 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
 
     function tradingViewSymbolFromIndex(item) {
       if (item.market === 'TH') return `SET:${item.symbol.replace('.BK', '')}`;
+      if (item.symbol.endsWith('.HK')) return `HKEX:${Number(item.symbol.replace('.HK', ''))}`;
       if (item.market === 'CN') {
         if (item.symbol.endsWith('.SS')) return `SSE:${item.symbol.replace('.SS', '')}`;
         if (item.symbol.endsWith('.SZ')) return `SZSE:${item.symbol.replace('.SZ', '')}`;

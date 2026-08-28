@@ -71,17 +71,35 @@
       </tr>`).join("");
   }
 
-  function renderMethodology(methodology) {
+  function renderMethodology(methodology, exclusions = []) {
     const labels = {
       period: "ช่วงเวลา",
       purchase_timing: "จังหวะลงทุน",
       ranking_metric: "วิธีจัดอันดับ",
       price_basis: "ราคาที่ใช้",
       drawdown: "ความเสี่ยงย้อนหลัง",
+      corporate_actions: "ความต่อเนื่องของหุ้น",
       excluded: "ข้อจำกัด",
     };
     elements.methodology.innerHTML = Object.entries(labels).map(([key, label]) => `
       <div><strong>${label}</strong><p>${escapeHtml(methodology[key] || "-")}</p></div>`).join("");
+    for (const item of exclusions) {
+      const row = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = `${item.symbol} · ไม่รวมในอันดับ 10 ปี`;
+      const reason = document.createElement("p");
+      reason.textContent = item.reason;
+      row.append(title, reason);
+      if (String(item.source_url || "").startsWith("https://")) {
+        const link = document.createElement("a");
+        link.href = item.source_url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "เอกสารอ้างอิง";
+        row.append(link);
+      }
+      elements.methodology.append(row);
+    }
   }
 
   function render(payload) {
@@ -92,7 +110,7 @@
       elements.podium.innerHTML = "";
       elements.body.innerHTML = '<tr><td colspan="10" class="empty-row">กำลังรอข้อมูลราคา 10 ปี</td></tr>';
       elements.coverage.textContent = "ไม่มีข้อมูลที่ผ่านการตรวจในกลุ่มที่เลือก";
-      renderMethodology(payload.methodology || {});
+      renderMethodology(payload.methodology || {}, payload.corporate_action_exclusions || []);
       return;
     }
     const updated = payload.source?.updated_at ? new Date(payload.source.updated_at).toLocaleString("th-TH") : "-";
@@ -103,9 +121,12 @@
       <div><span>เงินลงทุนตามแผน</span><strong>${state.leaders[0] ? money.format(state.leaders[0].total_invested) : "-"}</strong><small>บาทต่อหุ้นตลอดช่วง</small></div>
       <div><span>วันที่ประเมิน</span><strong>${escapeHtml(payload.as_of || "-")}</strong></div>`;
     elements.coverage.textContent = `จัดอันดับ ${payload.qualified} จาก ${payload.evaluated} บริษัทที่ประวัติผ่านเกณฑ์ · ไม่นำ ${payload.insufficient_history} บริษัทที่ประวัติหรือราคาปรับแล้วไม่ครบมาจัดอันดับ`;
+    if (payload.excluded_corporate_actions) {
+      elements.coverage.textContent += ` · แยกออกอีก ${payload.excluded_corporate_actions} บริษัทจากการยกเลิกหุ้นเดิม`;
+    }
     renderPodium(state.leaders);
     renderTable();
-    renderMethodology(payload.methodology || {});
+    renderMethodology(payload.methodology || {}, payload.corporate_action_exclusions || []);
   }
 
   async function loadHall(force = false) {

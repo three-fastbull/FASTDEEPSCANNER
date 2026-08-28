@@ -305,20 +305,23 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
     healthFact("EOD ที่ใช้สแกน ", scannerAsOf, health.can_publish ? "ok" : "bad"),
     healthFact("แท่งล่าสุดในไฟล์ ", latest),
     healthFact("ผู้ให้บริการ ", health.source || "-"),
-    healthFact("ดาวน์โหลดสำเร็จ ", `${health.symbols_succeeded}/${health.symbols_requested}`),
+    healthFact("หุ้นที่มีราคา ", `${health.symbols_succeeded}/${health.symbols_requested}`),
   ];
   if (freshness) {
+    const checked = health.symbols_fresh == null ? freshness.checked : health.symbols_requested;
+    const fresh = health.symbols_fresh == null ? freshness.fresh : health.symbols_fresh;
+    const stale = Math.max(0, checked - fresh);
     facts.push(healthFact(
       "หุ้นที่ราคาอัปเดตถึงวันสแกน ",
-      `${freshness.fresh}/${freshness.checked}${freshness.stale ? ` (ค้าง ${freshness.stale} ตัว)` : ""}`,
-      freshness.stale ? "warn" : "ok",
+      `${fresh}/${checked}${stale ? ` (ค้าง ${stale} ตัว)` : ""}`,
+      stale ? "warn" : "ok",
     ));
   }
   if (financialHealth) {
-    if (financialHealth.state === "running") {
+    if (["running", "updating"].includes(financialHealth.state)) {
       facts.push(healthFact(
         "กำลังอัปเดตงบ ",
-        `${financialHealth.symbols_processed || 0}/${financialHealth.symbols_requested}`,
+        `${financialHealth.symbols_processed || 0}/${financialHealth.update_symbols_requested || financialHealth.symbols_requested}`,
         "warn",
       ));
     }
@@ -437,6 +440,14 @@ function renderMetrics(results) {
 
 function renderTable(results) {
   elements.resultsBody.innerHTML = "";
+  if (!results.length) {
+    const coverage = window.fastDeepUniverse?.selection();
+    const message = coverage && !coverage.price_available
+      ? "มีรายชื่อในกลุ่มนี้แล้ว แต่ยังไม่มีราคาสำหรับสแกน"
+      : "ไม่พบหุ้นที่เข้าเงื่อนไขในกลุ่มและ Timeframe นี้";
+    elements.resultsBody.innerHTML = `<tr><td colspan="6" class="empty-row">${message}</td></tr>`;
+    return;
+  }
   for (const result of results.slice(0, MAX_VISIBLE_RESULTS)) {
     const topPattern = result.patterns[0];
     const row = document.createElement("tr");
@@ -576,6 +587,7 @@ function renderDecisionSummary(result) {
 
 function renderDetail(payload) {
   const { result, candles, fundamental, tradingview_url } = payload;
+  elements.detailTitle.closest(".detail-panel").dataset.state = "ready";
   state.selectedSymbol = result.symbol;
   state.detailPayload = payload;
   document.querySelectorAll("tbody tr").forEach((row) => {
@@ -762,9 +774,19 @@ async function closeTrade(id) {
 }
 
 async function runScan() {
+  if (window.fastDeepUniverse?.ready) await window.fastDeepUniverse.ready;
   const requestId = ++state.scanRequestId;
+  state.symbolRequestId += 1;
+  state.detailPayload = null;
+  state.results = [];
   const selectedAtStart = window.fastDeepSelectedSymbol;
   setStatus("Scanning");
+  elements.detailTitle.closest(".detail-panel").dataset.state = "empty";
+  elements.detailTitle.textContent = "กำลังสแกนกลุ่มที่เลือก";
+  elements.detailSubtitle.textContent = "";
+  elements.detailGrade.textContent = "-";
+  elements.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-row">กำลังสแกน...</td></tr>';
+  for (const element of [elements.metricCount, elements.metricBest, elements.metricA, elements.metricMarket]) element.textContent = "...";
   const query = criteriaQuery();
   elements.csvButton.href = `/api/export.csv?${query}`;
   try {
@@ -777,17 +799,25 @@ async function runScan() {
     state.results = payload.results;
     renderMetrics(payload.results);
     renderTable(payload.results);
+    window.fastDeepUniverse?.refresh();
     const generatedAt = payload.generated_at ? new Date(payload.generated_at).toLocaleString() : "-";
     const shown = Math.min(payload.results.length, MAX_VISIBLE_RESULTS);
     elements.generatedAt.textContent = `${generatedAt} | แสดง ${shown}/${payload.results.length}`;
     setStatus("Ready");
+    elements.detailTitle.textContent = "เลือกหุ้นจากผลสแกน";
     if (payload.results.length && window.fastDeepSelectedSymbol === selectedAtStart
         && !document.getElementById("scannerView").classList.contains("is-hidden")) {
       const preferred = payload.results.find((item) => item.symbol === selectedAtStart) || payload.results[0];
       await loadSymbol(preferred.symbol);
     }
   } catch (error) {
-    if (requestId === state.scanRequestId) setStatus("Scan error");
+    if (requestId === state.scanRequestId) {
+      state.results = [];
+      renderMetrics([]);
+      elements.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-row">สแกนไม่สำเร็จ กรุณาลองอีกครั้ง</td></tr>';
+      elements.detailTitle.textContent = "ยังไม่มีผลสแกน";
+      setStatus("Scan error");
+    }
   }
 }
 

@@ -40,6 +40,7 @@
           <option value="US">US</option>
           <option value="TH">TH</option>
           <option value="CN">CN</option>
+          <option value="HK">HK</option>
         </select>
       </label>
       <label>
@@ -48,6 +49,10 @@
           <option value="ALL">ALL</option>
           <option value="SP500">S&P 500</option>
           <option value="NASDAQ100">Nasdaq-100</option>
+          <option value="SP400">S&amp;P MidCap 400</option>
+          <option value="CSI300">CSI 300</option>
+          <option value="HSI">Hang Seng Index</option>
+          <option value="HSTECH">Hang Seng Tech</option>
           <option value="CHINA50">China 50</option>
           <option value="SET_SAMPLE">หุ้นไทย</option>
           <option value="SET50">SET50</option>
@@ -77,6 +82,20 @@
       </div>
       <button id="scanButton" class="primary-button">Scan</button>
       <a id="csvButton" class="ghost-button" href="/api/export.csv">CSV</a>
+    </section>
+
+    <section class="universe-coverage" aria-label="ความครอบคลุมข้อมูล">
+      <div id="universeCoverageSummary" class="coverage-summary" aria-live="polite">กำลังตรวจรายชื่อหุ้นและความพร้อมข้อมูล...</div>
+      <details id="universeCoverageDetails">
+        <summary>ความครบของแต่ละดัชนีและแหล่งข้อมูล</summary>
+        <div class="coverage-table-scroll" tabindex="0" aria-label="ความครอบคลุมแต่ละดัชนี">
+          <table class="coverage-table">
+            <thead><tr><th>กลุ่มหุ้น</th><th>รายชื่อ</th><th>มีราคา</th><th>ราคาถึงวันตรวจ</th><th>มีงบ</th><th>งบ 5 ปี</th><th>5 ปี + Q1-Q4</th><th>ที่มารายชื่อ / วันที่</th></tr></thead>
+            <tbody id="universeCoverageBody"></tbody>
+          </table>
+        </div>
+        <p class="coverage-note" id="universeCoverageNote"></p>
+      </details>
     </section>
 
     <section class="metrics-row" aria-label="Scanner summary">
@@ -320,12 +339,13 @@
     <section class="hall-controls" aria-label="Hall of Fame filters">
       <label>ตลาด
         <select id="hallMarket">
-          <option value="ALL">ทุกตลาด</option><option value="US">สหรัฐ</option><option value="TH">ไทย</option><option value="CN">จีน</option>
+          <option value="ALL">ทุกตลาด</option><option value="US">สหรัฐ</option><option value="TH">ไทย</option><option value="CN">จีนแผ่นดินใหญ่</option><option value="HK">ฮ่องกง</option>
         </select>
       </label>
       <label>Universe
         <select id="hallUniverse">
           <option value="ALL">ทั้งหมด</option><option value="SP500">S&amp;P 500</option><option value="NASDAQ100">Nasdaq-100</option>
+          <option value="SP400">S&amp;P MidCap 400</option><option value="CSI300">CSI 300</option><option value="HSI">Hang Seng Index</option><option value="HSTECH">Hang Seng Tech</option>
           <option value="CHINA50">China 50</option><option value="SET50">SET50</option><option value="SET100">SET100</option><option value="MAI">MAI</option>
         </select>
       </label>
@@ -638,6 +658,7 @@
 
   <footer>ข้อมูลเพื่อการศึกษาและวิจัย ไม่ใช่คำแนะนำซื้อขายหรือการรับประกันผลตอบแทน</footer>
 
+  <script src="/universe.js"></script>
   <script src="/app.js"></script>
   <script src="/screener.js"></script>
   <script src="/hall.js"></script>

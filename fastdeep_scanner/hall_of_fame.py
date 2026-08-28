@@ -16,6 +16,16 @@ DEFAULT_PRICE_PATH = ROOT / "data" / "fastdeep_hall_prices.csv"
 DEFAULT_SOURCE_PATH = ROOT / "data" / "fastdeep_hall_prices_source.json"
 MIN_MONTHS_FOR_TEN_YEARS = 120
 
+# Provider-adjusted prices cannot bridge cancelled predecessor equity.
+SECURITY_HISTORY_BREAKS = {
+    "CHRD": {
+        "valid_from": "2020-11-20",
+        "reason": "หุ้น Oasis เดิมถูกยกเลิกในปี 2020 หุ้นใหม่ซึ่งต่อมาใช้ชื่อ CHRD จึงไม่ใช่การถือหุ้นเดิมต่อเนื่อง 10 ปี",
+        "source_url": "https://ir.chordenergy.com/2020-11-19-Oasis-Petroleum-Successfully-Completes-Financial-Restructuring",
+        "mapping_source_url": "https://www.sec.gov/Archives/edgar/data/1255474/000119312522189511/d306292d8k.htm",
+    },
+}
+
 
 @dataclass
 class _MonthlyRecord:
@@ -117,6 +127,13 @@ def _groups(value: str) -> set[str]:
     return {item.strip() for item in value.replace(",", "|").split("|") if item.strip()}
 
 
+def _continuity_issue(symbol: str, as_of: date) -> dict[str, str] | None:
+    event = SECURITY_HISTORY_BREAKS.get(symbol.upper())
+    if event and _ten_year_start(as_of) < date.fromisoformat(event["valid_from"]):
+        return {"symbol": symbol, **event}
+    return None
+
+
 def evaluate_symbol(
     candles: list[StockCandle],
     *,
@@ -130,6 +147,8 @@ def evaluate_symbol(
     if not valid_dates:
         return None
     evaluation_date = as_of or max(valid_dates)
+    if _continuity_issue(candles[0].symbol, evaluation_date):
+        return None
     monthly = _monthly_records(candles, evaluation_date)
     if not monthly:
         return None
@@ -219,6 +238,7 @@ def _build_cached(
     )
     latest = max((items[-1].date for items in prices.values() if items), default=None)
     leaders: list[dict[str, Any]] = []
+    corporate_action_exclusions: list[dict[str, str]] = []
     evaluated = 0
     for symbol, candles in prices.items():
         item = metadata.get(symbol)
@@ -227,6 +247,10 @@ def _build_cached(
         if market != "ALL" and item["market"] != market:
             continue
         if universe != "ALL" and universe not in _groups(item.get("index_groups", "")):
+            continue
+        issue = _continuity_issue(symbol, latest) if latest else None
+        if issue:
+            corporate_action_exclusions.append(issue)
             continue
         result = evaluate_symbol(candles, as_of=latest)
         if result is None:
@@ -253,7 +277,9 @@ def _build_cached(
         "minimum_return_pct": min_return,
         "evaluated": evaluated,
         "universe_count": universe_count,
-        "insufficient_history": universe_count - evaluated,
+        "insufficient_history": universe_count - evaluated - len(corporate_action_exclusions),
+        "excluded_corporate_actions": len(corporate_action_exclusions),
+        "corporate_action_exclusions": corporate_action_exclusions,
         "qualified": len(leaders),
         "leaders": leaders,
     }
@@ -296,6 +322,7 @@ def build_hall_of_fame(
             "ranking_metric": "XIRR คำนึงถึงวันและจำนวนเงิน DCA โดยใช้ปีละ 365 วัน ส่วน CAGR วัดการโตของราคาปรับแล้วจากต้นถึงปลายช่วง",
             "price_basis": "Yahoo Finance Adjusted Close; ใช้ตัวปรับเดียวกันกับราคาเปิดรายเดือน",
             "drawdown": "การลดลงสูงสุดจากจุดสูงสุดของราคาปิดรายเดือน ไม่ใช่ขาดทุนระหว่างวันหรือขาดทุนของพอร์ต DCA",
+            "corporate_actions": "ไม่เชื่อมราคาข้ามการยกเลิกหุ้นเดิมที่ตรวจพบและมีแหล่งอ้างอิง การตรวจนี้ยังไม่ใช่การรับรองประวัติ corporate actions ของทุกบริษัท",
             "excluded": "แบบจำลองซื้อเศษหุ้นได้ ใช้วันที่ 1 แทนวันลงทุนรายเดือน สมมติค่าเงินคงที่ ไม่รวมค่าธรรมเนียมและภาษี ใช้สมาชิก Universe ปัจจุบันจึงมี survivorship bias ผลย้อนหลังไม่รับประกันอนาคต",
         },
     }

@@ -310,12 +310,13 @@ def load_market_data(
     for symbol in candles:
         if symbol not in fundamentals:
             fundamentals[symbol] = _placeholder_fundamental(symbol, universe.get(symbol))
-        elif symbol in universe:
+        elif symbol in universe and not force_sample:
             snapshot = fundamentals[symbol]
-            if not snapshot.index_groups:
-                fundamentals[symbol] = FundamentalSnapshot(
-                    **{**snapshot.__dict__, "index_groups": universe[symbol].get("index_groups", "")}
-                )
+            fundamentals[symbol] = replace(
+                snapshot,
+                index_groups=universe[symbol].get("index_groups", ""),
+                market=universe[symbol].get("market") or snapshot.market,
+            )
         snapshot = fundamentals[symbol] if force_sample else _snapshot_from_financial_cache(fundamentals[symbol])
         fundamentals[symbol] = _apply_analyst_review(
             replace(snapshot, trading_currency=trading_currency(symbol, snapshot.market)),

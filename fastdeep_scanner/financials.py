@@ -867,8 +867,15 @@ def cache_universe_financials(
     cache_max_age_hours: int = 24 * 7,
     max_retries: int = 2,
     coverage_path: str | Path = DEFAULT_COVERAGE_REPORT,
+    markets: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     symbols = load_universe(universe_path)
+    if markets:
+        selected_markets = {market.strip().upper() for market in markets}
+        if selected_markets - {"US", "TH", "CN", "HK"}:
+            raise ValueError("Unknown financial update market")
+        metadata = load_universe_metadata(universe_path)
+        symbols = [symbol for symbol in symbols if metadata.get(symbol, {}).get("market") in selected_markets]
     cache_dir = Path(cache_dir)
     status_path = cache_dir.parent / DEFAULT_UPDATE_STATUS.name
     cached_before = [
@@ -906,13 +913,15 @@ def cache_universe_financials(
     def cache_symbol(symbol: str) -> tuple[str, str | None]:
         wait_for_request_slot()
         try:
-            fetch_financials(
+            output = fetch_financials(
                 symbol,
                 refresh=True,
                 cache_dir=cache_dir,
                 request_timeout=request_timeout,
-                provider="yahoo",
+                provider="auto",
             )
+            if output.get("cache_status") == "stale_verified":
+                return symbol, output.get("refresh_error") or "Kept previous verified SEC statements; refresh failed"
             return symbol, None
         except Exception as exc:  # noqa: BLE001
             return symbol, str(exc)
@@ -987,7 +996,7 @@ def cache_sec_universe_financials(
     universe_path: str | Path,
     *,
     cache_dir: str | Path = DEFAULT_CACHE_DIR,
-    groups: tuple[str, ...] = ("SP500", "NASDAQ100"),
+    groups: tuple[str, ...] = ("SP500", "NASDAQ100", "SP400"),
     symbols: tuple[str, ...] = (),
     pause_seconds: float = 0.20,
     refresh: bool = False,

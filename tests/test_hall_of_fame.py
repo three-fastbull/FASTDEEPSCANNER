@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
 from dataclasses import replace
 from datetime import date
+from pathlib import Path
+from unittest.mock import patch
 
-from fastdeep_scanner.hall_of_fame import evaluate_symbol, xirr
+from fastdeep_scanner.hall_of_fame import build_hall_of_fame, evaluate_symbol, xirr
 from fastdeep_scanner.models import StockCandle
 
 
@@ -64,6 +67,30 @@ class HallOfFameTest(unittest.TestCase):
     def test_short_history_is_not_ranked_as_a_ten_year_leader(self) -> None:
         result = evaluate_symbol(_monthly_candles(0.30, months=60), as_of=date(2021, 7, 1))
         self.assertIsNone(result)
+
+    def test_cancelled_predecessor_equity_cannot_produce_a_ten_year_return(self) -> None:
+        candles = [replace(row, symbol="CHRD") for row in _monthly_candles(0.20)]
+        self.assertIsNone(evaluate_symbol(candles, as_of=date(2026, 8, 1)))
+
+    def test_full_ten_year_history_after_reorganization_can_be_ranked(self) -> None:
+        candles = [replace(row, symbol="CHRD", date=row.date.replace(year=row.date.year + 11)) for row in _monthly_candles(0.20)]
+        self.assertIsNotNone(evaluate_symbol(candles, as_of=date(2037, 8, 1)))
+
+    def test_hall_separates_history_gaps_from_corporate_action_exclusions(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            prices, universe = root / "prices.csv", root / "universe.csv"
+            prices.touch()
+            universe.write_text("symbol,name,market,sector,index_groups\nTEST,Test,US,Unknown,SP400\nCHRD,Chord,US,Energy,SP400\nSHORT,Short,US,Unknown,SP400\n", encoding="utf-8")
+            candles = _monthly_candles(0.20)
+            fixture = {"TEST": candles, "CHRD": [replace(row, symbol="CHRD") for row in candles], "SHORT": candles[-60:]}
+            with patch("fastdeep_scanner.hall_of_fame.load_price_csv", return_value=fixture):
+                result = build_hall_of_fame(price_path=prices, universe_path=universe, universe="SP400")
+            self.assertEqual(result["evaluated"], 1)
+            self.assertEqual(result["insufficient_history"], 1)
+            self.assertEqual(result["excluded_corporate_actions"], 1)
+            self.assertEqual(result["corporate_action_exclusions"][0]["symbol"], "CHRD")
+            self.assertTrue(result["corporate_action_exclusions"][0]["source_url"].startswith("https://"))
 
     def test_missing_middle_month_does_not_silently_skip_a_contribution(self) -> None:
         candles = _monthly_candles(0.20)

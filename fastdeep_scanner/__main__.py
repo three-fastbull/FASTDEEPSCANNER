@@ -21,6 +21,7 @@ from .server import run_server
 from .static_export import export_static_dashboard
 from .yahoo_prices import update_prices_from_yahoo
 from .timeframes import aggregate_candles
+from .universe import MANAGED_GROUPS, update_universe
 
 
 def _criteria(args: argparse.Namespace) -> ScanCriteria:
@@ -73,6 +74,19 @@ def export_static_command(args: argparse.Namespace) -> None:
     print(f"wrote static dashboard: {output}")
 
 
+def update_universe_command(args: argparse.Namespace) -> None:
+    summary = update_universe(
+        args.universe,
+        groups=tuple(value.strip().upper() for value in args.groups.split(",") if value.strip()),
+        dry_run=args.dry_run,
+    )
+    print(f"Universe: {summary['before']} -> {summary['after']} symbols; markets: {summary['by_market']}")
+    if args.dry_run:
+        print("Dry run: universe and source metadata were not changed.")
+    if summary["errors"]:
+        raise SystemExit(1)
+
+
 def update_prices_command(args: argparse.Namespace) -> None:
     summary = update_prices_from_yahoo(
         universe_path=args.universe,
@@ -106,6 +120,7 @@ def update_financials_command(args: argparse.Namespace) -> None:
         cache_max_age_hours=args.cache_max_age_hours,
         max_retries=args.retries,
         coverage_path=args.coverage_out,
+        markets=tuple(value.strip().upper() for value in args.markets.split(",") if value.strip()),
     )
     print(f"cached financial statements: {len(summary['succeeded'])}/{summary['symbols']}")
     coverage = summary["coverage"]
@@ -327,7 +342,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     scan = subparsers.add_parser("scan", help="Run scanner and print JSON")
-    scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN", "HK"])
     scan.add_argument("--universe", default="ALL")
     scan.add_argument("--patterns", default="")
     scan.add_argument("--min-score", type=float, default=70)
@@ -340,7 +355,7 @@ def build_parser() -> argparse.ArgumentParser:
     report = subparsers.add_parser("report", help="Create printable HTML report")
     report.add_argument("--symbol", required=True)
     report.add_argument("--out", default="storage/fastdeep_report.html")
-    report.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    report.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN", "HK"])
     report.add_argument("--universe", default="ALL")
     report.add_argument("--patterns", default="")
     report.add_argument("--min-score", type=float, default=70)
@@ -357,7 +372,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     static = subparsers.add_parser("export-static", help="Create a standalone HTML dashboard")
     static.add_argument("--out", default="storage/fastdeep_static_dashboard.html")
-    static.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    static.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN", "HK"])
     static.add_argument("--universe", default="ALL")
     static.add_argument("--patterns", default="")
     static.add_argument("--min-score", type=float, default=70)
@@ -369,6 +384,12 @@ def build_parser() -> argparse.ArgumentParser:
         "update-prices",
         help="Download daily OHLCV prices from Yahoo Finance into data/fastdeep_prices.csv",
     )
+    membership = subparsers.add_parser("update-universe", help="Refresh dated index membership; retain prior data if a source fails")
+    membership.add_argument("--universe", default="data/fastdeep_universe.csv")
+    membership.add_argument("--groups", default=",".join(MANAGED_GROUPS))
+    membership.add_argument("--dry-run", action="store_true")
+    membership.set_defaults(func=update_universe_command)
+
     update_prices.add_argument("--universe", default="data/fastdeep_universe.csv")
     update_prices.add_argument("--out", default="data/fastdeep_prices.csv")
     update_prices.add_argument("--range", default="2y")
@@ -384,6 +405,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Download and cache annual and quarterly financial statements for the universe",
     )
     update_financials.add_argument("--universe", default="data/fastdeep_universe.csv")
+    update_financials.add_argument("--markets", default="", help="Optional comma-separated markets: US,CN,HK,TH")
     update_financials.add_argument("--cache-dir", default="data/financial_cache")
     update_financials.add_argument("--pause", type=float, default=0.75)
     update_financials.add_argument("--refresh", action="store_true")
@@ -400,7 +422,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     update_sec.add_argument("--universe", default="data/fastdeep_universe.csv")
     update_sec.add_argument("--cache-dir", default="data/financial_cache")
-    update_sec.add_argument("--groups", default="SP500,NASDAQ100")
+    update_sec.add_argument("--groups", default="SP500,NASDAQ100,SP400")
     update_sec.add_argument("--symbols", default="")
     update_sec.add_argument("--pause", type=float, default=0.20)
     update_sec.add_argument("--refresh", action="store_true")
@@ -423,7 +445,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     daily_scan = subparsers.add_parser("daily-scan", help="Write the daily EOD scan summary as JSON")
     daily_scan.add_argument("--out", default="storage/fastdeep_daily_scan_summary.json")
-    daily_scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    daily_scan.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN", "HK"])
     daily_scan.add_argument("--universe", default="ALL")
     daily_scan.add_argument("--patterns", default="")
     daily_scan.add_argument("--min-score", type=float, default=70)
@@ -433,7 +455,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     backtest = subparsers.add_parser("backtest", help="Run a historical pattern event study")
     backtest.add_argument("--out", default="storage/fastdeep_event_study.json")
-    backtest.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN"])
+    backtest.add_argument("--market", default="ALL", choices=["ALL", "US", "TH", "CN", "HK"])
     backtest.add_argument("--universe", default="ALL")
     backtest.add_argument("--patterns", default="breakout,retest,cup_handle,double_bottom,head_shoulders")
     backtest.add_argument("--min-score", type=float, default=70)

@@ -165,6 +165,8 @@ def fetch_symbol_prices(
                 "volume": int(volumes[idx] or 0) if idx < len(volumes) else 0,
             }
         )
+    if not rows:
+        raise RuntimeError(f"{symbol}: no usable OHLC price rows")
     return rows
 
 
@@ -196,7 +198,10 @@ def update_prices_from_yahoo(
     try:
         def download(symbol: str) -> tuple[str, list[dict[str, str | float]], str | None]:
             try:
-                return symbol, fetch_symbol_prices(symbol, range_value, interval, timeout=request_timeout), None
+                downloaded = fetch_symbol_prices(symbol, range_value, interval, timeout=request_timeout)
+                if not downloaded:
+                    raise RuntimeError("No usable OHLC price rows")
+                return symbol, downloaded, None
             except Exception as exc:  # noqa: BLE001
                 return symbol, [], str(exc)
 
@@ -239,7 +244,10 @@ def update_prices_from_yahoo(
             retry_completed = 0
             for symbol in retry_symbols:
                 try:
-                    rows.extend(fetch_symbol_prices(symbol, range_value, interval, timeout=max(20, request_timeout)))
+                    downloaded = fetch_symbol_prices(symbol, range_value, interval, timeout=max(20, request_timeout))
+                    if not downloaded:
+                        raise RuntimeError("No usable OHLC price rows")
+                    rows.extend(downloaded)
                 except Exception as exc:  # noqa: BLE001
                     failed.append(f"{symbol}: {exc}")
                 retry_completed += 1
@@ -266,6 +274,17 @@ def update_prices_from_yahoo(
             )
 
         output.parent.mkdir(parents=True, exist_ok=True)
+        downloaded_rows = len(rows)
+        retained_symbols = set()
+        # A temporary provider failure must not erase the only stored history.
+        # Retained symbols remain in the failure list and are never called fresh.
+        if failed and output.exists():
+            missing = {item.split(":", 1)[0] for item in failed}
+            with output.open(encoding="utf-8-sig", newline="") as handle:
+                for old_row in csv.DictReader(handle):
+                    if old_row.get("symbol") in missing:
+                        rows.append(old_row)
+                        retained_symbols.add(old_row["symbol"])
         rows.sort(key=lambda row: (str(row["symbol"]), str(row["date"])))
         latest_candle_date = max(str(row["date"]) for row in rows)
         temp_output = output.with_name(f".{output.name}.{uuid4().hex}.tmp")
@@ -297,7 +316,9 @@ def update_prices_from_yahoo(
             "latest_candle_date": latest_candle_date,
             "symbols_requested": len(symbols),
             "symbols_succeeded": succeeded,
-            "rows_downloaded": len(rows),
+            "rows_downloaded": downloaded_rows,
+            "rows_stored": len(rows),
+            "retained_symbols": sorted(retained_symbols),
             "failed": failed,
         }
         _atomic_write(metadata_path, json.dumps(metadata, ensure_ascii=False, indent=2))

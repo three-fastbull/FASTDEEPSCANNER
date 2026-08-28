@@ -101,7 +101,7 @@ h3 {
 
 .control-band {
   display: grid;
-  grid-template-columns: minmax(120px, 160px) minmax(130px, 160px) minmax(100px, 130px) minmax(170px, 230px) 1fr auto auto;
+  grid-template-columns: minmax(175px, 205px) minmax(215px, 255px) minmax(75px, 100px) minmax(130px, 180px) minmax(180px, 1fr) auto auto;
   gap: 12px;
   align-items: end;
   padding: 14px;
@@ -109,6 +109,30 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
 }
+
+.universe-coverage {
+  margin: 14px 0 18px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.coverage-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; min-height: 28px; }
+.coverage-summary > strong { color: var(--teal); font-size: 14px; }
+.coverage-summary > span { font-variant-numeric: tabular-nums; }
+.coverage-pending, .coverage-warning { color: var(--amber); }
+.coverage-warning { flex-basis: 100%; line-height: 1.6; }
+.universe-coverage summary { display: list-item; cursor: pointer; color: var(--muted); padding: 8px 0; }
+.universe-coverage summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.coverage-table-scroll { overflow-x: auto; max-width: 100%; }
+.coverage-table { width: 100%; min-width: 850px; border-collapse: collapse; background: var(--panel); }
+.coverage-table th, .coverage-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.coverage-table th:first-child, .coverage-table td:first-child, .coverage-table th:last-child, .coverage-table td:last-child { text-align: left; }
+.coverage-table td:last-child { white-space: normal; min-width: 230px; max-width: 340px; }
+.coverage-table small { display: block; font-size: 11px; line-height: 1.6; color: var(--muted); }
+.coverage-table a { color: var(--teal); }
+.coverage-note { max-width: 1100px; margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.detail-panel[data-state="empty"] > :not(.panel-head) { display: none; }
 
 label {
   display: grid;
