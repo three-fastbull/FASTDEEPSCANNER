@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-28T04:23:22.814327+00:00",
+ "updated_at": "2026-08-28T04:51:24.150290+00:00",
  "note": "ข้อความยกมาจากแบบที่บริษัทยื่นต่อ SEC โดยไม่ผ่านการเรียบเรียง ใช้เป็นข้อมูลตั้งต้น ไม่ใช่บทวิเคราะห์ที่ทบทวนแล้ว",
  "profiles": {
   "A": {
@@ -105,6 +105,18 @@
     ],
     "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/R38.htm",
     "reconciled": true
+   },
+   "thai": {
+    "summary_th": "Apple ออกแบบ ผลิต และจำหน่ายสมาร์ทโฟน iPhone ครอบแครงด้วยระบบปฏิบัติการ iOS นอกจากนี้ยังขาย Mac, iPad, อุปกรณ์สวมใส่ต่างๆ และบริการดิจิทัล ลูกค้าเป็นผู้บริโภค SME องค์กรขนาดใหญ่ รัฐบาล และส่วนการศึกษา",
+    "revenue_model_th": "หารายได้จากการขายสินค้า (iPhone, Mac, iPad, Wearables และอุปกรณ์เสริม) และบริการ (AppleCare, App Store, บริการสตรีมมิง, Apple Pay และการโฆษณา) ในปีงบประมาณ 2025 iPhone และ Services เป็นแหล่งรายได้หลักที่ 209.6 พันล้าน USD และ 109.2 พันล้าน USD ตามลำดับ",
+    "customers_th": "ลูกค้าหลักมาจากตลาดผู้บริโภค ธุรกิจขนาดเล็กถึงกลาง การศึกษา องค์กรขนาดใหญ่ และรัฐบาล โดยจำหน่ายผ่านช่องทางโดยตรง 40% และช่องทางอ้อม 60% ของยอดขายรวม",
+    "competition_th": "ตลาดมีการแข่งขันสูงมากกับความกดดันด้านราคา ชีวิตของผลิตภัณฑ์สั้น และแนวโน้มการลอกเลียนแบบผลิตภัณฑ์ของคู่แข่ง Apple แข่งขันด้วยการนำเสนอผลิตภัณฑ์และบริการใหม่อย่างต่อเนื่อง ความเป็นเลิศทางการออกแบบ เทคโนโลยี และอนุรักษ์สิทธิ์ทางปัญญา",
+    "model": "claude-haiku-4-5-20251001",
+    "read_full_section": true,
+    "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+    "form": "10-K",
+    "period": "2025-09-27",
+    "summarized_at": "2026-08-28T04:51:07.989811+00:00"
    }
   },
   "ABBV": {
@@ -164,6 +176,18 @@
     ],
     "source_url": "https://www.sec.gov/Archives/edgar/data/1559720/000155972026000004/R85.htm",
     "reconciled": true
+   },
+   "thai": {
+    "summary_th": "Airbnb เป็นแพลตฟอร์มตลาดกลางระดับโลกที่เชื่อมต่อผู้เข้าพักกับที่พักส่วนตัว ประสบการณ์ท่องเที่ยว และบริการต่าง ๆ ในกว่า 220 ประเทศ มีโฮสต์มากกว่า 5 ล้านรายและผู้เข้าพักสะสมกว่า 2.5 พันล้านครั้ง เพิ่งขยายไปยังบริการเพิ่มเติม (Airbnb Services) และประสบการณ์ที่ออกแบบใหม่เมื่อเดือนพฤษภาคม 2568",
+    "revenue_model_th": "รับค่าธรรมเนียมจากการใช้งานแพลตฟอร์ม ข้อมูลรายละเอียดไม่ได้ระบุในข้อความที่ให้มา",
+    "customers_th": "ลูกค้าหลักคือผู้เข้าพักและโฮสต์ทั่วโลก มีการกระจายตัวทั่วกว่า 220 ประเทศและภูมิภาค",
+    "competition_th": "แข่งขันสูงในการดึงดูดและคงใจโฮสต์และผู้เข้าพัก บริษัทแข่งขันจากปัจจัยต่างๆ เช่น ปริมาณการจอง ความง่ายของแพลตฟอร์ม อัตราค่าธรรมเนียม และการป้องกันโฮสต์อย่าง AirCover for Hosts",
+    "model": "claude-haiku-4-5-20251001",
+    "read_full_section": true,
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1559720/000155972026000004/abnb-20251231.htm",
+    "form": "10-K",
+    "period": "2025-12-31",
+    "summarized_at": "2026-08-28T04:51:16.105032+00:00"
    }
   },
   "ABT": {
@@ -3799,6 +3823,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information (Schedule of Operations in Geographical Areas) (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 24568.0,
+    "segments": [
+     {
+      "name": "U.S. · Reportable geographical components",
+      "amount": 9981.0
+     },
+     {
+      "name": "China · Reportable geographical components",
+      "amount": 2631.0
+     },
+     {
+      "name": "Germany · Reportable geographical components",
+      "amount": 11956.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/313616/000031361626000062/R64.htm",
+    "reconciled": true
    }
   },
   "DIS": {
@@ -3819,7 +3865,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "DLR": {
    "symbol": "DLR",
@@ -3839,7 +3886,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "DLTR": {
    "symbol": "DLTR",
@@ -3859,6 +3907,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segments and Disaggregated Revenue - Disaggregation of Revenue (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 19395.7,
+    "segments": [
+     {
+      "name": "Consumable",
+      "amount": 9425.9
+     },
+     {
+      "name": "Variety",
+      "amount": 8860.5
+     },
+     {
+      "name": "Seasonal",
+      "amount": 1109.3
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/935703/000093570326000025/R76.htm",
+    "reconciled": true
    }
   },
   "DOC": {
@@ -3879,7 +3949,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "DOV": {
    "symbol": "DOV",
@@ -3899,6 +3970,36 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information - Schedule of Revenue Disaggregated by Geography based on the Location (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 8092.571,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 4400.499
+     },
+     {
+      "name": "Europe",
+      "amount": 1768.813
+     },
+     {
+      "name": "Asia",
+      "amount": 900.21
+     },
+     {
+      "name": "Other Americas",
+      "amount": 707.52
+     },
+     {
+      "name": "Other",
+      "amount": 315.529
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/29905/000002990526000009/R120.htm",
+    "reconciled": true
    }
   },
   "DOW": {
@@ -3919,7 +4020,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "DPZ": {
    "symbol": "DPZ",
@@ -3939,7 +4041,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "DRI": {
    "symbol": "DRI",
@@ -3959,6 +4062,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Schedule of Segment Reporting (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 13210.9,
+    "segments": [
+     {
+      "name": "Olive Garden",
+      "amount": 5594.8
+     },
+     {
+      "name": "LongHorn Steakhouse",
+      "amount": 3423.0
+     },
+     {
+      "name": "Fine Dining",
+      "amount": 1375.7
+     },
+     {
+      "name": "Other Business",
+      "amount": 2817.4
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/940944/000094094426000025/R63.htm",
+    "reconciled": true
    }
   },
   "DTE": {
@@ -3979,7 +4108,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "DUK": {
    "symbol": "DUK",
@@ -3999,7 +4129,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "DVA": {
    "symbol": "DVA",
@@ -4019,7 +4150,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "DVN": {
    "symbol": "DVN",
@@ -4039,7 +4171,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "DXCM": {
    "symbol": "DXCM",
@@ -4059,6 +4192,19 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": null,
+   "thai": {
+    "summary_th": "Dexcom ออกแบบและจำหน่ายระบบติดตามระดับน้ำตาลอย่างต่อเนื่อง (CGM) สำหรับผู้ป่วยเบาหวาน ผู้ดูแล และแพทย์ทั่วโลก ผลิตภัณฑ์หลักคือ G7 และ G7 15 Day ที่ได้รับการอนุมัติจากอย.ส.อ. และในสิงหาคม 2024 เปิดตัว Stelo เซนเซอร์ OTC แรกสำหรับผู้ไม่ใช้อินซูลิน",
+    "revenue_model_th": "หาเงินจากการขายระบบ CGM ให้กับผู้ป่วยเบาหวาน ผ่านการขายโดยตรงและตัวแทนจำหน่าย โดยใช้ Medicare Medicaid และประกันเชิงพาณิชย์เป็นช่องทางการชำระค่า",
+    "customers_th": "",
+    "competition_th": "แข่งขันโดยตรงกับ Abbott Laboratories Medtronic (MiniMed) Roche Diabetes Care LifeScan Ascensia Diabetes Care และบริษัทอื่น ๆ ที่ผลิตอุปกรณ์ตรวจวัดน้ำตาล Abbott Libre เป็นคู่แข่งหลักในตลาด CGM",
+    "model": "claude-haiku-4-5-20251001",
+    "read_full_section": true,
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1093557/000109355726000027/dxcm-20251231.htm",
+    "form": "10-K",
+    "period": "2025-12-31",
+    "summarized_at": "2026-08-28T04:51:23.849720+00:00"
    }
   },
   "FERG": {
@@ -4079,7 +4225,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "EBAY": {
    "symbol": "EBAY",
@@ -4099,7 +4246,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ECL": {
    "symbol": "ECL",
@@ -4119,7 +4267,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ED": {
    "symbol": "ED",
@@ -4139,7 +4288,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EFX": {
    "symbol": "EFX",
@@ -4159,7 +4309,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EG": {
    "symbol": "EG",
@@ -4179,7 +4330,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "EIX": {
    "symbol": "EIX",
@@ -4199,7 +4351,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EL": {
    "symbol": "EL",
@@ -4219,6 +4372,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT DATA AND RELATED INFORMATION - Schedule of Revenue by Geographical Location (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 15049.0,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 3749.0
+     },
+     {
+      "name": "Mainland China",
+      "amount": 3930.0
+     },
+     {
+      "name": "All other countries",
+      "amount": 7370.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1001250/000100125026000041/R139.htm",
+    "reconciled": true
    }
   },
   "ELV": {
@@ -4239,7 +4414,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EME": {
    "symbol": "EME",
@@ -4259,7 +4435,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EMR": {
    "symbol": "EMR",
@@ -4279,7 +4456,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EOG": {
    "symbol": "EOG",
@@ -4299,7 +4477,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EQIX": {
    "symbol": "EQIX",
@@ -4319,7 +4498,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "EQR": {
    "symbol": "EQR",
@@ -4339,7 +4519,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "EQT": {
    "symbol": "EQT",
@@ -4359,7 +4540,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ERIE": {
    "symbol": "ERIE",
@@ -4379,7 +4561,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ES": {
    "symbol": "ES",
@@ -4399,7 +4582,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ESS": {
    "symbol": "ESS",
@@ -4419,7 +4603,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ETN": {
    "symbol": "ETN",
@@ -4439,7 +4624,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ETR": {
    "symbol": "ETR",
@@ -4459,7 +4645,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EVRG": {
    "symbol": "EVRG",
@@ -4479,7 +4666,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EW": {
    "symbol": "EW",
@@ -4499,7 +4687,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "EXC": {
    "symbol": "EXC",
@@ -4519,7 +4708,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EXE": {
    "symbol": "EXE",
@@ -4539,7 +4729,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EXPD": {
    "symbol": "EXPD",
@@ -4559,6 +4750,44 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Business Segment Information - Financial Information Regarding Company's Operations by Geographic Area (Detail)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 11069.009,
+    "segments": [
+     {
+      "name": "United States Segment",
+      "amount": 3583.826
+     },
+     {
+      "name": "Other North America Segment",
+      "amount": 470.612
+     },
+     {
+      "name": "Latin America Segment",
+      "amount": 262.439
+     },
+     {
+      "name": "North Asia Segment",
+      "amount": 2737.513
+     },
+     {
+      "name": "South Asia Segment",
+      "amount": 1555.189
+     },
+     {
+      "name": "Europe Segment",
+      "amount": 1829.248
+     },
+     {
+      "name": "Middle East Africa and India Segment",
+      "amount": 638.771
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/746515/000119312526071569/R56.htm",
+    "reconciled": true
    }
   },
   "EXPE": {
@@ -4579,7 +4808,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "EXR": {
    "symbol": "EXR",
@@ -4599,7 +4829,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "F": {
    "symbol": "F",
@@ -4619,6 +4850,36 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Schedule of Geographic Information (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 187267.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 122574.0
+     },
+     {
+      "name": "Canada",
+      "amount": 14548.0
+     },
+     {
+      "name": "United Kingdom",
+      "amount": 12298.0
+     },
+     {
+      "name": "Mexico",
+      "amount": 2463.0
+     },
+     {
+      "name": "All Other",
+      "amount": 35384.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/37996/000003799626000015/R137.htm",
+    "reconciled": true
    }
   },
   "FANG": {
@@ -4639,7 +4900,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FAST": {
    "symbol": "FAST",
@@ -4659,6 +4921,24 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Reporting - Reconciliation of Reportable Segment Net Sales from External Customers to Consolidated Net Sales (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 8200.5,
+    "segments": [
+     {
+      "name": "U.S. reportable segment",
+      "amount": 6818.9
+     },
+     {
+      "name": "Other operating segment",
+      "amount": 1381.6
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/815556/000081555626000009/R66.htm",
+    "reconciled": true
    }
   },
   "FCX": {
@@ -4679,7 +4959,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FDS": {
    "symbol": "FDS",
@@ -4699,6 +4980,28 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Results of Operations (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 2321.748,
+    "segments": [
+     {
+      "name": "Americas",
+      "amount": 1506.108
+     },
+     {
+      "name": "EMEA",
+      "amount": 580.284
+     },
+     {
+      "name": "Asia Pacific",
+      "amount": 235.356
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1013237/000162828025045769/R88.htm",
+    "reconciled": true
    }
   },
   "FDX": {
@@ -4719,7 +5022,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FDXF": {
    "symbol": "FDXF",
@@ -4739,7 +5043,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "FE": {
    "symbol": "FE",
@@ -4759,7 +5064,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FER": {
    "symbol": "FER",
@@ -4779,7 +5085,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FFIV": {
    "symbol": "FFIV",
@@ -4799,7 +5106,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "FICO": {
    "symbol": "FICO",
@@ -4819,7 +5127,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "FIS": {
    "symbol": "FIS",
@@ -4839,7 +5148,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FISV": {
    "symbol": "FISV",
@@ -4859,7 +5169,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FITB": {
    "symbol": "FITB",
@@ -4879,7 +5190,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FIX": {
    "symbol": "FIX",
@@ -4899,7 +5211,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "FOX": {
    "symbol": "FOX",
@@ -4919,7 +5232,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FOXA": {
    "symbol": "FOXA",
@@ -4939,7 +5253,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FRT": {
    "symbol": "FRT",
@@ -4959,7 +5274,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FSLR": {
    "symbol": "FSLR",
@@ -4979,7 +5295,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "FTNT": {
    "symbol": "FTNT",
@@ -4999,7 +5316,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "FTV": {
    "symbol": "FTV",
@@ -5019,7 +5337,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GD": {
    "symbol": "GD",
@@ -5039,7 +5358,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GDDY": {
    "symbol": "GDDY",
@@ -5059,6 +5379,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Summary of Significant Accounting Policies - Revenue by Geography (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 4951.1,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 3324.3
+     },
+     {
+      "name": "International",
+      "amount": 1626.8
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1609711/000160971126000010/R55.htm",
+    "reconciled": true
    }
   },
   "GE": {
@@ -5079,7 +5417,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GEHC": {
    "symbol": "GEHC",
@@ -5099,7 +5438,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GEN": {
    "symbol": "GEN",
@@ -5119,6 +5459,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Revenues - Schedule of Disaggregation of Revenues (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5000.0,
+    "segments": [
+     {
+      "name": "Subscription and service revenue",
+      "amount": 4982.0
+     },
+     {
+      "name": "Net interest income on notes receivable",
+      "amount": 18.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/849399/000084939926000017/R55.htm",
+    "reconciled": true
    }
   },
   "GEV": {
@@ -5139,7 +5497,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GILD": {
    "symbol": "GILD",
@@ -5159,7 +5518,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GIS": {
    "symbol": "GIS",
@@ -5179,7 +5539,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GL": {
    "symbol": "GL",
@@ -5199,7 +5560,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GLW": {
    "symbol": "GLW",
@@ -5219,6 +5581,44 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Revenue - Schedule of Disaggregation of Revenue (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 15629.0,
+    "segments": [
+     {
+      "name": "Optical Communications",
+      "amount": 6274.0
+     },
+     {
+      "name": "Display products",
+      "amount": 2965.0
+     },
+     {
+      "name": "Specialty material products",
+      "amount": 2194.0
+     },
+     {
+      "name": "Automotive products",
+      "amount": 1777.0
+     },
+     {
+      "name": "Life science products",
+      "amount": 959.0
+     },
+     {
+      "name": "Polycrystalline silicon products",
+      "amount": 955.0
+     },
+     {
+      "name": "All other products",
+      "amount": 505.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/24741/000002474126000124/R57.htm",
+    "reconciled": true
    }
   },
   "GM": {
@@ -5239,7 +5639,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GNRC": {
    "symbol": "GNRC",
@@ -5259,7 +5660,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GOOG": {
    "symbol": "GOOG",
@@ -5279,7 +5681,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GOOGL": {
    "symbol": "GOOGL",
@@ -5299,7 +5702,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "GPC": {
    "symbol": "GPC",
@@ -5319,6 +5723,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information - Summary of Segment Data (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 24300.141,
+    "segments": [
+     {
+      "name": "North America Automotive",
+      "amount": 9520.042
+     },
+     {
+      "name": "International Automotive",
+      "amount": 5858.566
+     },
+     {
+      "name": "Industrial",
+      "amount": 8921.533
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/40987/000004098726000003/R52.htm",
+    "reconciled": true
    }
   },
   "GPN": {
@@ -5339,7 +5765,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GRMN": {
    "symbol": "GRMN",
@@ -5359,7 +5786,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GS": {
    "symbol": "GS",
@@ -5379,7 +5807,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "GWW": {
    "symbol": "GWW",
@@ -5399,7 +5828,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HAL": {
    "symbol": "HAL",
@@ -5419,7 +5849,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "HAS": {
    "symbol": "HAS",
@@ -5439,6 +5870,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Reporting - Segment Reporting Information by Segment (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5365.9,
+    "segments": [
+     {
+      "name": "Corporate and Other",
+      "amount": 184.4
+     },
+     {
+      "name": "Wizards of the Coast and Digital Gaming",
+      "amount": 2405.7
+     },
+     {
+      "name": "Consumer Products",
+      "amount": 2650.4
+     },
+     {
+      "name": "Entertainment",
+      "amount": 125.4
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/46080/000004608026000011/R114.htm",
+    "reconciled": true
    }
   },
   "HBAN": {
@@ -5459,7 +5916,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HCA": {
    "symbol": "HCA",
@@ -5479,7 +5937,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HD": {
    "symbol": "HD",
@@ -5499,6 +5958,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT REPORTING AND NET SALES - Schedule of Segment, Reconciliation of Other Items from Segments to Consolidated (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 164683.0,
+    "segments": [
+     {
+      "name": "Primary Segment",
+      "amount": 151966.0
+     },
+     {
+      "name": "Other",
+      "amount": 12717.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/354950/000162828026019436/R44.htm",
+    "reconciled": true
    }
   },
   "HIG": {
@@ -5519,7 +5996,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HII": {
    "symbol": "HII",
@@ -5539,7 +6017,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HLT": {
    "symbol": "HLT",
@@ -5559,7 +6038,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HON": {
    "symbol": "HON",
@@ -5579,7 +6059,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HOOD": {
    "symbol": "HOOD",
@@ -5599,7 +6080,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "HPE": {
    "symbol": "HPE",
@@ -5619,7 +6101,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "HPQ": {
    "symbol": "HPQ",
@@ -5639,7 +6122,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "HRL": {
    "symbol": "HRL",
@@ -5659,7 +6143,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "HSIC": {
    "symbol": "HSIC",
@@ -5679,7 +6164,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HST": {
    "symbol": "HST",
@@ -5699,6 +6185,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Geographic and Business Segment Information - Revenues and Long-Lived Assets by Geographical Area (Detail)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 6114.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 6010.0
+     },
+     {
+      "name": "Brazil",
+      "amount": 28.0
+     },
+     {
+      "name": "Canada",
+      "amount": 76.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1070750/000107075026000054/R89.htm",
+    "reconciled": true
    }
   },
   "HSY": {
@@ -5719,6 +6227,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - SCHEDULE OF NET SALES AND EARNINGS BY SEGMENT (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 11692.576,
+    "segments": [
+     {
+      "name": "North America Confectionery",
+      "amount": 9479.709
+     },
+     {
+      "name": "North America Salty Snacks",
+      "amount": 1271.299
+     },
+     {
+      "name": "International",
+      "amount": 941.568
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/47111/000162828026008586/R114.htm",
+    "reconciled": true
    }
   },
   "HUBB": {
@@ -5739,7 +6269,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HUM": {
    "symbol": "HUM",
@@ -5759,7 +6290,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "HWM": {
    "symbol": "HWM",
@@ -5779,7 +6311,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IBKR": {
    "symbol": "IBKR",
@@ -5799,7 +6332,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IBM": {
    "symbol": "IBM",
@@ -5819,7 +6353,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ICE": {
    "symbol": "ICE",
@@ -5839,7 +6374,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IDXX": {
    "symbol": "IDXX",
@@ -5859,7 +6395,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IEX": {
    "symbol": "IEX",
@@ -5879,7 +6416,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IFF": {
    "symbol": "IFF",
@@ -5899,7 +6437,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "INCY": {
    "symbol": "INCY",
@@ -5919,6 +6458,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Reporting - Schedule of Long-Lived Assets by Geographic Areas (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5141.242,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 4799.941
+     },
+     {
+      "name": "Europe",
+      "amount": 323.734
+     },
+     {
+      "name": "Other countries",
+      "amount": 17.567
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/879169/000087916926000010/R99.htm",
+    "reconciled": true
    }
   },
   "INSM": {
@@ -5939,7 +6500,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "INTC": {
    "symbol": "INTC",
@@ -5959,7 +6521,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "INTU": {
    "symbol": "INTU",
@@ -5979,7 +6542,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "INVH": {
    "symbol": "INVH",
@@ -5999,7 +6563,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "IP": {
    "symbol": "IP",
@@ -6019,7 +6584,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "IQV": {
    "symbol": "IQV",
@@ -6039,7 +6605,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IR": {
    "symbol": "IR",
@@ -6059,7 +6626,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "IRM": {
    "symbol": "IRM",
@@ -6079,6 +6647,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Geographical and Long Lived Assets (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 6901.737,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 4573.462
+     },
+     {
+      "name": "United Kingdom",
+      "amount": 472.611
+     },
+     {
+      "name": "Canada",
+      "amount": 302.421
+     },
+     {
+      "name": "Remaining Countries",
+      "amount": 1553.243
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1020569/000102056926000013/R104.htm",
+    "reconciled": true
    }
   },
   "ISRG": {
@@ -6099,7 +6693,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "IT": {
    "symbol": "IT",
@@ -6119,7 +6714,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ITW": {
    "symbol": "ITW",
@@ -6139,7 +6735,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "IVZ": {
    "symbol": "IVZ",
@@ -6159,7 +6756,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "J": {
    "symbol": "J",
@@ -6179,6 +6777,44 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Revenue Accounting for Contracts - Schedule of Disaggregation of Revenue and Schedule of Concentration of Risk (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 12029.783,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 7415.464
+     },
+     {
+      "name": "Europe",
+      "amount": 2871.566
+     },
+     {
+      "name": "Canada",
+      "amount": 248.118
+     },
+     {
+      "name": "Asia",
+      "amount": 144.944
+     },
+     {
+      "name": "India",
+      "amount": 180.124
+     },
+     {
+      "name": "Australia and New Zealand",
+      "amount": 573.237
+     },
+     {
+      "name": "Middle East and Africa",
+      "amount": 596.33
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/52988/000162828025053316/R52.htm",
+    "reconciled": true
    }
   },
   "JBHT": {
@@ -6199,7 +6835,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "JBL": {
    "symbol": "JBL",
@@ -6219,7 +6856,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "JCI": {
    "symbol": "JCI",
@@ -6239,6 +6877,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Financial Information Related to Company's Reportable Segments (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 23596.0,
+    "segments": [
+     {
+      "name": "Americas",
+      "amount": 15831.0
+     },
+     {
+      "name": "EMEA",
+      "amount": 4968.0
+     },
+     {
+      "name": "APAC",
+      "amount": 2797.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/833444/000083344425000097/R112.htm",
+    "reconciled": true
    }
   },
   "JKHY": {
@@ -6259,7 +6919,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "JNJ": {
    "symbol": "JNJ",
@@ -6279,7 +6940,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "JPM": {
    "symbol": "JPM",
@@ -6299,7 +6961,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "KDP": {
    "symbol": "KDP",
@@ -6319,6 +6982,24 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segments - Revenue by Geography (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 16603.0,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 14502.0
+     },
+     {
+      "name": "Foreign",
+      "amount": 2101.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1418135/000141813526000016/R75.htm",
+    "reconciled": true
    }
   },
   "KEY": {
@@ -6339,7 +7020,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "KEYS": {
    "symbol": "KEYS",
@@ -6359,7 +7041,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "KHC": {
    "symbol": "KHC",
@@ -6379,7 +7062,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "KIM": {
    "symbol": "KIM",
@@ -6399,7 +7083,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "KKR": {
    "symbol": "KKR",
@@ -6419,7 +7104,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "KLAC": {
    "symbol": "KLAC",
@@ -6439,6 +7125,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT REPORTING AND GEOGRAPHIC INFORMATION - Reconciliation of Total Reportable Segments Revenue to Total Revenue (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 13579.476,
+    "segments": [
+     {
+      "name": "Operating Segments",
+      "amount": 13579.212
+     },
+     {
+      "name": "Effects of changes in foreign currency exchange rates",
+      "amount": 0.264
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/319201/000031920126000027/R110.htm",
+    "reconciled": true
    }
   },
   "KMB": {
@@ -6459,7 +7163,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "KMI": {
    "symbol": "KMI",
@@ -6479,7 +7184,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "KO": {
    "symbol": "KO",
@@ -6499,7 +7205,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "KR": {
    "symbol": "KR",
@@ -6519,7 +7226,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "KVUE": {
    "symbol": "KVUE",
@@ -6539,7 +7247,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "L": {
    "symbol": "L",
@@ -6559,7 +7268,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LDOS": {
    "symbol": "LDOS",
@@ -6579,7 +7289,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LEN": {
    "symbol": "LEN",
@@ -6599,7 +7310,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LH": {
    "symbol": "LH",
@@ -6619,7 +7331,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LHX": {
    "symbol": "LHX",
@@ -6639,7 +7352,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LII": {
    "symbol": "LII",
@@ -6659,7 +7373,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LIN": {
    "symbol": "LIN",
@@ -6679,7 +7394,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LITE": {
    "symbol": "LITE",
@@ -6699,7 +7415,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LLY": {
    "symbol": "LLY",
@@ -6719,6 +7436,36 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Revenue - Disaggregation of Revenue by Geographical Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 65179.0,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 43481.0
+     },
+     {
+      "name": "Europe",
+      "amount": 11558.0
+     },
+     {
+      "name": "Japan",
+      "amount": 2132.0
+     },
+     {
+      "name": "China",
+      "amount": 1951.0
+     },
+     {
+      "name": "Rest of world",
+      "amount": 6057.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/59478/000005947826000013/R49.htm",
+    "reconciled": true
    }
   },
   "LMT": {
@@ -6739,7 +7486,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LNT": {
    "symbol": "LNT",
@@ -6759,7 +7507,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LOW": {
    "symbol": "LOW",
@@ -6779,6 +7528,24 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information - Schedule of Reconciliation to Consolidated (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 86286.0,
+    "segments": [
+     {
+      "name": "Operating Segments",
+      "amount": 84078.0
+     },
+     {
+      "name": "Other segment net sales",
+      "amount": 2208.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/60667/000006066726000029/R97.htm",
+    "reconciled": true
    }
   },
   "LRCX": {
@@ -6799,6 +7566,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Revenue - Revenues Disaggregated by Geographic Region and Primary Markets (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 23232.69,
+    "segments": [
+     {
+      "name": "Systems Revenue",
+      "amount": 14885.488
+     },
+     {
+      "name": "Customer support-related revenue and other",
+      "amount": 8347.202
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000037/R49.htm",
+    "reconciled": true
    }
   },
   "LULU": {
@@ -6819,7 +7604,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LUV": {
    "symbol": "LUV",
@@ -6839,7 +7625,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LVS": {
    "symbol": "LVS",
@@ -6859,7 +7646,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "LYB": {
    "symbol": "LYB",
@@ -6879,7 +7667,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "LYV": {
    "symbol": "LYV",
@@ -6899,7 +7688,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MA": {
    "symbol": "MA",
@@ -6919,7 +7709,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MAA": {
    "symbol": "MAA",
@@ -6939,7 +7730,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MAR": {
    "symbol": "MAR",
@@ -6959,7 +7751,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MAS": {
    "symbol": "MAS",
@@ -6979,7 +7772,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MCD": {
    "symbol": "MCD",
@@ -6999,7 +7793,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MCHP": {
    "symbol": "MCHP",
@@ -7019,6 +7814,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Geographic and Segment Information - Net Sales and Gross Profit (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 4713.1,
+    "segments": [
+     {
+      "name": "Semiconductor products",
+      "amount": 4549.3
+     },
+     {
+      "name": "Technology licensing",
+      "amount": 163.8
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/827054/000082705426000016/R45.htm",
+    "reconciled": true
    }
   },
   "MCK": {
@@ -7039,7 +7852,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MCO": {
    "symbol": "MCO",
@@ -7059,7 +7873,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MDLZ": {
    "symbol": "MDLZ",
@@ -7079,7 +7894,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MDT": {
    "symbol": "MDT",
@@ -7099,7 +7915,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MELI": {
    "symbol": "MELI",
@@ -7119,7 +7936,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MET": {
    "symbol": "MET",
@@ -7139,7 +7957,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "META": {
    "symbol": "META",
@@ -7159,7 +7978,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MGM": {
    "symbol": "MGM",
@@ -7179,7 +7999,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MKC": {
    "symbol": "MKC",
@@ -7199,7 +8020,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MLM": {
    "symbol": "MLM",
@@ -7219,7 +8041,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MMM": {
    "symbol": "MMM",
@@ -7239,7 +8062,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MNST": {
    "symbol": "MNST",
@@ -7259,7 +8083,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MO": {
    "symbol": "MO",
@@ -7279,7 +8104,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MOS": {
    "symbol": "MOS",
@@ -7299,7 +8125,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MPC": {
    "symbol": "MPC",
@@ -7319,7 +8146,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MPWR": {
    "symbol": "MPWR",
@@ -7339,7 +8167,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MRK": {
    "symbol": "MRK",
@@ -7359,6 +8188,44 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Reporting - Schedule of Consolidated Revenues by Geographic Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 65011.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 36510.0
+     },
+     {
+      "name": "Europe, Middle East and Africa",
+      "amount": 14580.0
+     },
+     {
+      "name": "Latin America",
+      "amount": 3410.0
+     },
+     {
+      "name": "Asia Pacific (other than Japan and China)",
+      "amount": 2983.0
+     },
+     {
+      "name": "Japan",
+      "amount": 2711.0
+     },
+     {
+      "name": "China",
+      "amount": 1939.0
+     },
+     {
+      "name": "Other",
+      "amount": 2878.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/310158/000031015826000063/R120.htm",
+    "reconciled": true
    }
   },
   "MRNA": {
@@ -7379,7 +8246,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MRSH": {
    "symbol": "MRSH",
@@ -7399,7 +8267,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MRVL": {
    "symbol": "MRVL",
@@ -7419,6 +8288,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Revenue - Net Revenue by End Market (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 8194.6,
+    "segments": [
+     {
+      "name": "Data center",
+      "amount": 6100.3
+     },
+     {
+      "name": "Communications and other",
+      "amount": 2094.3
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000011/R51.htm",
+    "reconciled": true
    }
   },
   "MS": {
@@ -7439,7 +8326,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MSCI": {
    "symbol": "MSCI",
@@ -7459,7 +8347,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MSFT": {
    "symbol": "MSFT",
@@ -7479,7 +8368,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MSI": {
    "symbol": "MSI",
@@ -7499,6 +8389,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Information by Segment and Geographic Region - Net Sales and Operating Earnings by Segment (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 11682.0,
+    "segments": [
+     {
+      "name": "Products and Systems Integration",
+      "amount": 7253.0
+     },
+     {
+      "name": "Software and Services",
+      "amount": 4429.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/R115.htm",
+    "reconciled": true
    }
   },
   "MSTR": {
@@ -7519,7 +8427,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "MTB": {
    "symbol": "MTB",
@@ -7539,6 +8448,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information - Information about Company's Segments (Detail)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 9690.0,
+    "segments": [
+     {
+      "name": "Commercial Bank",
+      "amount": 2947.0
+     },
+     {
+      "name": "Retail Bank",
+      "amount": 4868.0
+     },
+     {
+      "name": "Institutional Services and Wealth Management",
+      "amount": 1562.0
+     },
+     {
+      "name": "All Other",
+      "amount": 313.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/36270/000003627026000010/R136.htm",
+    "reconciled": true
    }
   },
   "MTD": {
@@ -7559,7 +8494,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "MU": {
    "symbol": "MU",
@@ -7579,7 +8515,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NCLH": {
    "symbol": "NCLH",
@@ -7599,7 +8536,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NDAQ": {
    "symbol": "NDAQ",
@@ -7619,7 +8557,8 @@
     "business_summary": false,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NDSN": {
    "symbol": "NDSN",
@@ -7639,7 +8578,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NEE": {
    "symbol": "NEE",
@@ -7659,7 +8599,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NEM": {
    "symbol": "NEM",
@@ -7679,7 +8620,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NFLX": {
    "symbol": "NFLX",
@@ -7699,7 +8641,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NI": {
    "symbol": "NI",
@@ -7719,7 +8662,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NKE": {
    "symbol": "NKE",
@@ -7739,7 +8683,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NOC": {
    "symbol": "NOC",
@@ -7759,7 +8704,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NOW": {
    "symbol": "NOW",
@@ -7779,7 +8725,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NRG": {
    "symbol": "NRG",
@@ -7799,7 +8746,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NSC": {
    "symbol": "NSC",
@@ -7819,7 +8767,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NTAP": {
    "symbol": "NTAP",
@@ -7839,7 +8788,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NTRS": {
    "symbol": "NTRS",
@@ -7859,7 +8809,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NUE": {
    "symbol": "NUE",
@@ -7879,7 +8830,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NVDA": {
    "symbol": "NVDA",
@@ -7899,7 +8851,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "NVR": {
    "symbol": "NVR",
@@ -7919,7 +8872,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "NWS": {
    "symbol": "NWS",
@@ -7939,6 +8893,32 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Reconciliation of Revenue and Segment EBITDA from Segments to Consolidated (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 9028.0,
+    "segments": [
+     {
+      "name": "Dow Jones",
+      "amount": 2497.0
+     },
+     {
+      "name": "Digital Real Estate Services",
+      "amount": 2016.0
+     },
+     {
+      "name": "Book Publishing",
+      "amount": 2288.0
+     },
+     {
+      "name": "News Media",
+      "amount": 2227.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1564708/000156470826000175/R120.htm",
+    "reconciled": true
    }
   },
   "NWSA": {
@@ -7959,6 +8939,32 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Reconciliation of Revenue and Segment EBITDA from Segments to Consolidated (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 9028.0,
+    "segments": [
+     {
+      "name": "Dow Jones",
+      "amount": 2497.0
+     },
+     {
+      "name": "Digital Real Estate Services",
+      "amount": 2016.0
+     },
+     {
+      "name": "Book Publishing",
+      "amount": 2288.0
+     },
+     {
+      "name": "News Media",
+      "amount": 2227.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1564708/000156470826000175/R120.htm",
+    "reconciled": true
    }
   },
   "NXPI": {
@@ -7979,6 +8985,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Supplemental Financial Information - Disaggregation of revenue (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 12269.0,
+    "segments": [
+     {
+      "name": "Distributors",
+      "amount": 7051.0
+     },
+     {
+      "name": "Direct",
+      "amount": 5084.0
+     },
+     {
+      "name": "Other",
+      "amount": 134.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1413447/000141344726000008/R63.htm",
+    "reconciled": true
    }
   },
   "O": {
@@ -7999,7 +9027,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ODFL": {
    "symbol": "ODFL",
@@ -8019,7 +9048,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "OKE": {
    "symbol": "OKE",
@@ -8039,7 +9069,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "OMC": {
    "symbol": "OMC",
@@ -8059,7 +9090,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ON": {
    "symbol": "ON",
@@ -8079,7 +9111,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ORCL": {
    "symbol": "ORCL",
@@ -8099,7 +9132,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ORLY": {
    "symbol": "ORLY",
@@ -8119,7 +9153,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "OTIS": {
    "symbol": "OTIS",
@@ -8139,7 +9174,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "OXY": {
    "symbol": "OXY",
@@ -8159,7 +9195,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PANW": {
    "symbol": "PANW",
@@ -8179,7 +9216,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PAYX": {
    "symbol": "PAYX",
@@ -8199,7 +9237,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PCAR": {
    "symbol": "PCAR",
@@ -8219,7 +9258,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PCG": {
    "symbol": "PCG",
@@ -8239,7 +9279,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PDD": {
    "symbol": "PDD",
@@ -8259,7 +9300,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PEG": {
    "symbol": "PEG",
@@ -8279,7 +9321,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PEP": {
    "symbol": "PEP",
@@ -8299,7 +9342,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PFE": {
    "symbol": "PFE",
@@ -8319,7 +9363,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PFG": {
    "symbol": "PFG",
@@ -8339,7 +9384,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PG": {
    "symbol": "PG",
@@ -8359,6 +9405,24 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - US And International Sales And Assets (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 87032.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 41700.0
+     },
+     {
+      "name": "International",
+      "amount": 45300.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/80424/000008042426000103/R46.htm",
+    "reconciled": true
    }
   },
   "PGR": {
@@ -8379,7 +9443,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PH": {
    "symbol": "PH",
@@ -8399,7 +9464,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PHM": {
    "symbol": "PHM",
@@ -8419,7 +9485,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PKG": {
    "symbol": "PKG",
@@ -8439,6 +9506,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Revenue - Summary of Revenues Disaggregated by Product Line (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 8989.3,
+    "segments": [
+     {
+      "name": "Packaging",
+      "amount": 8293.9
+     },
+     {
+      "name": "Paper",
+      "amount": 615.4
+     },
+     {
+      "name": "Corporate and Other",
+      "amount": 80.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/75677/000119312526074129/R62.htm",
+    "reconciled": true
    }
   },
   "PLD": {
@@ -8459,7 +9548,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PLTR": {
    "symbol": "PLTR",
@@ -8479,7 +9569,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PM": {
    "symbol": "PM",
@@ -8499,6 +9590,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Reporting: (Net Revenues, Significant Expenses, and Operating Income by Segment) (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 40648.0,
+    "segments": [
+     {
+      "name": "Europe",
+      "amount": 17111.0
+     },
+     {
+      "name": "SSEA, CIS & MEA",
+      "amount": 12051.0
+     },
+     {
+      "name": "EA, AU & PMI GTR",
+      "amount": 6632.0
+     },
+     {
+      "name": "Americas",
+      "amount": 4854.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1413329/000162828026005939/R90.htm",
+    "reconciled": true
    }
   },
   "PNC": {
@@ -8519,7 +9636,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PNR": {
    "symbol": "PNR",
@@ -8539,7 +9657,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "PNW": {
    "symbol": "PNW",
@@ -8559,7 +9678,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PODD": {
    "symbol": "PODD",
@@ -8579,6 +9699,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment and Geographic Data - Revenue by Geographic Location (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 2708.1,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 1953.9
+     },
+     {
+      "name": "International",
+      "amount": 754.3
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1145197/000114519726000028/R57.htm",
+    "reconciled": true
    }
   },
   "POOL": {
@@ -8599,6 +9737,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Net Sales and Net Property and Equipment by Geographic Region (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5289.396,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 4900.465
+     },
+     {
+      "name": "International",
+      "amount": 388.931
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/945841/000119312526074833/R94.htm",
+    "reconciled": true
    }
   },
   "PPG": {
@@ -8619,7 +9775,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PPL": {
    "symbol": "PPL",
@@ -8639,7 +9796,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PRU": {
    "symbol": "PRU",
@@ -8659,7 +9817,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PSA": {
    "symbol": "PSA",
@@ -8679,6 +9838,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Information (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 4824.113,
+    "segments": [
+     {
+      "name": "Self-Storage Operations Reportable Segment",
+      "amount": 4489.413
+     },
+     {
+      "name": "Ancillary Operations",
+      "amount": 334.7
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1393311/000162828026007696/R69.htm",
+    "reconciled": true
    }
   },
   "PSKY": {
@@ -8699,6 +9876,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "REVENUES - Schedule of Disaggregation of Revenue (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 12269.0,
+    "segments": [
+     {
+      "name": "Advertising",
+      "amount": 3803.0
+     },
+     {
+      "name": "Affiliate and subscription",
+      "amount": 5429.0
+     },
+     {
+      "name": "Theatrical",
+      "amount": 154.0
+     },
+     {
+      "name": "Licensing and other",
+      "amount": 2883.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/2041610/000204161026000011/R75.htm",
+    "reconciled": true
    }
   },
   "PSX": {
@@ -8719,7 +9922,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PTC": {
    "symbol": "PTC",
@@ -8739,7 +9943,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "PWR": {
    "symbol": "PWR",
@@ -8759,6 +9964,28 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Summarized Financial Information (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 28479.697,
+    "segments": [
+     {
+      "name": "Electric",
+      "amount": 23001.468
+     },
+     {
+      "name": "Electric · Termination Of The Peru Telecommunications Project",
+      "amount": 30.2
+     },
+     {
+      "name": "Underground and Infrastructure",
+      "amount": 5478.229
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1050915/000105091526000006/R53.htm",
+    "reconciled": true
    }
   },
   "PYPL": {
@@ -8779,7 +10006,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "Q": {
    "symbol": "Q",
@@ -8799,7 +10027,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "QCOM": {
    "symbol": "QCOM",
@@ -8819,7 +10048,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "RCL": {
    "symbol": "RCL",
@@ -8839,7 +10069,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "REG": {
    "symbol": "REG",
@@ -8859,7 +10090,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "REGN": {
    "symbol": "REGN",
@@ -8879,7 +10111,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "RF": {
    "symbol": "RF",
@@ -8899,7 +10132,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "RJF": {
    "symbol": "RJF",
@@ -8919,7 +10153,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "RL": {
    "symbol": "RL",
@@ -8939,7 +10174,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "RMD": {
    "symbol": "RMD",
@@ -8959,6 +10195,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Schedule of Revenue by Geographic Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5653.443,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 3562.024
+     },
+     {
+      "name": "Rest of the World",
+      "amount": 2091.419
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/943819/000094381926000047/R82.htm",
+    "reconciled": true
    }
   },
   "ROK": {
@@ -8979,7 +10233,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ROL": {
    "symbol": "ROL",
@@ -8999,6 +10254,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "REVENUE - Schedule of Disaggregation (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 3761.05,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 3491.325
+     },
+     {
+      "name": "Other countries",
+      "amount": 269.725
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/84839/000008483926000008/R55.htm",
+    "reconciled": true
    }
   },
   "ROP": {
@@ -9019,6 +10292,36 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment and Geographic Area Information - Schedule of Revenue by Geographic Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 7902.5,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 6872.8
+     },
+     {
+      "name": "Canada",
+      "amount": 291.7
+     },
+     {
+      "name": "Europe",
+      "amount": 541.4
+     },
+     {
+      "name": "Asia",
+      "amount": 71.1
+     },
+     {
+      "name": "Rest of the world",
+      "amount": 125.5
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/882835/000088283526000009/R78.htm",
+    "reconciled": true
    }
   },
   "ROST": {
@@ -9039,7 +10342,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "RSG": {
    "symbol": "RSG",
@@ -9059,7 +10363,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "RTX": {
    "symbol": "RTX",
@@ -9079,7 +10384,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "RVTY": {
    "symbol": "RVTY",
@@ -9099,7 +10405,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ECHO": {
    "symbol": "ECHO",
@@ -9119,7 +10426,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SBAC": {
    "symbol": "SBAC",
@@ -9139,7 +10447,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SBUX": {
    "symbol": "SBUX",
@@ -9159,7 +10468,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SCHW": {
    "symbol": "SCHW",
@@ -9179,7 +10489,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "SHOP": {
    "symbol": "SHOP",
@@ -9199,7 +10510,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "SHW": {
    "symbol": "SHW",
@@ -9219,7 +10531,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SJM": {
    "symbol": "SJM",
@@ -9239,7 +10552,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SLB": {
    "symbol": "SLB",
@@ -9259,7 +10573,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SMCI": {
    "symbol": "SMCI",
@@ -9279,7 +10594,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SNA": {
    "symbol": "SNA",
@@ -9299,7 +10615,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "SNDK": {
    "symbol": "SNDK",
@@ -9319,7 +10636,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SNPS": {
    "symbol": "SNPS",
@@ -9339,6 +10657,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Disclosure - Schedule of Segment Reporting Information (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 7054.178,
+    "segments": [
+     {
+      "name": "Design Automation",
+      "amount": 5302.34
+     },
+     {
+      "name": "Design IP",
+      "amount": 1751.838
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/883241/000088324125000028/R120.htm",
+    "reconciled": true
    }
   },
   "SO": {
@@ -9359,7 +10695,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SOLV": {
    "symbol": "SOLV",
@@ -9379,7 +10716,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SPG": {
    "symbol": "SPG",
@@ -9399,7 +10737,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SPGI": {
    "symbol": "SPGI",
@@ -9419,7 +10758,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SRE": {
    "symbol": "SRE",
@@ -9439,7 +10779,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "STE": {
    "symbol": "STE",
@@ -9459,7 +10800,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "STLD": {
    "symbol": "STLD",
@@ -9479,7 +10821,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "STT": {
    "symbol": "STT",
@@ -9499,7 +10842,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "STX": {
    "symbol": "STX",
@@ -9519,7 +10863,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "STZ": {
    "symbol": "STZ",
@@ -9539,7 +10884,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SW": {
    "symbol": "SW",
@@ -9559,6 +10905,44 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Sales by Country (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 31179.0,
+    "segments": [
+     {
+      "name": "Ireland (country of domicile)",
+      "amount": 226.0
+     },
+     {
+      "name": "U.S.",
+      "amount": 14467.0
+     },
+     {
+      "name": "Mexico",
+      "amount": 2521.0
+     },
+     {
+      "name": "Germany",
+      "amount": 1873.0
+     },
+     {
+      "name": "France",
+      "amount": 1546.0
+     },
+     {
+      "name": "Other Americas",
+      "amount": 3381.0
+     },
+     {
+      "name": "Other Europe, MEA and APAC",
+      "amount": 7165.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/2005951/000162828026012555/R73.htm",
+    "reconciled": true
    }
   },
   "SWK": {
@@ -9579,6 +10963,36 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "BUSINESS SEGMENTS AND GEOGRAPHIC AREAS - Schedule of Net Sales and Property Plant and Equipment, Net by Geographic Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 15130.4,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 9316.8
+     },
+     {
+      "name": "Canada",
+      "amount": 680.3
+     },
+     {
+      "name": "Other Americas",
+      "amount": 839.6
+     },
+     {
+      "name": "Europe",
+      "amount": 3079.8
+     },
+     {
+      "name": "Asia",
+      "amount": 1213.9
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/93556/000009355626000009/R108.htm",
+    "reconciled": true
    }
   },
   "SWKS": {
@@ -9599,7 +11013,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SYF": {
    "symbol": "SYF",
@@ -9619,7 +11034,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "SYK": {
    "symbol": "SYK",
@@ -9639,7 +11055,8 @@
     "business_summary": false,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "SYY": {
    "symbol": "SYY",
@@ -9659,6 +11076,40 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "BUSINESS SEGMENT INFORMATION - Geographic Area Revenue and Long-Lived Assets (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 84553.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 68108.0
+     },
+     {
+      "name": "Canada",
+      "amount": 6513.0
+     },
+     {
+      "name": "United Kingdom",
+      "amount": 4487.0
+     },
+     {
+      "name": "France",
+      "amount": 1897.0
+     },
+     {
+      "name": "Sweden",
+      "amount": 1032.0
+     },
+     {
+      "name": "Other",
+      "amount": 2516.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/96021/000009602126000033/R126.htm",
+    "reconciled": true
    }
   },
   "T": {
@@ -9679,6 +11130,40 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information (Schedule of Schedule of Revenues Earned from Customers and Property, Plant and Equipment by Geographical Areas) (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 125648.0,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 120219.0
+     },
+     {
+      "name": "Mexico",
+      "amount": 4428.0
+     },
+     {
+      "name": "Asia/Pacific Rim",
+      "amount": 395.0
+     },
+     {
+      "name": "Europe",
+      "amount": 382.0
+     },
+     {
+      "name": "Latin America",
+      "amount": 110.0
+     },
+     {
+      "name": "Other",
+      "amount": 114.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/732717/000073271726000120/R61.htm",
+    "reconciled": true
    }
   },
   "TAP": {
@@ -9699,7 +11184,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TDG": {
    "symbol": "TDG",
@@ -9719,7 +11205,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TDY": {
    "symbol": "TDY",
@@ -9739,7 +11226,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TECH": {
    "symbol": "TECH",
@@ -9759,7 +11247,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TEL": {
    "symbol": "TEL",
@@ -9779,7 +11268,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TER": {
    "symbol": "TER",
@@ -9799,7 +11289,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TFC": {
    "symbol": "TFC",
@@ -9819,7 +11310,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TGT": {
    "symbol": "TGT",
@@ -9839,7 +11331,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TJX": {
    "symbol": "TJX",
@@ -9859,7 +11352,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TKO": {
    "symbol": "TKO",
@@ -9879,7 +11373,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TMO": {
    "symbol": "TMO",
@@ -9899,7 +11394,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TMUS": {
    "symbol": "TMUS",
@@ -9919,7 +11415,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TPL": {
    "symbol": "TPL",
@@ -9939,7 +11436,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TPR": {
    "symbol": "TPR",
@@ -9959,6 +11457,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Schedule of Geographical Area Information (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 8004.2,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 4697.4
+     },
+     {
+      "name": "China",
+      "amount": 1398.7
+     },
+     {
+      "name": "Japan",
+      "amount": 465.7
+     },
+     {
+      "name": "Other",
+      "amount": 1442.4
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1116132/000111613226000018/R97.htm",
+    "reconciled": true
    }
   },
   "TRGP": {
@@ -9979,7 +11503,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TRI": {
    "symbol": "TRI",
@@ -9999,7 +11524,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TRMB": {
    "symbol": "TRMB",
@@ -10019,7 +11545,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TROW": {
    "symbol": "TROW",
@@ -10039,7 +11566,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TRV": {
    "symbol": "TRV",
@@ -10059,7 +11587,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TSCO": {
    "symbol": "TSCO",
@@ -10079,7 +11608,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TSLA": {
    "symbol": "TSLA",
@@ -10099,6 +11629,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Reporting and Information about Geographic Areas - Schedule of Total Revenues and Gross Profit by Reportable Segment (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 94827.0,
+    "segments": [
+     {
+      "name": "Automotive segment",
+      "amount": 82056.0
+     },
+     {
+      "name": "Energy generation and storage segment",
+      "amount": 12771.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/R93.htm",
+    "reconciled": true
    }
   },
   "TSN": {
@@ -10119,7 +11667,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TT": {
    "symbol": "TT",
@@ -10139,7 +11688,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TTD": {
    "symbol": "TTD",
@@ -10159,7 +11709,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TTWO": {
    "symbol": "TTWO",
@@ -10179,7 +11730,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TXN": {
    "symbol": "TXN",
@@ -10199,7 +11751,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "TXT": {
    "symbol": "TXT",
@@ -10219,7 +11772,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "TYL": {
    "symbol": "TYL",
@@ -10239,7 +11793,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UAL": {
    "symbol": "UAL",
@@ -10259,7 +11814,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UBER": {
    "symbol": "UBER",
@@ -10279,7 +11835,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "UDR": {
    "symbol": "UDR",
@@ -10299,7 +11856,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UHS": {
    "symbol": "UHS",
@@ -10319,7 +11877,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ULTA": {
    "symbol": "ULTA",
@@ -10339,7 +11898,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UNH": {
    "symbol": "UNH",
@@ -10359,7 +11919,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UNP": {
    "symbol": "UNP",
@@ -10379,7 +11940,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "UPS": {
    "symbol": "UPS",
@@ -10399,7 +11961,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "URI": {
    "symbol": "URI",
@@ -10419,7 +11982,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "USB": {
    "symbol": "USB",
@@ -10439,7 +12003,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "V": {
    "symbol": "V",
@@ -10459,7 +12024,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VEEV": {
    "symbol": "VEEV",
@@ -10479,6 +12045,32 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Information about Geographic Areas and Products - Revenue by Geographic Area (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 3195.311,
+    "segments": [
+     {
+      "name": "North America",
+      "amount": 1903.342
+     },
+     {
+      "name": "Europe",
+      "amount": 939.63
+     },
+     {
+      "name": "Asia Pacific",
+      "amount": 280.162
+     },
+     {
+      "name": "Other international",
+      "amount": 72.177
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1393052/000139305226000014/R79.htm",
+    "reconciled": true
    }
   },
   "VICI": {
@@ -10499,7 +12091,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VLO": {
    "symbol": "VLO",
@@ -10519,7 +12112,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "VLTO": {
    "symbol": "VLTO",
@@ -10539,6 +12133,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information (Segment Results) (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 5503.0,
+    "segments": [
+     {
+      "name": "Water Quality",
+      "amount": 3321.0
+     },
+     {
+      "name": "Product Quality & Innovation",
+      "amount": 2182.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000011/R60.htm",
+    "reconciled": true
    }
   },
   "VMC": {
@@ -10559,7 +12171,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "VRSK": {
    "symbol": "VRSK",
@@ -10579,7 +12192,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "VRSN": {
    "symbol": "VRSN",
@@ -10599,7 +12213,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "VRT": {
    "symbol": "VRT",
@@ -10619,6 +12234,36 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "SEGMENT INFORMATION - Schedule of Sales by Destination (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 10229.9,
+    "segments": [
+     {
+      "name": "United States",
+      "amount": 6013.6
+     },
+     {
+      "name": "Europe",
+      "amount": 1474.6
+     },
+     {
+      "name": "Asia Pacific",
+      "amount": 2020.3
+     },
+     {
+      "name": "Latin America and Canada",
+      "amount": 436.9
+     },
+     {
+      "name": "Middle East/Africa",
+      "amount": 284.5
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1674101/000167410126000008/R96.htm",
+    "reconciled": true
    }
   },
   "VRTX": {
@@ -10639,7 +12284,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VST": {
    "symbol": "VST",
@@ -10659,7 +12305,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VTR": {
    "symbol": "VTR",
@@ -10679,7 +12326,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VTRS": {
    "symbol": "VTRS",
@@ -10699,7 +12347,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "VZ": {
    "symbol": "VZ",
@@ -10719,7 +12368,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WAB": {
    "symbol": "WAB",
@@ -10739,7 +12389,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WAT": {
    "symbol": "WAT",
@@ -10759,7 +12410,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WBD": {
    "symbol": "WBD",
@@ -10779,7 +12431,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WDAY": {
    "symbol": "WDAY",
@@ -10799,7 +12452,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WDC": {
    "symbol": "WDC",
@@ -10819,7 +12473,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WEC": {
    "symbol": "WEC",
@@ -10839,7 +12494,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WELL": {
    "symbol": "WELL",
@@ -10859,6 +12515,32 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segment Reporting - Segment Information for Reportable Segments (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 10838.034,
+    "segments": [
+     {
+      "name": "Non-segment/Corporate",
+      "amount": 369.965
+     },
+     {
+      "name": "Seniors Housing Operating",
+      "amount": 8489.095
+     },
+     {
+      "name": "Triple-net",
+      "amount": 1197.042
+     },
+     {
+      "name": "Outpatient Medical",
+      "amount": 781.932
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/R118.htm",
+    "reconciled": true
    }
   },
   "WFC": {
@@ -10879,7 +12561,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "WM": {
    "symbol": "WM",
@@ -10899,7 +12582,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WMB": {
    "symbol": "WMB",
@@ -10919,7 +12603,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WMT": {
    "symbol": "WMT",
@@ -10939,6 +12624,24 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
+   },
+   "segments": {
+    "basis": "Segments and Disaggregated Revenue - Segment Revenues and Long-Lived Assets (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 713163.0,
+    "segments": [
+     {
+      "name": "U.S.",
+      "amount": 581175.0
+     },
+     {
+      "name": "Non-U.S. operations",
+      "amount": 131988.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/104169/000010416926000055/R74.htm",
+    "reconciled": true
    }
   },
   "WRB": {
@@ -10959,7 +12662,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WSM": {
    "symbol": "WSM",
@@ -10979,7 +12683,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "WST": {
    "symbol": "WST",
@@ -10999,6 +12704,24 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
+   },
+   "segments": {
+    "basis": "Segment Information - Sales by Product Group (Details)",
+    "currency": "USD",
+    "unit": "ล้าน",
+    "total": 3074.1,
+    "segments": [
+     {
+      "name": "Proprietary Products",
+      "amount": 2492.1
+     },
+     {
+      "name": "Contract-Manufactured Products",
+      "amount": 582.0
+     }
+    ],
+    "source_url": "https://www.sec.gov/Archives/edgar/data/105770/000010577026000010/R114.htm",
+    "reconciled": true
    }
   },
   "WTW": {
@@ -11019,7 +12742,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "WY": {
    "symbol": "WY",
@@ -11039,7 +12763,8 @@
     "business_summary": false,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "WYNN": {
    "symbol": "WYNN",
@@ -11059,7 +12784,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "XEL": {
    "symbol": "XEL",
@@ -11079,7 +12805,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "XYL": {
    "symbol": "XYL",
@@ -11099,7 +12826,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "XYZ": {
    "symbol": "XYZ",
@@ -11119,7 +12847,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "YUM": {
    "symbol": "YUM",
@@ -11139,7 +12868,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   },
   "ZBH": {
    "symbol": "ZBH",
@@ -11159,7 +12889,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ZBRA": {
    "symbol": "ZBRA",
@@ -11179,7 +12910,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ZS": {
    "symbol": "ZS",
@@ -11199,7 +12931,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "ZTS": {
    "symbol": "ZTS",
@@ -11219,7 +12952,8 @@
     "business_summary": true,
     "competition": true,
     "customer_concentration": true
-   }
+   },
+   "segments": null
   },
   "XOM": {
    "symbol": "XOM",
@@ -11239,7 +12973,8 @@
     "business_summary": true,
     "competition": false,
     "customer_concentration": false
-   }
+   },
+   "segments": null
   }
  }
 }

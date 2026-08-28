@@ -112,5 +112,29 @@ class ThaiDisplayTest(unittest.TestCase):
         self.assertEqual(business["field_origins"]["revenue_segments"], "missing")
 
 
+class TruncationTest(unittest.TestCase):
+    """ภาษาไทยกินโทเคนสูง คำตอบสี่ช่องเคยยาวเกินจนถูกตัดกลาง JSON"""
+
+    def test_a_truncated_reply_names_the_real_cause(self) -> None:
+        truncated = {"stop_reason": "max_tokens", "content": [{"type": "text", "text": '{"summary_th": "ยาวมาก'}]}
+        with patch("fastdeep_scanner.summarize._request", return_value=truncated):
+            with self.assertRaises(SummaryError) as caught:
+                summarize_profile(PROFILE, key="test-key", read_full_section=False)
+        message = str(caught.exception)
+        self.assertIn("ถูกตัดกลางทาง", message)
+        self.assertNotIn("ไม่ใช่ JSON", message, "ต้องไม่ชี้ไปว่าโมเดลตอบผิดรูปแบบ")
+
+    def test_a_complete_reply_is_not_flagged(self) -> None:
+        complete = {"stop_reason": "end_turn", "content": [{"type": "text", "text": '{"summary_th": "ครบ"}'}]}
+        with patch("fastdeep_scanner.summarize._request", return_value=complete):
+            result = summarize_profile(PROFILE, key="test-key", read_full_section=False)
+        self.assertEqual(result["summary_th"], "ครบ")
+
+    def test_the_output_cap_leaves_room_for_four_thai_fields(self) -> None:
+        from fastdeep_scanner.summarize import MAX_OUTPUT_TOKENS
+
+        self.assertGreaterEqual(MAX_OUTPUT_TOKENS, 1200)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -25,6 +25,8 @@ from .local_config import get_setting
 API_URL = "https://api.anthropic.com/v1/messages"
 API_KEY_SETTING = "ANTHROPIC_API_KEY"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
+# ภาษาไทยกินโทเคนต่อตัวอักษรสูง คำตอบสี่ช่องจึงเกิน 900 และถูกตัดกลาง JSON
+MAX_OUTPUT_TOKENS = 1600
 SCHEMA_VERSION = 1
 
 SYSTEM_PROMPT = """คุณคือผู้ช่วยที่ย่อข้อมูลบริษัทจากแบบที่ยื่นต่อ ก.ล.ต. สหรัฐ ให้นักลงทุนไทยอ่าน
@@ -36,13 +38,15 @@ SYSTEM_PROMPT = """คุณคือผู้ช่วยที่ย่อข�
 - เขียนภาษาไทยที่คนทั่วไปเข้าใจ เลี่ยงศัพท์การเงินที่ไม่จำเป็น
 - ชื่อสินค้าและชื่อบริษัทให้คงภาษาอังกฤษไว้
 
-ตอบเป็น JSON เท่านั้น ตามรูปแบบนี้
+ความยาวสำคัญมาก ทุกช่องต้องสั้นและได้ใจความ ห้ามลอกยาว ๆ มาทั้งย่อหน้า
+
+ตอบเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอก JSON และห้ามใส่ code fence
 {"summary_th": "...", "revenue_model_th": "...", "customers_th": "...", "competition_th": ""}
 
-summary_th: บริษัททำอะไร ขายอะไร ให้ใคร 2-4 ประโยค
-revenue_model_th: หาเงินจากทางไหน ถ้าข้อความไม่ได้บอกให้เว้นว่าง
-customers_th: ลูกค้าหลักและการกระจุกตัว ถ้าไม่ได้บอกให้เว้นว่าง
-competition_th: สภาพการแข่งขันตามที่บริษัทอธิบาย ถ้าไม่ได้บอกให้เว้นว่าง"""
+summary_th: บริษัททำอะไร ขายอะไร ให้ใคร ไม่เกิน 3 ประโยค
+revenue_model_th: หาเงินจากทางไหน ไม่เกิน 2 ประโยค ถ้าข้อความไม่ได้บอกให้เว้นว่าง
+customers_th: ลูกค้าหลักและการกระจุกตัว ไม่เกิน 2 ประโยค ถ้าไม่ได้บอกให้เว้นว่าง
+competition_th: สภาพการแข่งขันตามที่บริษัทอธิบาย ไม่เกิน 2 ประโยค ถ้าไม่ได้บอกให้เว้นว่าง"""
 
 
 class SummaryError(RuntimeError):
@@ -87,11 +91,11 @@ TOPIC_KEYWORDS = (
     r"competition|competitors|competitive landscape",
     r"products and services|our products|principal products|segments",
 )
-OPENING_CHARS = 6000
-WINDOW_CHARS = 2600
+OPENING_CHARS = 3500
+WINDOW_CHARS = 1800
 
 
-def full_business_section(profile: dict[str, Any], *, timeout: int = 60, limit: int = 24000) -> str:
+def full_business_section(profile: dict[str, Any], *, timeout: int = 60, limit: int = 11000) -> str:
     """ส่วนที่บรรยายธุรกิจ โดยเลือกช่วงที่ตอบคำถามของแต่ละช่อง
 
     Item 1 ของบางบริษัทยาวเป็นแสนตัวอักษร การตัดเอาแค่ตอนต้นทำให้ย่อหน้าเรื่อง
@@ -127,7 +131,7 @@ def full_business_section(profile: dict[str, Any], *, timeout: int = 60, limit: 
     return "\n[...]\n".join(body[start:end] for start, end in merged)[:limit]
 
 
-def _source_text(profile: dict[str, Any], limit: int = 26000, body: str = "") -> str:
+def _source_text(profile: dict[str, Any], limit: int = 13000, body: str = "") -> str:
     parts = [
         f"บริษัท: {profile.get('entity_name') or profile.get('symbol')}",
         f"กลุ่มอุตสาหกรรมตาม SEC: {profile.get('industry') or '-'}",
@@ -186,11 +190,18 @@ def summarize_profile(
     body = full_business_section(profile, timeout=timeout) if read_full_section else ""
     payload = {
         "model": model,
-        "max_tokens": 900,
+        "max_tokens": MAX_OUTPUT_TOKENS,
         "system": SYSTEM_PROMPT,
         "messages": [{"role": "user", "content": _source_text(profile, body=body)}],
     }
     response = _request(payload, key, timeout)
+    # คำตอบที่ถูกตัดกลางทางจะปิด JSON ไม่ครบ ถ้าไม่ดักไว้จะขึ้นว่าอ่าน JSON ไม่ได้
+    # ซึ่งชี้ไปผิดทางว่าโมเดลตอบผิดรูปแบบ ทั้งที่ปัญหาคือพื้นที่ตอบไม่พอ
+    if response.get("stop_reason") == "max_tokens":
+        raise SummaryError(
+            f"คำตอบยาวเกิน {MAX_OUTPUT_TOKENS} โทเคนจึงถูกตัดกลางทาง "
+            "ให้เพิ่ม MAX_OUTPUT_TOKENS หรือสั่งให้ย่อสั้นลง"
+        )
     blocks = [block.get("text", "") for block in response.get("content", []) if block.get("type") == "text"]
     fields = _parse_reply("".join(blocks))
     return {
