@@ -101,16 +101,15 @@
     return sources.length ? `<div class="reference-citations">${sourceLinks(sources)}</div>` : "";
   }
 
-  const ORIGIN_MARKERS = {
-    journal: ["journal-marker", "บันทึกของคุณ"],
-    filing: ["filing-marker", "ยกจากแบบที่ยื่น ยังไม่ทบทวน"],
-  };
-
   // ผู้อ่านต้องแยกออกทันทีว่าข้อความมาจากบันทึกของตัวเอง จากงานวิจัยที่ทบทวนแล้ว
-  // หรือยกมาดิบ ๆ จากเอกสารที่บริษัทยื่น
+  // ย่อจากเอกสารที่บริษัทยื่น หรือยกมาดิบ ๆ เป็นภาษาอังกฤษ
   function journalMarker(business, key) {
-    const marker = ORIGIN_MARKERS[business.field_origins?.[key]];
-    return marker ? `<small class="${marker[0]}">${marker[1]}</small>` : "";
+    const origin = business.field_origins?.[key];
+    if (origin === "journal") return '<small class="journal-marker">บันทึกของคุณ</small>';
+    if (origin !== "filing") return "";
+    return business.filing?.translated
+      ? '<small class="translated-marker">ย่อไทยจากแบบที่ยื่น</small>'
+      : '<small class="filing-marker">ยกจากแบบที่ยื่น ยังไม่ทบทวน</small>';
   }
 
   function filingNote(business) {
@@ -120,10 +119,13 @@
     const used = Object.values(origins).filter((origin) => origin === "filing").length;
     if (!used) return "";
     const period = filing.period || filing.filed_at || "";
+    const nature = filing.translated
+      ? "ข้อความถูกย่อและแปลจากเอกสารฉบับนี้โดยตรง ไม่ได้เพิ่มข้อมูลจากแหล่งอื่น และยังไม่ผ่านการทบทวนโดยนักวิเคราะห์"
+      : "เป็นข้อความต้นฉบับภาษาอังกฤษที่ยังไม่ผ่านการเรียบเรียงหรือทบทวน ใช้เป็นจุดตั้งต้นเท่านั้น";
     return `<div class="filing-note">
-      <strong>ข้อความบางช่องยกมาจากแบบ ${escapeHtml(filing.form || "10-K")} ที่ยื่นต่อ SEC</strong>
+      <strong>ข้อความบางช่องมาจากแบบ ${escapeHtml(filing.form || "10-K")} ที่ยื่นต่อ SEC</strong>
       <span>${escapeHtml(filing.entity_name || "")}${period ? ` · งวด ${escapeHtml(period)}` : ""}${filing.industry ? ` · ${escapeHtml(filing.industry)}` : ""}</span>
-      <span>เป็นข้อความต้นฉบับภาษาอังกฤษที่ยังไม่ผ่านการเรียบเรียงหรือทบทวน ใช้เป็นจุดตั้งต้นเท่านั้น</span>
+      <span>${escapeHtml(nature)}</span>
       ${sourceLinks([{ url: filing.source_url, title: `เปิดแบบ ${filing.form || "10-K"} ฉบับเต็ม` }])}
     </div>`;
   }

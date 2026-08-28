@@ -2104,6 +2104,11 @@ footer {
   font: inherit;
   color: inherit;
   transition: border-color .15s, background .15s;
+  /* กฎรวมของปุ่มตั้ง white-space เป็น nowrap ไว้ การ์ดนี้เป็นย่อหน้าจึงต้องตัดบรรทัด
+     และ min-width ศูนย์ทำให้ช่องกริดหดตามคอลัมน์แทนที่จะดันจนล้น */
+  white-space: normal;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .trend-card:hover { border-color: var(--blue); }
@@ -2144,4 +2149,15 @@ footer {
   color: var(--blue);
   cursor: pointer;
   text-decoration: underline;
+}
+
+.translated-marker {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
 }

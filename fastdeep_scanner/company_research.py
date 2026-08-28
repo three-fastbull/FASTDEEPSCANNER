@@ -22,6 +22,13 @@ FILING_FIELDS = {
     "competitors": "competition",
     "key_customers": "customer_concentration",
 }
+# คำแปลไทยย่อจากข้อความชุดเดียวกัน จึงยังอ้างอิงไฟล์ที่ยื่นฉบับเดิมได้
+THAI_FIELDS = {
+    "summary": "summary_th",
+    "revenue_model": "revenue_model_th",
+    "key_customers": "customers_th",
+    "competitors": "competition_th",
+}
 TEXT_FIELDS = {
     "summary": "business_summary",
     "revenue_model": "revenue_model",
@@ -194,6 +201,12 @@ def build_company_business(
     filing_defaults = {
         key: _text(filing.get(source_key)) for key, source_key in FILING_FIELDS.items()
     }
+    # คำแปลไทยย่อจากข้อความเดียวกัน อ่านง่ายกว่าต้นฉบับอังกฤษ จึงใช้ก่อนถ้ามี
+    thai = filing.get("thai") or {}
+    for key, thai_key in THAI_FIELDS.items():
+        translated = _text(thai.get(thai_key))
+        if translated:
+            filing_defaults[key] = translated
     if filing.get("source_url"):
         filing_defaults["source_urls"] = _text(filing["source_url"])
 
@@ -221,7 +234,9 @@ def build_company_business(
         "filed_at": _text(filing.get("filed_at")),
         "period": _text(filing.get("period")),
         "source_url": _text(filing.get("source_url")) if _http_url(filing.get("source_url")) else "",
-        "language": _text(filing.get("language")) or "en",
+        "language": "th" if thai.get("summary_th") else (_text(filing.get("language")) or "en"),
+        "translated": bool(thai.get("summary_th")),
+        "model": _text(thai.get("model")),
         "found": filing.get("found") or {},
     }
     # Reference material never supplies the user's Moat rating, thesis, or approval.

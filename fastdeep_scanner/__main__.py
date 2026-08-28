@@ -253,6 +253,31 @@ def update_filing_profiles_command(args: argparse.Namespace) -> None:
         print(f"  - {failure}")
 
 
+def summarize_filings_command(args: argparse.Namespace) -> None:
+    from .summarize import SummaryError, summarize_all
+
+    symbols = [value.strip() for value in str(args.symbols).split(",") if value.strip()]
+    try:
+        summary = summarize_all(
+            symbols=symbols or None,
+            path=args.store,
+            model=args.model,
+            pause=args.pause,
+            timeout=args.request_timeout,
+            refresh=args.refresh,
+            limit=args.limit,
+        )
+    except SummaryError as exc:
+        print(f"summaries: {exc}")
+        raise SystemExit(1) from exc
+    print(
+        f"summaries: {summary['summarized']}/{summary['requested']} done, "
+        f"{len(summary['failed'])} failed, {summary['with_thai']} companies now have Thai text"
+    )
+    for failure in summary["failed"][:10]:
+        print(f"  - {failure}")
+
+
 def update_fx_command(args: argparse.Namespace) -> None:
     from .yahoo_prices import update_fx_rates
 
@@ -398,6 +423,19 @@ def build_parser() -> argparse.ArgumentParser:
     filing_profiles.add_argument("--refresh", action="store_true")
     filing_profiles.add_argument("--limit", type=int, default=None)
     filing_profiles.set_defaults(func=update_filing_profiles_command)
+
+    summarize = subparsers.add_parser(
+        "summarize-filings",
+        help="Translate and condense the stored filing text into Thai with the Claude API",
+    )
+    summarize.add_argument("--store", default="data/fastdeep_filing_profiles.json")
+    summarize.add_argument("--symbols", default="")
+    summarize.add_argument("--model", default="claude-haiku-4-5-20251001")
+    summarize.add_argument("--pause", type=float, default=0.3)
+    summarize.add_argument("--request-timeout", type=int, default=60)
+    summarize.add_argument("--refresh", action="store_true")
+    summarize.add_argument("--limit", type=int, default=None)
+    summarize.set_defaults(func=summarize_filings_command)
 
     update_fx = subparsers.add_parser("update-fx", help="Refresh currency rates used for valuation and liquidity")
     update_fx.add_argument("--out", default="data/fastdeep_fx_rates.json")
