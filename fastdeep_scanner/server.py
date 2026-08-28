@@ -198,6 +198,13 @@ class FastDeepHandler(BaseHTTPRequestHandler):
             self._send_json({"trades": list_trades(), "summary": journal_summary()})
             return
 
+        if parsed.path == "/api/screener":
+            from .screener import build_screener
+
+            market = (query.get("market", ["US"])[0] or "US").upper()
+            self._send_json(build_screener(market=market))
+            return
+
         if parsed.path == "/api/event-study":
             timeframe = (query.get("timeframe", ["D"])[0] or "D").upper()
             study_path = ROOT / "storage" / f"fastdeep_event_study_{timeframe}.json"

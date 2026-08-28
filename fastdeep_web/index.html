@@ -22,6 +22,7 @@
 
   <nav class="app-navigation" aria-label="FastDeep views">
     <button class="nav-tab is-active" type="button" data-view-target="scannerView">Scanner</button>
+    <button class="nav-tab" type="button" data-view-target="trendView">คัดจากเมกะเทรนด์</button>
     <button class="nav-tab" type="button" data-view-target="hallView">Hall of Fame</button>
     <button class="nav-tab" type="button" data-view-target="profileView">ข้อมูลบริษัท</button>
     <button class="nav-tab" type="button" data-view-target="financialsView">งบการเงิน 5 ปี</button>
@@ -222,6 +223,86 @@
           <ul id="warningList" class="warning-list"></ul>
         </details>
       </aside>
+    </section>
+  </main>
+
+  <main id="trendView" class="app-shell app-view is-hidden">
+    <header class="trend-heading">
+      <div>
+        <p class="eyebrow">TOP-DOWN SCREENING</p>
+        <h2>คัดหุ้นจากเมกะเทรนด์และกลุ่มอุตสาหกรรม</h2>
+        <p id="trendSubtitle">เลือกเทรนด์ที่เชื่อว่าจะโตใน 10-20 ปี แล้วค่อยไล่ดูบริษัทในเทรนด์นั้น</p>
+      </div>
+      <div class="trend-count">
+        <span>บริษัทที่แสดง</span>
+        <strong id="trendCount">-</strong>
+        <small id="trendTotal">-</small>
+      </div>
+    </header>
+
+    <p class="trend-caveat" id="trendCaveat"></p>
+
+    <section class="trend-block">
+      <h3>1. เลือกเมกะเทรนด์</h3>
+      <div class="trend-grid" id="trendCards"></div>
+    </section>
+
+    <section class="trend-block">
+      <h3>2. จำกัดให้แคบลง</h3>
+      <div class="trend-filters">
+        <label>กลุ่มอุตสาหกรรม
+          <select id="trendIndustry"><option value="ALL">ทุกกลุ่ม</option></select>
+        </label>
+        <label>ROE อย่างน้อย
+          <select id="trendRoe">
+            <option value="">ไม่กำหนด</option>
+            <option value="10">10%</option>
+            <option value="15">15%</option>
+            <option value="20">20%</option>
+          </select>
+        </label>
+        <label>รายได้โตเฉลี่ยอย่างน้อย
+          <select id="trendGrowth">
+            <option value="">ไม่กำหนด</option>
+            <option value="5">5% ต่อปี</option>
+            <option value="10">10% ต่อปี</option>
+            <option value="20">20% ต่อปี</option>
+          </select>
+        </label>
+        <label>หนี้สินต่อทุนไม่เกิน
+          <select id="trendDebt">
+            <option value="">ไม่กำหนด</option>
+            <option value="0.5">0.5 เท่า</option>
+            <option value="1">1.0 เท่า</option>
+            <option value="1.5">1.5 เท่า</option>
+          </select>
+        </label>
+        <label class="trend-search">ค้นหาชื่อหรือชื่อย่อ
+          <input id="trendSearch" type="search" placeholder="เช่น NVDA หรือ Nvidia">
+        </label>
+        <button id="trendReset" class="ghost-button" type="button">ล้างตัวกรอง</button>
+      </div>
+    </section>
+
+    <section class="trend-block">
+      <h3>3. รายชื่อบริษัทที่เหลือ</h3>
+      <p class="profile-lead">กดที่ชื่อบริษัทเพื่อเปิดหน้าข้อมูลบริษัทและไล่ดูตามลำดับ ธุรกิจ คุณภาพ แล้วราคา</p>
+      <div class="table-scroll">
+        <table class="trend-table">
+          <thead>
+            <tr>
+              <th>บริษัท</th>
+              <th>กลุ่มอุตสาหกรรม</th>
+              <th>รายได้โตเฉลี่ย</th>
+              <th>ROE</th>
+              <th>อัตรากำไรสุทธิ</th>
+              <th>D/E</th>
+              <th>งบย้อนหลัง</th>
+            </tr>
+          </thead>
+          <tbody id="trendBody"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
@@ -557,6 +638,7 @@
   <footer>ข้อมูลเพื่อการศึกษาและวิจัย ไม่ใช่คำแนะนำซื้อขายหรือการรับประกันผลตอบแทน</footer>
 
   <script src="/app.js"></script>
+  <script src="/screener.js"></script>
   <script src="/hall.js"></script>
   <script src="/financial.js"></script>
   <script src="/profile.js"></script>
