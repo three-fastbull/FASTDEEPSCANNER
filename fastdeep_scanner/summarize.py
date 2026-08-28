@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -76,14 +77,64 @@ def _request(payload: dict[str, Any], key: str, timeout: int) -> dict[str, Any]:
         raise SummaryError(f"เรียก API ไม่สำเร็จ ({exc.code}): {detail}") from exc
 
 
-def _source_text(profile: dict[str, Any], limit: int = 6000) -> str:
+# คำที่นำไปสู่ย่อหน้าที่ตอบคำถามแต่ละช่อง หัวข้อย่อยใน 10-K ไม่มีรูปแบบตายตัว
+# การตัดหน้าต่างรอบคำเหล่านี้จึงเชื่อถือได้กว่าการไล่หาชื่อหัวข้อ
+TOPIC_KEYWORDS = (
+    r"how we (?:make money|generate revenue)|revenue is generated|we generate revenue|"
+    r"our revenue|sources of revenue|pricing|reimbursement",
+    r"our customers|customer base|distributors|distribution channels|end users|"
+    r"no single customer|customers accounted",
+    r"competition|competitors|competitive landscape",
+    r"products and services|our products|principal products|segments",
+)
+OPENING_CHARS = 6000
+WINDOW_CHARS = 2600
+
+
+def full_business_section(profile: dict[str, Any], *, timeout: int = 60, limit: int = 24000) -> str:
+    """ส่วนที่บรรยายธุรกิจ โดยเลือกช่วงที่ตอบคำถามของแต่ละช่อง
+
+    Item 1 ของบางบริษัทยาวเป็นแสนตัวอักษร การตัดเอาแค่ตอนต้นทำให้ย่อหน้าเรื่อง
+    ลูกค้าและคู่แข่งหลุดไปทั้งหมด จึงเก็บตอนต้นไว้แล้วต่อด้วยช่วงรอบคำสำคัญ
+    """
+    url = profile.get("source_url") or ""
+    if not url:
+        return ""
+    try:
+        from .filing_extract import _download, item1_body, plain_text
+
+        body = item1_body(plain_text(_download(url, timeout).decode("utf-8", "replace")))
+    except Exception:  # noqa: BLE001 - ดึงไม่ได้ก็ใช้ข้อความสั้นที่เก็บไว้แทน
+        return ""
+    if not body:
+        return ""
+    if len(body) <= limit:
+        return body
+
+    spans: list[tuple[int, int]] = [(0, OPENING_CHARS)]
+    for pattern in TOPIC_KEYWORDS:
+        match = re.search(pattern, body, re.I)
+        if match:
+            start = max(0, match.start() - 300)
+            spans.append((start, start + WINDOW_CHARS))
+
+    merged: list[list[int]] = []
+    for start, end in sorted(spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return "\n[...]\n".join(body[start:end] for start, end in merged)[:limit]
+
+
+def _source_text(profile: dict[str, Any], limit: int = 26000, body: str = "") -> str:
     parts = [
         f"บริษัท: {profile.get('entity_name') or profile.get('symbol')}",
         f"กลุ่มอุตสาหกรรมตาม SEC: {profile.get('industry') or '-'}",
         f"แบบที่ยื่น: {profile.get('form')} งวด {profile.get('period')}",
         "",
         "[ส่วนอธิบายธุรกิจ]",
-        profile.get("business_summary") or "(ไม่มี)",
+        body or profile.get("business_summary") or "(ไม่มี)",
         "",
         "[ส่วนการแข่งขัน]",
         profile.get("competition") or "(ไม่มี)",
@@ -91,6 +142,13 @@ def _source_text(profile: dict[str, Any], limit: int = 6000) -> str:
         "[ส่วนลูกค้า]",
         profile.get("customer_concentration") or "(ไม่มี)",
     ]
+    segments = profile.get("segments") or {}
+    if segments.get("segments"):
+        lines = [
+            f"- {item['name']}: {item['amount']:,.0f} ล้าน {segments.get('currency', '')}"
+            for item in segments["segments"]
+        ]
+        parts += ["", "[รายได้แยกส่วนงานจากตารางในงบ ตัวเลขนี้ถูกต้องแล้ว ใช้อธิบายได้]", *lines]
     return "\n".join(parts)[:limit]
 
 
@@ -121,14 +179,16 @@ def summarize_profile(
     key: str,
     model: str = DEFAULT_MODEL,
     timeout: int = 60,
+    read_full_section: bool = True,
 ) -> dict[str, Any]:
     if not (profile.get("business_summary") or "").strip():
         raise SummaryError("ไม่มีข้อความธุรกิจให้สรุป")
+    body = full_business_section(profile, timeout=timeout) if read_full_section else ""
     payload = {
         "model": model,
         "max_tokens": 900,
         "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": _source_text(profile)}],
+        "messages": [{"role": "user", "content": _source_text(profile, body=body)}],
     }
     response = _request(payload, key, timeout)
     blocks = [block.get("text", "") for block in response.get("content", []) if block.get("type") == "text"]
@@ -136,6 +196,7 @@ def summarize_profile(
     return {
         **fields,
         "model": model,
+        "read_full_section": bool(body),
         "source_url": profile.get("source_url", ""),
         "form": profile.get("form", ""),
         "period": profile.get("period", ""),

@@ -278,6 +278,43 @@ def summarize_filings_command(args: argparse.Namespace) -> None:
         print(f"  - {failure}")
 
 
+def update_filing_segments_command(args: argparse.Namespace) -> None:
+    import time
+
+    from .filing_extract import load_filing_profiles, save_filing_profiles
+    from .filing_segments import extract_segments
+
+    profiles = load_filing_profiles(args.store)
+    wanted = {value.strip().upper() for value in str(args.symbols).split(",") if value.strip()}
+    targets = [
+        symbol
+        for symbol, profile in sorted(profiles.items())
+        if (not wanted or symbol in wanted)
+        and profile.get("source_url")
+        and (args.refresh or "segments" not in profile)
+    ]
+    if args.limit:
+        targets = targets[: args.limit]
+
+    found = 0
+    for index, symbol in enumerate(targets, start=1):
+        try:
+            result = extract_segments(profiles[symbol]["source_url"], timeout=args.request_timeout)
+        except Exception:  # noqa: BLE001 - หนึ่งบริษัทล้มต้องไม่หยุดทั้งชุด
+            result = None
+        # เก็บ None ไว้ด้วย เพื่อไม่ต้องยิงซ้ำตัวที่พิสูจน์แล้วว่าไม่มีชุดที่กระทบยอดได้
+        profiles[symbol]["segments"] = result
+        found += bool(result)
+        if index % 20 == 0:
+            save_filing_profiles(profiles, args.store)
+        if args.pause:
+            time.sleep(args.pause)
+
+    save_filing_profiles(profiles, args.store)
+    stored = sum(1 for item in profiles.values() if item.get("segments"))
+    print(f"segments: {found}/{len(targets)} reconciled, {stored} companies now have a revenue split")
+
+
 def update_fx_command(args: argparse.Namespace) -> None:
     from .yahoo_prices import update_fx_rates
 
@@ -436,6 +473,18 @@ def build_parser() -> argparse.ArgumentParser:
     summarize.add_argument("--refresh", action="store_true")
     summarize.add_argument("--limit", type=int, default=None)
     summarize.set_defaults(func=summarize_filings_command)
+
+    segments = subparsers.add_parser(
+        "update-filing-segments",
+        help="Read the revenue split out of each filing, keeping only figures that reconcile",
+    )
+    segments.add_argument("--store", default="data/fastdeep_filing_profiles.json")
+    segments.add_argument("--symbols", default="")
+    segments.add_argument("--pause", type=float, default=0.2)
+    segments.add_argument("--request-timeout", type=int, default=60)
+    segments.add_argument("--refresh", action="store_true")
+    segments.add_argument("--limit", type=int, default=None)
+    segments.set_defaults(func=update_filing_segments_command)
 
     update_fx = subparsers.add_parser("update-fx", help="Refresh currency rates used for valuation and liquidity")
     update_fx.add_argument("--out", default="data/fastdeep_fx_rates.json")

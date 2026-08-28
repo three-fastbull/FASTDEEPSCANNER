@@ -207,6 +207,15 @@ def build_company_business(
         translated = _text(thai.get(thai_key))
         if translated:
             filing_defaults[key] = translated
+    # รายได้แยกส่วนงานมาจากตารางในงบและผ่านการกระทบยอดแล้ว จึงเป็นตัวเลข ไม่ใช่ข้อความ
+    filing_segments = filing.get("segments") or None
+    if filing_segments:
+        total = filing_segments.get("total")
+        lines = []
+        for segment in filing_segments.get("segments", []):
+            share = f" {segment['amount'] / total * 100:.1f}%" if total else ""
+            lines.append(f"{segment['name']}{share}: {segment['amount']:,.0f} ล้าน {filing_segments.get('currency', '')}".rstrip())
+        filing_defaults["revenue_segments"] = "\n".join(lines)
     if filing.get("source_url"):
         filing_defaults["source_urls"] = _text(filing["source_url"])
 
@@ -234,6 +243,7 @@ def build_company_business(
         "filed_at": _text(filing.get("filed_at")),
         "period": _text(filing.get("period")),
         "source_url": _text(filing.get("source_url")) if _http_url(filing.get("source_url")) else "",
+        "segments": filing_segments,
         "language": "th" if thai.get("summary_th") else (_text(filing.get("language")) or "en"),
         "translated": bool(thai.get("summary_th")),
         "model": _text(thai.get("model")),
