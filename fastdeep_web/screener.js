@@ -7,6 +7,7 @@
     count: document.getElementById("trendCount"),
     total: document.getElementById("trendTotal"),
     cards: document.getElementById("trendCards"),
+    detail: document.getElementById("trendDetail"),
     industry: document.getElementById("trendIndustry"),
     roe: document.getElementById("trendRoe"),
     growth: document.getElementById("trendGrowth"),
@@ -43,21 +44,42 @@
     return "unknown";
   }
 
+  // การ์ดเก็บแค่ชื่อกับจำนวน ส่วนคำอธิบายยาวย้ายไปแถบเดียวใต้กริด
+  // ถ้าใส่ไว้ในทุกการ์ดจะอ่านไม่ไหวและกวาดตาหาเทรนด์ที่ต้องการไม่เจอ
   function renderCards() {
     const trends = state.data.megatrends || [];
     elements.cards.innerHTML = [
       `<button class="trend-card ${state.trend ? "" : "is-active"}" type="button" data-trend="">
-        <strong>ทุกเทรนด์</strong>
-        <span class="trend-card-count">${state.data.total} บริษัท</span>
-        <p>ดูทั้ง universe โดยไม่จำกัดเทรนด์</p>
+        <span class="trend-card-name">All Trends</span>
+        <span class="trend-card-short">ดูทั้ง universe</span>
+        <span class="trend-card-count">${state.data.total}</span>
       </button>`,
       ...trends.map((trend) => `<button class="trend-card ${state.trend === trend.key ? "is-active" : ""}" type="button" data-trend="${escapeHtml(trend.key)}">
-        <strong>${escapeHtml(trend.name)}</strong>
-        <span class="trend-card-count">${trend.count} บริษัท</span>
-        <p>${escapeHtml(trend.thesis)}</p>
-        <small>ต้องระวัง: ${escapeHtml(trend.watch)}</small>
+        <span class="trend-card-name">${escapeHtml(trend.name)}</span>
+        <span class="trend-card-short">${escapeHtml(trend.short)}</span>
+        <span class="trend-card-count">${trend.count}</span>
       </button>`),
     ].join("");
+    renderTrendDetail();
+  }
+
+  function renderTrendDetail() {
+    const trend = (state.data.megatrends || []).find((item) => item.key === state.trend);
+    if (!trend) {
+      elements.detail.innerHTML = "";
+      elements.detail.hidden = true;
+      return;
+    }
+    elements.detail.hidden = false;
+    elements.detail.innerHTML = `
+      <div>
+        <span>ทำไมเทรนด์นี้น่าสนใจ</span>
+        <p>${escapeHtml(trend.thesis)}</p>
+      </div>
+      <div class="trend-detail-watch">
+        <span>สิ่งที่ต้องระวัง</span>
+        <p>${escapeHtml(trend.watch)}</p>
+      </div>`;
   }
 
   function renderIndustryOptions() {

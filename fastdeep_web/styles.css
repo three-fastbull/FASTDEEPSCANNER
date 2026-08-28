@@ -2089,34 +2089,80 @@ footer {
 
 .trend-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 9px;
 }
 
 .trend-card {
-  padding: 13px 15px;
+  /* กฎรวมของปุ่มตั้ง display เป็น inline-flex กับ white-space เป็น nowrap ไว้
+     ซึ่งทำให้บรรทัดในการ์ดเรียงข้างกันเป็นคอลัมน์แทนที่จะซ้อนกันและไม่ตัดคำ */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "name count" "short count";
+  align-items: center;
+  gap: 1px 10px;
+  min-height: 0;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  padding: 11px 13px;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--line);
-  border-radius: 10px;
+  border-left: 3px solid var(--line);
+  border-radius: 9px;
   background: #fbfcfe;
   text-align: left;
   cursor: pointer;
   font: inherit;
   color: inherit;
   transition: border-color .15s, background .15s;
-  /* กฎรวมของปุ่มตั้ง white-space เป็น nowrap ไว้ การ์ดนี้เป็นย่อหน้าจึงต้องตัดบรรทัด
-     และ min-width ศูนย์ทำให้ช่องกริดหดตามคอลัมน์แทนที่จะดันจนล้น */
-  white-space: normal;
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .trend-card:hover { border-color: var(--blue); }
 .trend-card.is-active { border-left-color: var(--blue); background: #eff6ff; }
-.trend-card strong { display: block; font-size: 14px; }
-.trend-card-count { display: block; margin: 2px 0 6px; font-size: 12px; font-weight: 700; color: var(--blue); }
-.trend-card p { margin: 0 0 5px; font-size: 12px; line-height: 1.6; color: var(--muted); }
-.trend-card small { display: block; font-size: 11px; line-height: 1.55; color: var(--amber); }
+
+.trend-card-name {
+  grid-area: name;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.trend-card-short {
+  grid-area: short;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.trend-card-count {
+  grid-area: count;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+}
+
+.trend-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px 20px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #eff6ff;
+}
+
+.trend-detail span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.trend-detail p { margin: 3px 0 0; font-size: 12.5px; line-height: 1.65; }
+.trend-detail-watch p { color: var(--amber); }
 
 .trend-filters {
   display: flex;

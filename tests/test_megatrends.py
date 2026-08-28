@@ -95,5 +95,28 @@ class CatalogTest(unittest.TestCase):
         self.assertTrue(all(trend["count"] == 0 for trend in catalog["megatrends"]))
 
 
+class CardTextTest(unittest.TestCase):
+    """การ์ดบนหน้าจอมีที่ว่างจำกัด ชื่อและคำอธิบายสั้นจึงต้องสั้นจริง"""
+
+    def test_every_trend_has_an_english_name_and_a_short_thai_line(self) -> None:
+        for trend in MEGATRENDS:
+            self.assertTrue(trend["name"].isascii(), f"{trend['key']} ชื่อบนการ์ดควรเป็นอังกฤษล้วน")
+            self.assertLessEqual(len(trend["name"]), 22, trend["key"])
+            self.assertTrue(trend["short"].strip(), trend["key"])
+            self.assertLessEqual(len(trend["short"]), 48, f"{trend['key']} คำอธิบายสั้นยาวเกินการ์ด")
+
+    def test_the_long_explanation_stays_out_of_the_card_fields(self) -> None:
+        for trend in MEGATRENDS:
+            self.assertNotEqual(trend["short"], trend["thesis"], trend["key"])
+            self.assertGreater(len(trend["thesis"]), len(trend["short"]), trend["key"])
+
+    def test_the_catalog_passes_both_lengths_through(self) -> None:
+        catalog = build_catalog([{"industry_group": "software", "megatrends": ["ai"]}])
+        card = next(item for item in catalog["megatrends"] if item["key"] == "ai")
+        self.assertEqual(card["name"], "AI & Automation")
+        self.assertTrue(card["short"])
+        self.assertTrue(card["thesis"])
+
+
 if __name__ == "__main__":
     unittest.main()
