@@ -48,7 +48,7 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FastDeep Scanner App</title>
+  <title>FastDeep Scanner</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fb; color: #0f172a; }
@@ -88,6 +88,8 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
     .bad { color: #b91c1c; font-weight: 700; }
     .warn { color: #b45309; font-weight: 700; }
     .source-note { margin-top: 10px; padding: 10px 12px; border: 1px solid #f3d38a; border-radius: 8px; background: #fff7df; color: #7c4a03; font-size: 13px; font-weight: 700; }
+    .disclaimer { margin: 0 0 18px; padding: 12px 14px; border: 1px solid #f0b8b8; border-left: 4px solid #c5352f; border-radius: 8px; background: #fdf3f2; color: #7d211d; font-size: 13px; line-height: 1.7; }
+    .disclaimer strong { display: block; margin-bottom: 4px; font-size: 14px; }
     canvas { width: calc(100% - 28px); height: 320px; margin: 14px; border: 1px solid #dbe3ee; border-radius: 8px; background: #fbfcfe; }
     .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 14px 14px; }
     .box { border-top: 1px solid #dbe3ee; padding-top: 14px; }
@@ -131,6 +133,16 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
       </div>
     <span class="badge" id="statusBadge">พร้อมสแกน</span>
   </header>
+
+  <!-- The export carries entry, stop and target levels, which read like trade
+       calls once the file leaves this machine. The banner travels with them. -->
+  <p class="disclaimer">
+    <strong>ใช้เพื่อการศึกษาเท่านั้น ไม่ใช่คำแนะนำการลงทุน</strong>
+    รายชื่อและระดับราคาในหน้านี้เป็นผลจากการคำนวณอัตโนมัติ ไม่ใช่สัญญาณซื้อขาย
+    และไม่ได้ผ่านการวิเคราะห์ธุรกิจโดยคน โปรดตรวจสอบข้อมูลจากแหล่งทางการก่อนตัดสินใจทุกครั้ง
+    การลงทุนมีความเสี่ยง ผู้ลงทุนรับผิดชอบการตัดสินใจของตนเอง
+    <span id="snapshotNote"></span>
+  </p>
 
   <main>
     <div class="controls">
@@ -660,6 +672,20 @@ def build_static_dashboard_html(criteria: ScanCriteria | None = None) -> str:
 
     generatedAt.textContent = `ข้อมูลสร้างเมื่อ ${new Date(DATA.generated_at).toLocaleString()}`;
     document.getElementById('dataSourceNote').textContent = `Data Source: ${DATA.data_source}`;
+    // A shared copy keeps whatever prices it was built with, so say so plainly
+    // rather than letting a reader assume the numbers moved with the market.
+    // The build date is not the data date: an export made on a Saturday still
+    // carries Friday's close, so read the date off the candles themselves.
+    let snapshotDay = '';
+    Object.values(DATA.symbols || {}).forEach((entry) => {
+      const candles = entry.candles || [];
+      const last = candles.length ? candles[candles.length - 1].date : '';
+      if (last > snapshotDay) snapshotDay = last;
+    });
+    if (!snapshotDay) snapshotDay = (DATA.generated_at || '').slice(0, 10);
+    document.getElementById('snapshotNote').textContent = snapshotDay
+      ? ` ข้อมูลในหน้านี้เป็นภาพนิ่ง ณ วันที่ ${snapshotDay} และจะไม่อัปเดตตามตลาด`
+      : ' ข้อมูลในหน้านี้เป็นภาพนิ่ง และจะไม่อัปเดตตามตลาด';
     scoreRange.addEventListener('input', () => {
       scoreText.textContent = scoreRange.value;
     });
