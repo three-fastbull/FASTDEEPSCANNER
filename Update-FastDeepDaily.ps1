@@ -1,7 +1,47 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
+try {
+    $utf8 = [System.Text.UTF8Encoding]::new($false)
+    [Console]::InputEncoding = $utf8
+    [Console]::OutputEncoding = $utf8
+    $OutputEncoding = $utf8
+} catch {}
 
 $root = Split-Path -Parent $PSCommandPath
-$python = "C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
+
+function Resolve-FastDeepPython {
+    # A hard-coded interpreter path only exists on the machine that wrote it, so
+    # try the override, then the py launcher, then PATH, then the bundled runtime.
+    # A missing py launcher writes to stderr, which ErrorActionPreference = Stop
+    # turns into a terminating NativeCommandError, so probing has to be quiet.
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "SilentlyContinue"
+    $candidates = @()
+    if ($env:FASTDEEP_PYTHON_OVERRIDE) { $candidates += $env:FASTDEEP_PYTHON_OVERRIDE }
+    if (Get-Command py -ErrorAction SilentlyContinue) {
+        foreach ($version in @("3.13", "3.12", "3.11")) {
+            try {
+                $found = & py -$version -c "import sys; print(sys.executable)" 2>$null
+                if ($LASTEXITCODE -eq 0 -and $found) { $candidates += ([string]$found).Trim() }
+            } catch { }
+        }
+    }
+    $onPath = Get-Command python -ErrorAction SilentlyContinue
+    if ($onPath) { $candidates += $onPath.Source }
+    $candidates += Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
+
+    foreach ($candidate in $candidates) {
+        if (-not $candidate -or -not (Test-Path -LiteralPath $candidate)) { continue }
+        # datetime.UTC is used throughout the scanner, so 3.11 is the real floor.
+        try {
+            & $candidate -c "import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)" 2>$null
+            if ($LASTEXITCODE -eq 0) { $ErrorActionPreference = $previous; return $candidate }
+        } catch { }
+    }
+    $ErrorActionPreference = $previous
+    throw "ไม่พบ Python 3.11 ขึ้นไป - ติดตั้งจาก https://www.python.org/downloads/ แล้วติ๊ก Add Python to PATH"
+}
+
+$python = Resolve-FastDeepPython
 $storage = Join-Path $root "storage"
 $log = Join-Path $storage "fastdeep_daily_update.log"
 
@@ -10,10 +50,30 @@ function Write-DailyLog([string]$Message) {
     Add-Content -LiteralPath $log -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] $Message"
 }
 
+$updateMutex = [System.Threading.Mutex]::new($false, "Global\FastDeepDailyUpdate")
+try {
+    $updateLockAcquired = $updateMutex.WaitOne(0)
+} catch [System.Threading.AbandonedMutexException] {
+    $updateLockAcquired = $true
+}
+if (-not $updateLockAcquired) {
+    Write-DailyLog "Another FastDeep update is already running; skipped this duplicate run."
+    $updateMutex.Dispose()
+    exit 0
+}
+
 Set-Location $root
 $env:GIT_TERMINAL_PROMPT = "0"
 $env:PYTHONUTF8 = "1"
-& git -C $root -c credential.interactive=never pull --ff-only origin main 2>&1 | ForEach-Object { Write-DailyLog "git: $_" }
+$originalErrorPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+$gitOutput = & git -C $root -c credential.interactive=never pull --ff-only origin main 2>&1
+$gitExitCode = $LASTEXITCODE
+$ErrorActionPreference = $originalErrorPreference
+$gitOutput | ForEach-Object { Write-DailyLog "git: $_" }
+if ($gitExitCode -ne 0) {
+    Write-DailyLog "git: pull unavailable; continuing with the installed version"
+}
 
 try {
     & $python -m fastdeep_scanner update-universe 2>&1 | ForEach-Object { Write-DailyLog "universe: $_" }
@@ -63,7 +123,11 @@ try {
     }
 
     Write-DailyLog "Daily FastDeep update completed."
+    $updateMutex.ReleaseMutex()
+    $updateMutex.Dispose()
 } catch {
     Write-DailyLog "FAILED: $($_.Exception.Message)"
+    try { $updateMutex.ReleaseMutex() } catch {}
+    $updateMutex.Dispose()
     exit 1
 }

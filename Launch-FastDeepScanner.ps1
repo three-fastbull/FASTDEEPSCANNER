@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [switch]$AppWindow,
     [switch]$SkipUpdate,
@@ -9,7 +9,41 @@ $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSCommandPath
 $runtime = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies"
-$python = Join-Path $runtime "python\python.exe"
+
+function Resolve-FastDeepPython {
+    # The bundled runtime only exists on the author's machine. Students install
+    # Python normally, so search the usual places and fall back to the bundle.
+    # A missing py launcher writes to stderr, which ErrorActionPreference = Stop
+    # turns into a terminating NativeCommandError, so probing has to be quiet.
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "SilentlyContinue"
+    $candidates = @()
+    if ($env:FASTDEEP_PYTHON_OVERRIDE) { $candidates += $env:FASTDEEP_PYTHON_OVERRIDE }
+    if (Get-Command py -ErrorAction SilentlyContinue) {
+        foreach ($version in @("3.13", "3.12", "3.11")) {
+            try {
+                $found = & py -$version -c "import sys; print(sys.executable)" 2>$null
+                if ($LASTEXITCODE -eq 0 -and $found) { $candidates += ([string]$found).Trim() }
+            } catch { }
+        }
+    }
+    $onPath = Get-Command python -ErrorAction SilentlyContinue
+    if ($onPath) { $candidates += $onPath.Source }
+    $candidates += Join-Path $runtime "python\python.exe"
+
+    foreach ($candidate in $candidates) {
+        if (-not $candidate -or -not (Test-Path -LiteralPath $candidate)) { continue }
+        # datetime.UTC is used throughout the scanner, so 3.11 is the real floor.
+        try {
+            & $candidate -c "import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)" 2>$null
+            if ($LASTEXITCODE -eq 0) { $ErrorActionPreference = $previous; return $candidate }
+        } catch { }
+    }
+    $ErrorActionPreference = $previous
+    return $null
+}
+
+$python = Resolve-FastDeepPython
 $url = "http://127.0.0.1:8765"
 $storage = Join-Path $root "storage"
 $metadataPath = Join-Path $root "data\fastdeep_prices_source.json"
@@ -85,6 +119,13 @@ function Update-FastDeepCode {
 }
 
 function Start-PriceUpdateIfStale {
+    # -SkipUpdate used to skip only the git pull, so passing it still fired a
+    # 5-year price download in the background. When the provider throttles, that
+    # download hangs holding the price lock and takes the session down with it.
+    if ($SkipUpdate) {
+        Write-LauncherLog "Price update skipped by -SkipUpdate."
+        return
+    }
     $lastUpdate = $null
     if (Test-Path -LiteralPath $metadataPath) {
         try {
@@ -118,7 +159,9 @@ $exitCode = 0
 try {
     try { $ownsMutex = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $ownsMutex = $true }
     if (-not $ownsMutex) { return }
-    if (-not (Test-Path -LiteralPath $python)) { throw "Python runtime was not found: $python" }
+    if (-not $python) {
+        throw "ไม่พบ Python 3.11 ขึ้นไป - ติดตั้งจาก https://www.python.org/downloads/ แล้วติ๊ก ""Add Python to PATH"" จากนั้นเปิดโปรแกรมใหม่"
+    }
     try { Update-FastDeepCode } catch { Write-LauncherLog "Git update skipped: $($_.Exception.Message)" }
 
     Stop-FastDeepServer

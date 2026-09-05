@@ -87,6 +87,12 @@ def update_universe_command(args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
 
+def doctor_command(args) -> int:
+    from .doctor import run_doctor
+
+    return 1 if run_doctor() else 0
+
+
 def update_prices_command(args: argparse.Namespace) -> None:
     summary = update_prices_from_yahoo(
         universe_path=args.universe,
@@ -97,6 +103,8 @@ def update_prices_command(args: argparse.Namespace) -> None:
         min_success_ratio=args.min_success_ratio,
         max_workers=args.workers,
         request_timeout=args.request_timeout,
+        nasdaq_fallback=not args.no_nasdaq_fallback,
+        deadline_seconds=args.deadline_seconds,
     )
     print(f"wrote prices: {summary.output}")
     print(f"- symbols requested: {summary.symbols}")
@@ -398,7 +406,24 @@ def build_parser() -> argparse.ArgumentParser:
     update_prices.add_argument("--min-success-ratio", type=float, default=0.97)
     update_prices.add_argument("--workers", type=int, default=6)
     update_prices.add_argument("--request-timeout", type=int, default=12)
+    update_prices.add_argument(
+        "--deadline-seconds",
+        type=float,
+        default=900.0,
+        help="Give up on the whole run after this long; 0 waits forever",
+    )
+    update_prices.add_argument(
+        "--no-nasdaq-fallback",
+        action="store_true",
+        help="Do not fill a missing latest US EOD candle from Nasdaq historical data",
+    )
     update_prices.set_defaults(func=update_prices_command)
+
+    doctor = subparsers.add_parser(
+        "doctor",
+        help="ตรวจว่าติดตั้งครบและพร้อมใช้งานหรือยัง",
+    )
+    doctor.set_defaults(func=doctor_command)
 
     update_financials = subparsers.add_parser(
         "update-financials",
