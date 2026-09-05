@@ -101,7 +101,7 @@ h3 {
 
 .control-band {
   display: grid;
-  grid-template-columns: minmax(175px, 205px) minmax(215px, 255px) minmax(75px, 100px) minmax(130px, 180px) minmax(180px, 1fr) auto auto;
+  grid-template-columns: minmax(160px, .9fr) minmax(200px, 1.2fr) 100px minmax(140px, 1fr) auto auto;
   gap: 12px;
   align-items: end;
   padding: 14px;
@@ -132,7 +132,8 @@ h3 {
 .coverage-table small { display: block; font-size: 11px; line-height: 1.6; color: var(--muted); }
 .coverage-table a { color: var(--teal); }
 .coverage-note { max-width: 1100px; margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
-.detail-panel[data-state="empty"] > :not(.panel-head) { display: none; }
+.detail-panel[data-state="empty"] > :not(.panel-head),
+.detail-panel[data-state="empty"] > #priceChart { display: none; }
 
 label {
   display: grid;
@@ -162,6 +163,11 @@ select {
   gap: 8px;
   align-items: center;
 }
+
+.control-band > label { min-width: 0; }
+.control-band .pattern-controls { grid-column: 1 / -1; grid-row: 2; }
+#scanButton { grid-column: 5; grid-row: 1; }
+#csvButton { grid-column: 6; grid-row: 1; }
 
 .pattern-controls label {
   min-height: 34px;
@@ -339,6 +345,7 @@ a.primary-button {
 
 .table-panel,
 .detail-panel {
+  min-width: 0;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -360,6 +367,8 @@ a.primary-button {
   color: var(--muted);
   font-size: 12px;
 }
+
+.panel-head > div { min-width: 0; }
 
 .table-scroll {
   overflow-x: auto;
@@ -568,10 +577,14 @@ footer {
 }
 
 @media (max-width: 1180px) {
-  .control-band,
   .workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
+
+  .control-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .control-band .pattern-controls { grid-row: 3; }
+  #scanButton { grid-column: 1; grid-row: 4; }
+  #csvButton { grid-column: 2; grid-row: 4; }
 
   .metrics-row {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -598,7 +611,6 @@ footer {
     font-size: 22px;
   }
 
-  .metrics-row,
   .split-grid,
   .image-preview-area {
     grid-template-columns: 1fr;
@@ -609,6 +621,15 @@ footer {
     align-items: stretch;
     flex-direction: column;
   }
+
+  .metrics-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .control-band > label:first-child { grid-column: 1; grid-row: 1; }
+  .control-band > label:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  .control-band > label:nth-child(3) { grid-column: 2; grid-row: 1; }
+  .control-band > label:nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
+  .control-band .pattern-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-row: 4; }
+  .control-band .pattern-controls label { grid-template-columns: auto minmax(0, 1fr); padding: 6px; }
+  #scanButton, #csvButton { grid-row: 5; }
 
   button,
   a.ghost-button,
@@ -1916,7 +1937,7 @@ footer {
 .quarterly-panel, #annualFinancialPanel { scroll-margin-top: 60px; }
 .quarterly-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
 .quarterly-controls label { display: grid; gap: 4px; font-size: 12px; }
-.quarterly-controls select { width: 100px; min-height: 36px; }
+.quarterly-controls select { width: 176px; max-width: 100%; min-height: 36px; }
 .quarterly-controls button { min-height: 36px; }
 
 @media (max-width: 1180px) {

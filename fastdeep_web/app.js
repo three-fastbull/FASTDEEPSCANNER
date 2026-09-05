@@ -302,6 +302,7 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
   const freshness = payload.symbol_freshness;
   const fx = payload.fx_health;
   const facts = [
+    healthFact("กลุ่มสแกน ", health.universe && health.universe !== "ALL" ? health.universe : health.market && health.market !== "ALL" ? health.market : "ทุกตลาด"),
     healthFact("EOD ที่ใช้สแกน ", scannerAsOf, health.can_publish ? "ok" : "bad"),
     healthFact("แท่งล่าสุดในไฟล์ ", latest),
     healthFact("ผู้ให้บริการ ", health.source || "-"),
@@ -312,8 +313,8 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
     const fresh = health.symbols_fresh == null ? freshness.fresh : health.symbols_fresh;
     const stale = Math.max(0, checked - fresh);
     facts.push(healthFact(
-      "หุ้นที่ราคาอัปเดตถึงวันสแกน ",
-      `${fresh}/${checked}${stale ? ` (ค้าง ${stale} ตัว)` : ""}`,
+      "หุ้นที่ผู้ให้บริการส่งถึงวันสแกน ",
+      `${fresh}/${checked}${stale ? ` (รอแท่งล่าสุด ${stale} ตัว)` : ""}`,
       stale ? "warn" : "ok",
     ));
   }
@@ -326,7 +327,7 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
       ));
     }
     facts.push(healthFact(
-      "หุ้นที่มีข้อมูลงบ ",
+      "หุ้นที่มีไฟล์งบย้อนหลัง ",
       `${financialHealth.cached_symbols}/${financialHealth.symbols_requested}`,
       financialHealth.cached_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
     ));
@@ -335,11 +336,20 @@ function renderDataHealth(health, financialHealth = null, payload = {}) {
       `${financialHealth.annual_5y_symbols || 0}/${financialHealth.symbols_requested}`,
       financialHealth.annual_5y_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
     ));
-    facts.push(healthFact(
-      "ครบ 5 ปี + Q1-Q4 ",
-      `${financialHealth.complete_symbols || 0}/${financialHealth.symbols_requested}`,
-      financialHealth.complete_symbols >= financialHealth.symbols_requested * 0.95 ? "ok" : "warn",
-    ));
+    const usCoverage = financialHealth.by_market?.US;
+    if (usCoverage?.symbols) {
+      facts.push(healthFact(
+        "งบสหรัฐครบ 5 ปี + Q1-Q4 ",
+        `${usCoverage.complete || 0}/${usCoverage.symbols}`,
+        usCoverage.complete >= usCoverage.symbols * 0.85 ? "ok" : "warn",
+      ));
+    }
+    if ((financialHealth.symbols_requested || 0) > (usCoverage?.symbols || 0)) {
+      facts.push(healthFact(
+        "งบจีน ฮ่องกง และไทย ",
+        "แสดงตามงวดที่ตลาดเผยแพร่ ไม่ถือ Q ที่ไม่มีเป็นงานค้าง",
+      ));
+    }
     const secCount = financialHealth.by_source?.["SEC EDGAR"] || 0;
     const usTotal = financialHealth.by_market?.US?.symbols || 0;
     const secUpdate = financialHealth.sec_update || {};
@@ -481,7 +491,7 @@ function drawChart(candles, result) {
   const canvas = elements.chart;
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-  canvas.width = Math.max(640, Math.floor(rect.width * dpr));
+  canvas.width = Math.max(1, Math.floor((rect.width || 640) * dpr));
   canvas.height = Math.floor(320 * dpr);
   const ctx = canvas.getContext("2d");
   ctx.scale(dpr, dpr);
@@ -518,7 +528,7 @@ function drawChart(candles, result) {
     ctx.fillText(price.toFixed(2), 8, yy + 4);
   }
 
-  const candleW = Math.max(3, chartW / candles.length * 0.58);
+  const candleW = Math.max(1, chartW / candles.length * 0.58);
   candles.forEach((candle, idx) => {
     const xx = x(idx);
     const up = candle.close >= candle.open;
@@ -546,7 +556,7 @@ function drawChart(candles, result) {
     ctx.fillText(`${pattern.label} ${pattern.level.toFixed(2)}`, pad.left + 8, y(pattern.level) - 7);
   }
 
-  const maxVolume = Math.max(...candles.map((item) => item.volume));
+  const maxVolume = Math.max(1, ...candles.map((item) => item.volume));
   candles.forEach((candle, idx) => {
     const barH = candle.volume / maxVolume * 34;
     ctx.fillStyle = candle.close >= candle.open ? "rgba(21,128,61,.28)" : "rgba(185,28,28,.28)";

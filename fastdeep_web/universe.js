@@ -30,8 +30,15 @@
       ["รายชื่อ", selected.registered, null],
       ["มีราคา", selected.price_available, selected.registered],
       ["มีงบ", selected.financial_cached, selected.registered],
-      ["งบครบ 5 ปี + Q1-Q4", selected.financial_complete, selected.registered],
+      ["งบรายปีครบ 5 ปี", selected.annual_5y, selected.registered],
     ];
+    const selectedMarket = group === "ALL" ? market : data.groups.find((item) => item.id === group)?.market;
+    if (selectedMarket === "US") {
+      facts.push(["งบครบ 5 ปี + Q1-Q4", selected.financial_complete, selected.registered]);
+    } else if (selectedMarket === "ALL") {
+      const us = data.markets.find((item) => item.id === "US");
+      if (us) facts.push(["งบสหรัฐครบ 5 ปี + Q1-Q4", us.financial_complete, us.registered]);
+    }
     for (const [label, count, total] of facts) {
       const item = document.createElement("span");
       item.textContent = `${label} ${number.format(count)}${total === null ? " ตัว" : `/${number.format(total)}`}`;
@@ -40,9 +47,14 @@
     }
     if (selected.price_missing || selected.price_stale) {
       const warning = document.createElement("small");
-      warning.textContent = `ยังไม่มีราคา ${selected.price_missing} ตัว · ราคาไม่ถึง ${data.expected_eod_date} อีก ${selected.price_stale} ตัว`;
+      warning.textContent = `ยังไม่มีราคา ${selected.price_missing} ตัว · ผู้ให้บริการยังไม่มีแท่ง ${data.expected_eod_date} อีก ${selected.price_stale} ตัว`;
       warning.className = "coverage-warning";
       summary.append(warning);
+    }
+    if (!["US", "ALL"].includes(selectedMarket)) {
+      const reportingNote = document.createElement("small");
+      reportingNote.textContent = "ไตรมาสแสดงตามรอบที่ตลาดนั้นประกาศ ไม่สร้าง Q1-Q4 ที่ไม่มีการรายงาน";
+      summary.append(reportingNote);
     }
   }
 
@@ -51,7 +63,8 @@
     body.replaceChildren();
     for (const group of data.groups) {
       const row = document.createElement("tr");
-      for (const value of [group.label, group.registered, group.price_available, group.price_fresh, group.financial_cached, group.annual_5y, group.financial_complete]) {
+      const strictQuarterCoverage = group.market === "US" ? group.financial_complete : "ตามงวดที่เผยแพร่";
+      for (const value of [group.label, group.registered, group.price_available, group.price_fresh, group.financial_cached, group.annual_5y, strictQuarterCoverage]) {
         const cell = document.createElement("td");
         cell.textContent = typeof value === "number" ? number.format(value) : value;
         row.append(cell);
@@ -73,7 +86,7 @@
       row.append(sourceCell);
       body.append(row);
     }
-    note.textContent = `นับหลักทรัพย์ไม่ซ้ำใน ALL; หุ้นหนึ่งตัวอาจอยู่หลายดัชนี และ A/H share เป็นคนละหลักทรัพย์ · ราคาถึงวันตรวจ ${data.expected_eod_date} (เกณฑ์วันทำการ ไม่รวมปฏิทินวันหยุดแต่ละตลาด) · งบตรวจล่าสุด ${data.financial_audited_at ? new Date(data.financial_audited_at).toLocaleString("th-TH") : "ยังไม่ตรวจ"} · รายชื่อ ETF เป็นตัวแทนดัชนี ไม่ใช่ไฟล์สมาชิกทางการ; China 50 และ mai เป็นชุดเดิมที่ติดตาม ไม่ใช่ทั้งตลาด`;
+    note.textContent = `นับหลักทรัพย์ไม่ซ้ำใน ALL; หุ้นหนึ่งตัวอาจอยู่หลายดัชนี และ A/H share เป็นคนละหลักทรัพย์ · ราคาถึงวันตรวจ ${data.expected_eod_date} (เกณฑ์วันทำการ ไม่รวมปฏิทินวันหยุดแต่ละตลาด) · Q1-Q4 ครบ 5 ปีเป็นเกณฑ์เข้มสำหรับงบสหรัฐ ส่วนตลาดอื่นแสดงตามงวดที่ประกาศจริง · งบตรวจล่าสุด ${data.financial_audited_at ? new Date(data.financial_audited_at).toLocaleString("th-TH") : "ยังไม่ตรวจ"} · รายชื่อ ETF เป็นตัวแทนดัชนี ไม่ใช่ไฟล์สมาชิกทางการ; China 50 และ mai เป็นชุดเดิมที่ติดตาม ไม่ใช่ทั้งตลาด`;
   }
 
   function populate() {

@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-28T11:09:25.826249+00:00",
+ "updated_at": "2026-08-30T12:52:38.265225+00:00",
  "note": "ข้อความยกมาจากแบบที่บริษัทยื่นต่อ SEC โดยไม่ผ่านการเรียบเรียง ใช้เป็นข้อมูลตั้งต้น ไม่ใช่บทวิเคราะห์ที่ทบทวนแล้ว",
  "profiles": {
   "A": {
@@ -18782,6 +18782,146 @@
     "form": "10-K",
     "period": "2025-12-31",
     "summarized_at": "2026-08-28T11:09:25.525329+00:00"
+   }
+  },
+  "ALAB": {
+   "symbol": "ALAB",
+   "cik": "0001736297",
+   "entity_name": "Astera Labs, Inc.",
+   "industry": "Semiconductors & Related Devices",
+   "form": "10-K",
+   "filed_at": "2026-02-20",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1736297/000173629726000010/alab-20251231.htm",
+   "language": "en",
+   "business_summary": "Our mission is to innovate, design, and deliver semiconductor-based connectivity solutions that are purpose-built to unleash the full potential of cloud and AI infrastructure. Building on years of experience with a singular focus on addressing connectivity challenges in data-centric systems, we have developed and deployed our leading Intelligent Connectivity Platform built from the ground up for cloud and AI infrastructure. Our Intelligent Connectivity Platform comprises of semiconductor-based, high-speed, mixed-signal connectivity products that integrate a matrix of microcontrollers and sensors, and COSMOS, our software suite, which is embedded in our connectivity products and integrated into our customers’ systems. Our Intelligent Connectivity Platform provides our customers with the ability to deploy and operate high-performance cloud and AI infrastructure at scale, addressing an increasingly diverse set of requirements. We provide our connectivity products in various form factors including Integrated Circuits (“ICs”), boards, and modules. Our patented software-defined platform ap",
+   "competition": "Competition — We offer a differentiated and holistic Intelligent Connectivity Platform purpose-built for cloud and AI infrastructure workloads. Our competitors typically compete with us with respect to some, but not all, of our solutions. Our principal competitors include Broadcom, Inc., Credo Technology Group Holding Ltd., Marvell Technology, Inc., Microchip Technology Inc., Montage Technology, Parade Technologies, Ltd., and Rambus, Inc.",
+   "customer_concentration": "2025, our top three end customers represented an aggregate of approximately 86% of our revenue. In 2025, one end customer represented more than 70% of our revenue; the top three end customers represented an aggregate of approximately 86% of our revenue.",
+   "extracted_at": "2026-08-30T12:51:57.891234+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "CRWV": {
+   "symbol": "CRWV",
+   "cik": "0001769628",
+   "entity_name": "CoreWeave, Inc.",
+   "industry": "Services-Prepackaged Software",
+   "form": "10-K",
+   "filed_at": "2026-03-02",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm",
+   "language": "en",
+   "business_summary": "CoreWeave is The Essential Cloud for AI TM , purpose-built to accelerate breakthroughs by AI pioneers, from leading research labs to enterprises fueling business growth. Our CoreWeave Cloud platform enables the full lifecycle of AI, including large-scale model training, inference, data movement, continuous iteration, and agentic workflows. CoreWeave Cloud combines proprietary software and orchestration, advanced infrastructure, and managed cloud services within a highly secure environment to deliver best-in-class high-performance computing, enabling our customers to develop, deploy, and operate advanced AI models and applications at scale. AI workloads demand a fundamentally different approach to infrastructure versus general purpose cloud environments. Both training and inference require high-density compute, advanced networking, optimized storage, and software capable of managing complex distributed systems. General-purpose cloud infrastructure was not designed to meet these requirements. We address them by integrating purpose-built infrastructure with AI-native software and manage",
+   "competition": "Competition — The AI cloud market is highly competitive and continues to evolve rapidly. We primarily compete with hyperscalers who offer general purpose cloud computing as part of a broader product portfolio, several of which are also customers of, and partners to, CoreWeave. We also compete with smaller cloud service providers. CoreWeave's competitive advantage is a result of our platform being purpose-built for AI and accelerated compute use cases. We believe our speed to market with the latest generations of GPUs, proprietary software and orchestration platform, security standards and ability to deliver a highly attractive total cost of ownership all contribute to CoreWeave's rapid growth. Our competitive differentiation is further underpinned by our ability to service AI compute use cases of all sizes rapidly and fungibly. For more information, refer to the risk factor entitled \"We ",
+   "customer_concentration": "None of our other customers represented 10% or more of our revenue for the year ended December 31, 2025.",
+   "extracted_at": "2026-08-30T12:52:05.811973+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "FLEX": {
+   "symbol": "FLEX",
+   "cik": "0000866374",
+   "entity_name": "FLEX LTD.",
+   "industry": "Printed Circuit Boards",
+   "form": "10-K",
+   "filed_at": "2026-05-20",
+   "period": "2026-03-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/866374/000086637426000012/flex-20260331.htm",
+   "language": "en",
+   "business_summary": "Flex is the advanced, end-to-end manufacturing partner of choice that helps a diverse customer base design, build, deliver and manage products that improve the world. Through the collective strength of a global workforce across approximately 30 countries with responsible, sustainable operations, we deliver technology innovation, supply chain, and manufacturing solutions to diverse industries and end markets. The Company’s full suite of specialized capabilities includes design and engineering, supply chain, manufacturing, and integrated services, plus a portfolio of power and cooling products. Over time, we have built differentiated scale and expertise across both technology-driven and regulated markets, enabling us to support customers with increasingly complex product, infrastructure, and compliance requirements. We partner with customers across a diverse set of industries including data center, healthcare, industrial, automotive, communications, and lifestyle. Reflecting the evolution of our portfolio and operating model, as of March 31, 2026, Flex's three operating and reportable",
+   "competition": "COMPETITION — The contract manufacturing services market is competitive. Flex competes against numerous domestic and foreign manufacturing service providers, as well as current and prospective customers. We believe the principal competitive factors in the contract manufacturing services market are quality and range of services; design and technological capabilities; cost; location of sites; supply chain resiliency; sustainability; and responsiveness and flexibility.",
+   "customer_concentration": "In fiscal year 2026, our ten largest customers accounted for 45% of net sales. No customer accounted for greater than 10% of the Company's net sales in fiscal year 2026. No customer accounts for more than 10% of our annual revenue and the ten largest accounted for 45% of our net sales in fiscal year 2026. • A significant percentage of our sales come from a small number of customers and a decline in sales to any of our largest customers has in the past adversely affected, and could in the future adversely affect, our business, results of operations, cash flows, and financial condition. A significant percentage of our sales come from a small number of customers and a decline in sales to any of",
+   "extracted_at": "2026-08-30T12:52:12.285031+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "NBIS": {
+   "symbol": "NBIS",
+   "cik": "0001513845",
+   "entity_name": "Nebius Group N.V.",
+   "industry": "Services-Computer Programming, Data Processing, Etc.",
+   "form": "20-F",
+   "filed_at": "2026-04-30",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm",
+   "language": "en",
+   "business_summary": "Nebius, a global AI cloud platform, delivers a unified full-stack AI cloud that spans the complete AI journey – from compute capacity to software and services that enable fast and efficient training and inference at scale. Founded around deep in-house technological expertise, Nebius offers a comprehensive and integrated suite of AI and ML cloud solutions, including both hardware and software built in-house. This combination of AI-optimized hardware and software enables us to deliver high-performance GPU compute clusters, storage, managed services, and advanced tools for AI model training and inference at enterprise-scale. Headquartered in Amsterdam and listed on Nasdaq, Nebius Group offers one of the few global, at scale, multi-tenant clouds purpose built for AI, with a significant presence in Europe, the U.S., and other geographies around the world. Nebius Group includes Nebius as well two distinct businesses that operate under separate brands: Avride, a leading developer of autonomous vehicles and delivery robots; and TripleTen, a leading edtech platform reskilling people for caree",
+   "competition": "Competition — The markets that we target are highly competitive and rapidly changing. Given the current pace of innovation and technological advancement, we anticipate continued high levels of competition in the industry. As a full-stack AI cloud provider, we face competition from cloud computing providers that are scaling AI-specific offerings, such as Amazon (AWS), Google (Google Cloud Platform), Microsoft (Azure) and Oracle. Given the breadth of our services, we also face different competitors across the AI cloud stack. For example, on the compute layer, we see other AI-centric providers offering bare-metal GPU clusters and GPU-centric data center operations. This group of competitors includes CoreWeave, Crusoe, and Lambda Labs, among others. Solutions such as Token Factory may face competition from AI-native inference-as-a-service solutions such as Fireworks AI and Together AI.",
+   "customer_concentration": "",
+   "extracted_at": "2026-08-30T12:52:20.068430+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": false
+   }
+  },
+  "RDDT": {
+   "symbol": "RDDT",
+   "cik": "0001713445",
+   "entity_name": "Reddit, Inc.",
+   "industry": "Services-Computer Processing & Data Preparation",
+   "form": "10-K",
+   "filed_at": "2026-02-06",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm",
+   "language": "en",
+   "business_summary": "This Annual Report on Form 10-K contains forward-looking statements about us and our industry that involve substantial risks and uncertainties. All statements other than statements of historical facts contained in this Annual Report on Form 10-K, including statements regarding our strategy, future financial condition, future operations, our plans with respect to our share repurchase program, projected costs, prospects, plans, objectives of management, and expected market growth, are forward-looking statements. In some cases, you can identify forward-looking statements because they contain words such as “may,” “will,” “shall,” “should,” “expects,” “plans,” “anticipates,” “could,” “intends,” “target,” “projects,” “contemplates,” “believes,” “estimates,” “predicts,” “potential,” “goal,” “objective,” “seeks,” or “continue,” or the negative of these words or other similar terms or expressions that concern our expectations, strategy, plans, or intentions. Forward-looking statements contained in this Annual Report on Form 10-K include, but are not limited to, statements about: • our strateg",
+   "competition": "Competition — We are competing for people’s time and for global advertising spend. As such, we face significant competition across many areas of our business. People may choose to spend their time using other products when looking to fulfill the needs Reddit provides, such as being entertained, seeking information, diving into current events, exploring passions and hobbies, or peer-to-peer commerce. Examples of select competitors across several time spent categories include: • For Seeking Information —Google, Amazon, YouTube, Wikipedia, X, other news sites, and LLMs like ChatGPT, Gemini, and Anthropic. • For Entertainment —Meta (including Facebook, Instagram, Threads, and WhatsApp), YouTube, Snap, X, TikTok, Roblox, and Twitch. • For Passions and Hobbies —Facebook Groups, Discord, X, and Pinterest. • For Peer-to-peer Commerce —Facebook Marketplace, Nextdoor, Craigslist, Poshmark, Etsy, a",
+   "customer_concentration": "No customer accounted for greater than 10% of our revenues for the years ended December 31, 2025, 2024, and 2023. No customer accounted for greater than 10% of our accounts receivable as of December 31, 2025 and 2024.",
+   "extracted_at": "2026-08-30T12:52:25.387449+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "RKLB": {
+   "symbol": "RKLB",
+   "cik": "0001819994",
+   "entity_name": "Rocket Lab Corp",
+   "industry": "Guided Missiles & Space Vehicles & Parts",
+   "form": "10-K",
+   "filed_at": "2026-02-26",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1819994/000181999426000013/rklb-20251231.htm",
+   "language": "en",
+   "business_summary": "Rocket Lab is an end-to-end space company with an established track record of mission success. We deliver reliable launch services, spacecraft design services, spacecraft components, spacecraft manufacturing, optical systems and other spacecraft and on-orbit management solutions that make it faster, easier and more affordable to access space. We believe that space has defined some of humanity’s greatest achievements and it continues to shape our future. We are motivated by the impact we can have on Earth by making it easier to get to space and using it as a platform for innovation, exploration and infrastructure. As one of select few commercial companies delivering regular access to orbit, our proven launch vehicle, spacecraft technology and global infrastructure uniquely position us to grow in this dynamic market. Advances in technologies, materials and components have led to miniaturization of spacecraft and a significant reduction in cost and time-to-market, concurrent with the increase in demand for space applications such as communications, remote sensing, Earth observation, met",
+   "competition": "Competition — We believe our main sources of competition fall into 4 categories: • companies providing dedicated and rideshare launch vehicles to deliver payloads to generic and custom planes/inclinations and altitude trajectories, such as Northrop Grumman, SpaceX, United Launch Alliance (a joint venture between Lockheed Martin Corporation and The Boeing Company), Firefly, Blue Origin, and established Russian, Indian, Chinese, European and Japanese launch providers; • companies that are reported to have plans to provide launch vehicles that can deliver payloads to a range of planes/inclinations and altitude trajectories; • companies providing spacecraft solutions, such as Airbus, Lockheed, Boeing, General Atomics, General Dynamics, Maxar Technology, Northrop Grumman, Raytheon Technologies, Thales Alenia Space, Astro Digital, York Space Systems and L3Harris; and • companies providing spac",
+   "customer_concentration": "For the year ended December 31, 2025, our top five customers accounted for approximately 49% of our revenues and our top five backlog customers accounted for approximately 77% of our backlog in the aggregate as of December 31, 2025.",
+   "extracted_at": "2026-08-30T12:52:30.925223+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
+   }
+  },
+  "VMRK": {
+   "symbol": "VMRK",
+   "cik": "0000906107",
+   "entity_name": "VIVMARK RESIDENTIAL",
+   "industry": "Real Estate Investment Trusts",
+   "form": "10-K",
+   "filed_at": "2026-02-13",
+   "period": "2025-12-31",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/906107/000119312526051433/eqr-20251231.htm",
+   "language": "en",
+   "business_summary": "Equity Residential (“EQR”) is committed to creating communities where people thrive. The Company, a member of the S&P 500, owns and manages rental properties in dynamic metro areas across the U.S. ERP Operating Limited Partnership (“ERPOP”) is focused on conducting the multifamily property business of EQR. EQR is a Maryland real estate investment trust (“REIT”) formed in March 1993 and ERPOP is an Illinois limited partnership formed in May 1993. References to the “Company,” “we,” “us” or “our” mean collectively EQR, ERPOP and those entities/subsidiaries owned or controlled by EQR and/or ERPOP. References to the “Operating Partnership” mean collectively ERPOP and those entities/subsidiaries owned or controlled by ERPOP. EQR is the general partner of, and as of December 31, 2025 owned an approximate 97.6% ownership interest in, ERPOP. All of the Company’s property ownership, development and related business operations are conducted through the Operating Partnership and EQR has no material assets or liabilities other than its investment in ERPOP. EQR issues equity from time to time, the",
+   "competition": "Competition — All of the Company’s properties are located in developed areas with multiple housing choices, including other multifamily properties. The number of competitive housing choices or multifamily properties in a particular area could have a material effect on the Company’s ability to lease apartment units at its properties and on the rents charged. We also face significant competition for the acquisition and development of apartment communities. The Company may be competing with other housing providers that have greater resources than the Company and whose managers have more experience than the Company’s managers. In addition, other forms of rental properties and single family housing provide housing alternatives to potential residents of multifamily properties. See Item 1A, Risk Factors , for additional information with respect to competition.",
+   "customer_concentration": "revenues are from external customers and there is no customer who contributed 10% or more of the Company’s total revenues during the years ended December 31, 2025, 2024 and 2023, respectively.",
+   "extracted_at": "2026-08-30T12:52:38.064586+00:00",
+   "found": {
+    "business_summary": true,
+    "competition": true,
+    "customer_concentration": true
    }
   }
  }

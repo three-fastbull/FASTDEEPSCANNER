@@ -151,6 +151,52 @@ test('thesis progress is bounded and handles debt-free and invalid targets', asy
   assert.equal(context.targetProgress(null, 10), null);
 });
 
+test('financial quarters include the current interim year before an annual filing exists', async () => {
+  const { context, element } = await appHarness('financial.js');
+  vm.runInContext(`state.financials = {
+    symbol: 'TEST', annual: [{fiscal_year: '2025', period_end: '2025-12-31'}],
+    quarterly_by_year: {'2025': [], '2026': [{quarter: 'Q1', period_end: '2026-03-31', metrics: {}}]},
+    sections: []
+  }; state.selectedYear = '2026'; renderQuarterly();`, context);
+  assert.match(element('quarterlyYearSelect').innerHTML, /value="2026" selected/);
+  assert.match(element('quarterlyYearSelect').innerHTML, /ระหว่างปี/);
+  assert.match(element('quarterlyTitle').textContent, /2026/);
+  assert.match(element('quarterlyPeriodNote').textContent, /1\/4/);
+});
+
+test('financial provenance distinguishes reported EPS from derived cash flows', async () => {
+  const { context } = await appHarness('financial.js');
+  const period = {metrics: {basic_eps: 1.25, operating_cash_flow: 200}, metric_sources: {
+    basic_eps: {kind: 'reported', source_form: '10-K', filed_at: '2026-03-01'},
+    operating_cash_flow: {kind: 'derived_ytd_difference'},
+  }};
+  assert.match(context.metricProvenance(period, 'basic_eps'), /10-K/);
+  assert.match(context.metricProvenance(period, 'operating_cash_flow'), /ยอดสะสม/);
+  assert.match(context.metricProvenance(period, 'total_revenue'), /ยังไม่มีข้อมูล/);
+});
+
+test('mobile charts use their actual CSS width and zero volume never draws NaN', async () => {
+  const { context, window, element } = await appHarness();
+  const canvas = element('priceChart');
+  const rectangles = [];
+  const drawContext = {};
+  for (const method of ['scale', 'clearRect', 'beginPath', 'moveTo', 'lineTo', 'stroke', 'fillText', 'setLineDash']) {
+    drawContext[method] = () => {};
+  }
+  drawContext.fillRect = (...args) => rectangles.push(args);
+  canvas.getContext = () => drawContext;
+  canvas.getBoundingClientRect = () => ({ width: 300, height: 320 });
+  const candles = [{ open: 10, high: 11, low: 9, close: 10.5, volume: 0 }];
+  const result = { patterns: [], symbol: 'TEST', last_price: 10.5, market_phase: 'RUN' };
+  window.devicePixelRatio = 1;
+  context.drawChart(candles, result);
+  assert.equal(canvas.width, 300);
+  window.devicePixelRatio = 2;
+  context.drawChart(candles, result);
+  assert.equal(canvas.width, 600);
+  assert.ok(rectangles.flat().every(Number.isFinite));
+});
+
 test('small year changes do not become negative zero', async () => {
   const { context } = await appHarness('financial.js');
   const badge = context.changeBadge(352583, 352755, 'total_assets');

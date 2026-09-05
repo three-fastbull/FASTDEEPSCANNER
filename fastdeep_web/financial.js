@@ -168,7 +168,8 @@
       if (!response.ok) throw new Error(payload.error || "ไม่สามารถโหลดงบการเงินได้");
       if (requestId !== state.financialRequestId) return;
       state.financials = payload;
-      state.selectedYear = fiscalYear(payload.annual.at(-1));
+      state.selectedYear = Object.keys(payload.quarterly_by_year || {}).sort().at(-1)
+        || fiscalYear(payload.annual.at(-1));
       renderFinancials();
       renderVi();
       if (window.fastDeepSelectedSymbol !== payload.symbol) {
@@ -313,16 +314,19 @@
     const periods = data.quarterly_by_year[state.selectedYear] || [];
     const byQuarter = new Map(periods.map((period) => [period.quarter, period]));
     const quarters = ["Q1", "Q2", "Q3", "Q4"];
-    elements.quarterlyYear.innerHTML = (data.annual || []).map((period) => {
-      const year = fiscalYear(period);
-      return `<option value="${year}" ${String(year) === String(state.selectedYear) ? "selected" : ""}>${year}</option>`;
+    const annualYears = new Set((data.annual || []).map(fiscalYear));
+    const availableYears = [...new Set([...annualYears, ...Object.keys(data.quarterly_by_year || {})])].sort();
+    elements.quarterlyYear.innerHTML = availableYears.map((year) => {
+      return `<option value="${escapeHtml(year)}" ${String(year) === String(state.selectedYear) ? "selected" : ""}>${escapeHtml(year)}${annualYears.has(year) ? "" : " · ระหว่างปี"}</option>`;
     }).join("");
     elements.quarterlyTitle.textContent = `${data.symbol} - รายไตรมาส ปี ${state.selectedYear} (${data.unit_label || ""})`;
-    elements.quarterlySubtitle.textContent = "Q4*: รายได้และกำไรคำนวณจากทั้งปีลบ Q1-Q3 · งบดุลใช้ยอดสิ้นปี · EPS แสดงเฉพาะงวดที่มีรายงานตรง";
-    elements.quarterlyNote.textContent = periods.length ? `${periods.length}/4 งวดจากผู้ให้บริการ` : "ไม่พบข้อมูลงวดรายไตรมาส";
+    elements.quarterlySubtitle.textContent = "* รายการคำนวณจากยอดสะสมหรือทั้งปีลบ Q1-Q3 · งบดุล Q4 ใช้ยอดสิ้นปี · EPS ใช้เฉพาะที่รายงานตรง";
+    elements.quarterlyNote.textContent = periods.length
+      ? `${periods.length}/4 งวด${annualYears.has(state.selectedYear) ? "" : " · งบระหว่างปี"}`
+      : "ไม่พบข้อมูลงวดรายไตรมาส";
     elements.quarterlyHead.innerHTML = `<tr><th>หัวข้องบการเงิน</th>${quarters.map((quarter) => {
       const period = byQuarter.get(quarter);
-      const suffix = period?.derived_from_annual ? "*" : "";
+      const suffix = period?.derived_from_annual || period?.derived_metrics?.length ? "*" : "";
       return `<th>${quarter}${suffix}<small>${period?.period_end || "-"}</small></th>`;
     }).join("")}</tr>`;
     const rows = [];
@@ -331,11 +335,27 @@
       for (const metric of section.metrics) {
         rows.push(`<tr><th scope="row">${escapeHtml(data.metric_labels[metric] || metric)}<small>${escapeHtml(metricUnitLabel(metric))}</small></th>${quarters.map((quarter) => {
           const period = byQuarter.get(quarter);
-          return `<td>${period ? amount(period.metrics[metric], metric) : "-"}</td>`;
+          const source = period?.metric_sources?.[metric];
+          const derived = source?.kind?.startsWith("derived_");
+          return `<td title="${escapeHtml(metricProvenance(period, metric))}">${period ? amount(period.metrics[metric], metric) : "-"}${derived ? "<sup>*</sup>" : ""}</td>`;
         }).join("")}</tr>`);
       }
     }
     elements.quarterlyBody.innerHTML = rows.join("");
+  }
+
+  function metricProvenance(period, metric) {
+    if (period?.metrics?.[metric] === null || period?.metrics?.[metric] === undefined) return "ยังไม่มีข้อมูลรายการนี้";
+    const source = period.metric_sources?.[metric];
+    const labels = {
+      reported: "ตัวเลขที่บริษัทรายงาน",
+      derived_ytd_difference: "คำนวณจากยอดสะสมลบยอดสะสมไตรมาสก่อน",
+      derived_free_cash_flow: "กระแสเงินสดดำเนินงานหักเงินลงทุน (Capex)",
+      derived_annual_less_q1_q3: "คำนวณจากทั้งปีลบ Q1-Q3",
+      annual_closing_balance: "ยอดงบดุล ณ วันสิ้นปี ไม่ใช่ผลรวมไตรมาส",
+    };
+    return [labels[source?.kind] || "ข้อมูลจากผู้ให้บริการ", source?.source_form,
+      source?.filed_at ? `ยื่น ${source.filed_at}` : ""].filter(Boolean).join(" · ");
   }
 
   function metricByKey(summary, key) {

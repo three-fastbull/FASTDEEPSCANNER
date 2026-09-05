@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import threading
 import time
 import urllib.parse
@@ -13,7 +14,7 @@ from uuid import uuid4
 
 from .currency import currency_label, currency_name_th, trading_currency
 from .data_io import load_universe_metadata
-from .sec_edgar import fetch_sec_companyfacts, load_sec_ticker_map
+from .sec_edgar import NORMALIZER_VERSION, fetch_sec_companyfacts, load_sec_ticker_map
 from .yahoo_prices import load_universe
 
 
@@ -171,11 +172,13 @@ def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
-def _financial_url(symbol: str) -> str:
-    now = datetime.now(UTC)
-    period_start = now - timedelta(days=365 * 7)
+def _financial_url(symbol: str, *, period_start: datetime | None = None,
+                   period_end: datetime | None = None, annual_only: bool = False) -> str:
+    now = period_end or datetime.now(UTC)
+    period_start = period_start or now - timedelta(days=365 * 7)
     types = [f"annual{value}" for value in METRIC_TYPES.values()]
-    types.extend(f"quarterly{value}" for value in METRIC_TYPES.values())
+    if not annual_only:
+        types.extend(f"quarterly{value}" for value in METRIC_TYPES.values())
     query = urllib.parse.urlencode(
         {
             "symbol": symbol,
@@ -191,7 +194,8 @@ def _safe_number(value: Any) -> float | None:
     if value is None:
         return None
     try:
-        return float(value)
+        number = float(value)
+        return number if math.isfinite(number) else None
     except (TypeError, ValueError):
         return None
 
@@ -205,6 +209,8 @@ def _extract_periods(payload: dict[str, Any], prefix: str) -> tuple[list[dict[st
     for result in results:
         for provider_key, metric in reverse_types.items():
             for item in result.get(provider_key) or []:
+                if item.get("periodType") not in {None, "", "12M" if prefix == "annual" else "3M"}:
+                    continue
                 period_end = str(item.get("asOfDate") or "")
                 if not period_end:
                     continue
@@ -213,10 +219,78 @@ def _extract_periods(payload: dict[str, Any], prefix: str) -> tuple[list[dict[st
                     continue
                 bucket = buckets.setdefault(period_end, {"period_end": period_end, "metrics": {}})
                 bucket["metrics"][metric] = raw
+                bucket.setdefault("metric_sources", {})[metric] = {
+                    "kind": "reported", "period_end": period_end,
+                    "provider_type": provider_key, "period_type": item.get("periodType"),
+                }
                 currency = currency or str(item.get("currencyCode") or "")
 
     periods = sorted(buckets.values(), key=lambda item: item["period_end"])
     return periods, currency
+
+
+def _merge_period_metrics(older: list[dict[str, Any]], newer: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged = {str(period["period_end"]): {**period, "metrics": dict(period.get("metrics") or {})}
+              for period in older if period.get("period_end")}
+    for period in newer:
+        key = str(period["period_end"])
+        previous = merged.get(key, {})
+        merged[key] = {
+            **previous, **period,
+            "metrics": {**previous.get("metrics", {}), **period.get("metrics", {})},
+            "metric_sources": {**previous.get("metric_sources", {}), **period.get("metric_sources", {})},
+        }
+    return [merged[key] for key in sorted(merged)]
+
+
+def _align_yahoo_quarters(periods: list[dict[str, Any]], annual: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not annual:
+        return periods
+    annual = sorted(annual, key=lambda period: period["period_end"])
+    aligned = []
+    for period in periods:
+        end = datetime.fromisoformat(period["period_end"])
+        enclosing = next((year for year in annual
+                          if 0 <= (datetime.fromisoformat(year["period_end"]) - end).days <= 330), None)
+        if enclosing:
+            remaining = (datetime.fromisoformat(enclosing["period_end"]) - end).days
+            year = str(enclosing.get("fiscal_year") or enclosing["period_end"][:4])
+            quarter = max(1, min(4, 4 - round(remaining / 91.31)))
+        else:
+            latest = annual[-1]
+            elapsed = (end - datetime.fromisoformat(latest["period_end"])).days
+            if not 45 <= elapsed <= 310:
+                continue
+            year = str(int(latest.get("fiscal_year") or latest["period_end"][:4]) + 1)
+            quarter = max(1, min(3, round(elapsed / 91.31)))
+        aligned.append({**period, "fiscal_year": year, "quarter": f"Q{quarter}"})
+    return aligned
+
+
+def _backfill_yahoo_annual(symbol: str, annual: list[dict[str, Any]], currency: str,
+                          timeout: int) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    latest_five = sorted(annual, key=lambda period: period["period_end"])[-5:]
+    enough = len(latest_five) == 5 and all(
+        sum(_safe_number(period.get("metrics", {}).get(metric)) is not None for metric in CORE_ANNUAL_METRICS) >= 4
+        for period in latest_five
+    )
+    if enough or not latest_five:
+        return annual, {}
+    last_year = int(latest_five[-1]["period_end"][:4])
+    url = _financial_url(symbol, period_start=datetime(last_year - 5, 1, 1, tzinfo=UTC),
+                         period_end=datetime(last_year - 2, 1, 1, tzinfo=UTC), annual_only=True)
+    metadata: dict[str, Any] = {"annual_history_url": url, "annual_history_checked_at": datetime.now(UTC).isoformat()}
+    try:
+        payload = _download_json(url, timeout=timeout)
+        history, history_currency = _extract_periods(payload, "annual")
+        if history and (not currency or history_currency != currency):
+            raise FinancialDataError("งบเก่าใช้สกุลเงินไม่ตรงกับงบปัจจุบัน จึงไม่รวมข้อมูลข้ามสกุล")
+        existing_dates = {period["period_end"] for period in annual}
+        metadata["annual_history_added"] = sorted({period["period_end"] for period in history} - existing_dates)
+        return _merge_period_metrics(history, annual), metadata
+    except Exception as exc:  # noqa: BLE001 - Retain the newer statements if backfill is unavailable.
+        metadata["annual_history_error"] = str(exc)
+        return annual, metadata
 
 
 def _value(metrics: dict[str, Any], key: str) -> float | None:
@@ -319,37 +393,60 @@ def _quarterly_by_year(
     for year, annual in annual_by_year.items():
         entries = grouped.setdefault(year, [])
         quarters = {entry["quarter"]: entry for entry in entries}
-        if "Q4" not in quarters:
-            q4_metrics: dict[str, float] = {}
-            for metric, annual_value in annual["metrics"].items():
-                annual_value = _safe_number(annual_value)
-                # EPS uses period-specific weighted shares, not annual minus quarterly EPS.
-                if annual_value is None or METRIC_UNITS.get(metric) == "per_share":
-                    continue
-                if metric in FLOW_METRICS:
-                    prior_values = [
-                        _value(quarters.get(quarter, {}).get("metrics", {}), metric)
-                        for quarter in ("Q1", "Q2", "Q3")
-                    ]
-                    if all(value is not None for value in prior_values):
-                        q4_metrics[metric] = annual_value - sum(value for value in prior_values if value is not None)
-                else:
-                    q4_metrics[metric] = annual_value
-            if q4_metrics:
-                entries.append(
-                    {
-                        "period_end": annual["period_end"],
-                        "fiscal_year": year,
-                        "quarter": "Q4",
-                        "metrics": q4_metrics,
-                        "derived_from_annual": True,
-                        "source_form": annual.get("source_form"),
-                        "accession": annual.get("accession"),
-                        "filed_at": annual.get("filed_at"),
-                        "source_url": annual.get("source_url"),
-                    }
+        if quarters.get("Q4") and quarters["Q4"]["period_end"] != annual["period_end"]:
+            continue
+        q4_metrics: dict[str, float] = {}
+        for metric, annual_value in annual["metrics"].items():
+            if _value(quarters.get("Q4", {}).get("metrics", {}), metric) is not None:
+                continue
+            annual_value = _safe_number(annual_value)
+            # EPS uses period-specific weighted shares, not annual minus quarterly EPS.
+            if annual_value is None or METRIC_UNITS.get(metric) == "per_share":
+                continue
+            if metric in FLOW_METRICS:
+                prior_values = [
+                    _value(quarters.get(quarter, {}).get("metrics", {}), metric)
+                    for quarter in ("Q1", "Q2", "Q3")
+                ]
+                prior_dates = [str(quarters.get(quarter, {}).get("period_end") or "") for quarter in ("Q1", "Q2", "Q3")]
+                dates_valid = (
+                    all(prior_dates) and prior_dates == sorted(set(prior_dates))
+                    and prior_dates[-1] < annual["period_end"]
+                    and (datetime.fromisoformat(annual["period_end"]) - datetime.fromisoformat(prior_dates[0])).days <= 330
+                    and (not annual.get("period_start") or prior_dates[0] >= annual["period_start"])
                 )
-                entries.sort(key=lambda item: item["quarter"])
+                if dates_valid and all(value is not None for value in prior_values):
+                    q4_metrics[metric] = annual_value - sum(value for value in prior_values if value is not None)
+            else:
+                q4_metrics[metric] = annual_value
+        if q4_metrics:
+            q4 = quarters.get("Q4")
+            if q4 is None:
+                q4 = {
+                    "period_end": annual["period_end"],
+                    "fiscal_year": year,
+                    "quarter": "Q4",
+                    "metrics": {},
+                    "source_form": annual.get("source_form"),
+                    "accession": annual.get("accession"),
+                    "filed_at": annual.get("filed_at"),
+                    "source_url": annual.get("source_url"),
+                }
+                entries.append(q4)
+            q4["metrics"].update(q4_metrics)
+            q4["derived_from_annual"] = True
+            q4["derived_metrics"] = sorted(set(q4.get("derived_metrics", [])) | set(q4_metrics))
+            for metric in q4_metrics:
+                q4.setdefault("metric_sources", {})[metric] = {
+                    "kind": "derived_annual_less_q1_q3" if metric in FLOW_METRICS else "annual_closing_balance",
+                    "source_url": annual.get("source_url"),
+                    "inputs": [
+                        (annual.get("metric_sources") or {}).get(metric),
+                        *[(quarters.get(quarter, {}).get("metric_sources") or {}).get(metric)
+                          for quarter in ("Q1", "Q2", "Q3") if metric in FLOW_METRICS],
+                    ],
+                }
+            entries.sort(key=lambda item: item["quarter"])
     return {year: grouped[year] for year in sorted(grouped)}
 
 
@@ -532,8 +629,34 @@ def _with_currency_presentation(payload: dict[str, Any]) -> dict[str, Any]:
                 period["metrics"] = {
                     metric: value for metric, value in period.get("metrics", {}).items()
                     if METRIC_UNITS.get(metric) != "per_share"
+                    or (metric not in period.get("derived_metrics", [])
+                        and (period.get("metric_sources", {}).get(metric) or {}).get("kind") == "reported")
                 }
     return payload
+
+
+def _reconciliation_issues(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    issues = []
+    for annual in payload.get("annual") or []:
+        year = str(annual.get("fiscal_year") or str(annual.get("period_end") or "")[:4])
+        periods = (payload.get("quarterly_by_year") or {}).get(year, [])
+        by_quarter = {item.get("quarter"): item for item in periods if item.get("period_end")}
+        if not {"Q1", "Q2", "Q3", "Q4"}.issubset(by_quarter):
+            continue
+        for metric in ("total_revenue", "net_income", "operating_cash_flow"):
+            value = _safe_number((annual.get("metrics") or {}).get(metric))
+            quarters = [_safe_number((by_quarter[q].get("metrics") or {}).get(metric)) for q in ("Q1", "Q2", "Q3", "Q4")]
+            if value is None or any(number is None for number in quarters):
+                continue
+            total = sum(quarters)
+            # Small rounding differences are not restatements; larger ones
+            # need a review, not a fabricated adjustment to make totals agree.
+            tolerance = max(1.0, abs(value) * 0.005)
+            if abs(total - value) > tolerance:
+                issues.append({"year": year, "metric": metric, "annual_value": value,
+                               "quarter_sum": total, "difference": total - value,
+                               "source_url": annual.get("source_url")})
+    return issues
 
 
 def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
@@ -546,6 +669,11 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
         str(item.get("fiscal_year") or str(item["period_end"])[:4])
         for item in annual_five
     ]
+    unique_years = sorted(set(annual_years))
+    consecutive_years = (
+        len(unique_years) == 5 and all(year.isdigit() for year in unique_years)
+        and int(unique_years[-1]) - int(unique_years[0]) == 4
+    )
 
     metric_slots = len(annual_five) * len(CORE_ANNUAL_METRICS)
     metric_values = sum(
@@ -561,6 +689,7 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
     full_quarter_years: list[str] = []
     quarter_metric_values = 0
     quarter_metric_slots = 0
+    period_gaps: dict[str, Any] = {}
     for year, periods in quarterly_by_year.items():
         period_list = list(periods or [])
         quarters = {str(item.get("quarter") or "") for item in period_list}
@@ -578,21 +707,40 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
         quarter_metric_slots += year_slots
         quarter_metric_values += year_values
         year_coverage = year_values / year_slots * 100 if year_slots else 0.0
-        if {"Q1", "Q2", "Q3", "Q4"}.issubset(quarters) and year_coverage >= 80.0:
+        missing_metrics = {
+            str(item["quarter"]): [metric for metric in CORE_ANNUAL_METRICS
+                                   if _safe_number((item.get("metrics") or {}).get(metric)) is None]
+            for item in relevant_periods
+        }
+        missing_quarters = sorted({"Q1", "Q2", "Q3", "Q4"} - quarters)
+        period_gaps[str(year)] = {
+            "missing_quarters": missing_quarters,
+            "missing_metrics": {quarter: metrics for quarter, metrics in missing_metrics.items() if metrics},
+        }
+        each_quarter_usable = all(len(metrics) <= 1 for metrics in missing_metrics.values())
+        if not missing_quarters and year_coverage >= 80.0 and each_quarter_usable:
             full_quarter_years.append(str(year))
 
     quarter_metric_coverage = (
         quarter_metric_values / quarter_metric_slots * 100 if quarter_metric_slots else 0.0
     )
 
-    annual_complete = len(annual_five) >= 5 and metric_coverage >= 80.0
-    quarterly_complete = len(set(annual_years) & set(full_quarter_years)) >= 5
+    reconciliation = _reconciliation_issues(payload)
+    excluded_periods = [item for item in payload.get("excluded_periods", [])
+                        if annual_five and str(item.get("period_end") or "") > annual_five[-1]["period_end"]]
+    review_years = {item["year"] for item in reconciliation}
+    full_quarter_years = [year for year in full_quarter_years if year not in review_years]
+    annual_complete = not excluded_periods and consecutive_years and metric_coverage >= 80.0 and all(
+        sum(_safe_number((item.get("metrics") or {}).get(metric)) is not None for metric in CORE_ANNUAL_METRICS) >= 4
+        for item in annual_five
+    )
+    quarterly_complete = not excluded_periods and consecutive_years and len(set(annual_years) & set(full_quarter_years)) >= 5
     if annual_complete and quarterly_complete:
         status = "complete"
         label = "ครบ 5 ปีและ Q1-Q4"
     elif annual_complete:
         status = "annual_complete"
-        label = "รายปีครบ 5 ปี แต่ไตรมาสยังไม่ครบ"
+        label = "รายปีครบ 5 ปี แต่ยอดไตรมาสต้องตรวจ" if reconciliation else "รายปีครบ 5 ปี แต่ไตรมาสยังไม่ครบ"
     elif annual:
         status = "partial"
         label = "ข้อมูลงบบางส่วน"
@@ -603,11 +751,18 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
     gaps: list[str] = []
     if len(annual_five) < 5:
         gaps.append(f"ขาดงบรายปี {5 - len(annual_five)} งวด")
+    elif not consecutive_years:
+        gaps.append("ปีบัญชีซ้ำหรือไม่ต่อเนื่อง 5 ปี ต้องตรวจวันที่งบ")
     if metric_coverage < 80.0:
         gaps.append(f"หัวข้อหลักครบ {metric_coverage:.0f}%")
     missing_quarter_years = [year for year in annual_years if year not in full_quarter_years]
     if missing_quarter_years:
         gaps.append(f"Q1-Q4 ไม่ครบ {len(missing_quarter_years)} ปี")
+    if reconciliation:
+        gaps.append(f"ยอดรายปีกับผลรวมไตรมาสต่างกัน {len(reconciliation)} รายการ ต้องตรวจงบปรับปรุง")
+    if excluded_periods:
+        period = max(excluded_periods, key=lambda item: item["period_end"])
+        gaps.append(f"มีงบเปลี่ยนรอบหรือระยะเวลาไม่ครบปี {period['period_end']} ({period['source_form']}) ต้องตรวจแยก")
 
     return {
         "status": status,
@@ -615,6 +770,7 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
         "annual_periods": len(annual_five),
         "annual_target": 5,
         "annual_years": annual_years,
+        "consecutive_annual_years": consecutive_years,
         "annual_complete": annual_complete,
         "core_metric_coverage_pct": round(metric_coverage, 1),
         "quarter_periods": quarter_periods,
@@ -623,6 +779,11 @@ def assess_financial_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
         "quarterly_target_years": 5,
         "quarterly_complete": quarterly_complete,
         "latest_period": str(annual_five[-1]["period_end"]) if annual_five else None,
+        "latest_quarter_period": max((str(item.get("period_end") or "")
+                                      for periods in quarterly_by_year.values() for item in periods), default=None),
+        "period_gaps": period_gaps,
+        "reconciliation_issues": reconciliation,
+        "excluded_periods": excluded_periods,
         "gaps": gaps,
     }
 
@@ -730,10 +891,11 @@ def _build_financial_payload(
         str(item.get("fiscal_year") or str(item.get("period_end") or "")[:4])
         for item in annual
     }
+    latest_annual_year = max(annual_years)
     quarterly_by_year = {
         year: periods
         for year, periods in _quarterly_by_year(quarterly_periods, annual).items()
-        if year in annual_years
+        if year in annual_years or (year.isdigit() and int(year) == int(latest_annual_year) + 1)
     }
     output = {
         "symbol": symbol,
@@ -784,6 +946,8 @@ def _sec_financial_payload(
         provider_metadata={
             "cik": normalized["cik"],
             "sec_entity_name": normalized["entity_name"],
+            "normalizer_version": normalized.get("normalizer_version"),
+            "excluded_periods": normalized.get("excluded_periods", []),
         },
     )
 
@@ -844,13 +1008,25 @@ def fetch_financials(
 
     annual, annual_currency = _extract_periods(payload, "annual")
     quarterly, quarterly_currency = _extract_periods(payload, "quarterly")
+    currency = annual_currency or quarterly_currency
+    existing = _read_cache(cache_file, max_age_hours=24 * 365 * 20)
+    if (existing and str(existing.get("source") or "").startswith("Yahoo Finance")
+            and currency and existing.get("currency") == currency):
+        annual = _merge_period_metrics(existing.get("annual") or [], annual)
+        if existing.get("yahoo_history_version") == 1:
+            reported_quarters = [period for periods in existing.get("quarterly_by_year", {}).values()
+                                 for period in periods if not period.get("derived_from_annual")]
+            quarterly = _merge_period_metrics(reported_quarters, quarterly)
+    annual, history_metadata = _backfill_yahoo_annual(symbol, annual, currency, request_timeout)
+    quarterly = _align_yahoo_quarters(quarterly, annual)
     output = _build_financial_payload(
         symbol,
         annual_periods=annual,
         quarterly_periods=quarterly,
-        currency=annual_currency or quarterly_currency,
+        currency=currency,
         source="Yahoo Finance fundamentals timeseries",
-        provider_metadata={"provider_fallback_note": sec_error} if sec_error else None,
+        provider_metadata={"yahoo_history_version": 1, "quarter_alignment_version": 1, **history_metadata,
+                           **({"provider_fallback_note": sec_error} if sec_error else {})},
     )
     _write_json_atomic(cache_file, output)
     return output
@@ -1034,7 +1210,8 @@ def cache_sec_universe_financials(
         cached = None if refresh else _read_cache(
             _cache_path(symbol, cache_dir), cache_max_age_hours
         )
-        if cached and str(cached.get("source") or "").startswith("SEC EDGAR"):
+        if (cached and str(cached.get("source") or "").startswith("SEC EDGAR")
+                and cached.get("normalizer_version") == NORMALIZER_VERSION):
             cached_before.append(symbol)
     cached_set = set(cached_before)
     pending = [symbol for symbol in selected if symbol not in cached_set]

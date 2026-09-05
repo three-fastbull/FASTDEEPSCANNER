@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import math
+import gzip
 import os
 import re
 import time
@@ -8,8 +10,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, timedelta
+from collections import Counter
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 
 from .local_config import get_setting
@@ -29,6 +33,8 @@ APPLICATION_NAME = "FastDeep Intelligence Platform"
 UNREACHABLE_EMAIL_DOMAINS = ("noreply", "no-reply", "example.com", "localhost")
 ANNUAL_FORMS = {"10-K", "10-K/A", "20-F", "20-F/A", "40-F", "40-F/A"}
 QUARTERLY_FORMS = {"10-Q", "10-Q/A"}
+TRANSITION_FORMS = {"10-KT", "10-KT/A", "10-QT", "10-QT/A"}
+NORMALIZER_VERSION = 4
 
 
 class SecEdgarError(RuntimeError):
@@ -39,10 +45,10 @@ class SecEdgarError(RuntimeError):
 # as fallbacks because issuers can change taxonomy versions between filings.
 SEC_CONCEPTS: dict[str, tuple[str, ...]] = {
     "total_revenue": (
-        "RevenueFromContractWithCustomerExcludingAssessedTax",
-        "RevenueFromContractWithCustomerIncludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
+        "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
         "OperatingRevenues",
     ),
@@ -262,7 +268,7 @@ def _taxonomy_concepts(payload: dict[str, Any]) -> list[tuple[str, dict[str, tup
 
 
 def _detect_currency(payload: dict[str, Any]) -> str:
-    counts: dict[str, int] = {}
+    dates: dict[str, set[tuple[str, str]]] = {}
     facts = payload.get("facts") or {}
     for taxonomy, mappings in _taxonomy_concepts(payload):
         taxonomy_facts = facts.get(taxonomy) or {}
@@ -271,15 +277,17 @@ def _detect_currency(payload: dict[str, Any]) -> str:
                 for unit, values in (taxonomy_facts.get(concept) or {}).get("units", {}).items():
                     if not _is_currency_unit(unit):
                         continue
-                    count = sum(
-                        1
-                        for item in values
-                        if str(item.get("form") or "") in ANNUAL_FORMS | QUARTERLY_FORMS
-                    )
-                    counts[unit] = counts.get(unit, 0) + count
-    if not counts:
+                    for item in values:
+                        if (str(item.get("form") or "") in ANNUAL_FORMS | QUARTERLY_FORMS | TRANSITION_FORMS
+                                and _parse_date(item.get("end"))):
+                            dates.setdefault(unit, set()).add((item["end"], metric))
+    if not dates:
         return "USD"
-    return max(counts, key=lambda unit: (counts[unit], unit == "USD"))
+    # A former reporting currency can have many more historical facts than
+    # the current one. Prefer the most recent financial period, never mix units.
+    latest = {unit: max(end for end, _ in records) for unit, records in dates.items()}
+    return max(dates, key=lambda unit: (latest[unit],
+               sum(end == latest[unit] for end, _ in dates[unit]), len(dates[unit]), unit == "USD"))
 
 
 def _unit_values(node: dict[str, Any], metric: str, currency: str) -> list[dict[str, Any]]:
@@ -298,24 +306,20 @@ def _unit_values(node: dict[str, Any], metric: str, currency: str) -> list[dict[
 def _valid_annual(item: dict[str, Any], metric: str) -> bool:
     if str(item.get("form") or "") not in ANNUAL_FORMS:
         return False
-    if item.get("fp") not in {None, "", "FY"}:
-        return False
     delay = _filing_delay_days(item)
-    if delay is not None and not 0 <= delay <= 300:
+    if delay is None or delay < 0:
         return False
     duration = _duration_days(item)
-    if metric in FLOW_METRICS and (duration is None or not 300 <= duration <= 430):
+    if metric in FLOW_METRICS and (duration is None or not 330 <= duration <= 400):
         return False
     return bool(item.get("end"))
 
 
 def _valid_quarter(item: dict[str, Any], metric: str) -> bool:
-    if str(item.get("form") or "") not in QUARTERLY_FORMS:
-        return False
-    if str(item.get("fp") or "") not in {"Q1", "Q2", "Q3"}:
+    if str(item.get("form") or "") not in QUARTERLY_FORMS | ANNUAL_FORMS:
         return False
     delay = _filing_delay_days(item)
-    if delay is not None and not 0 <= delay <= 180:
+    if delay is None or delay < 0:
         return False
     duration = _duration_days(item)
     if metric in FLOW_METRICS and (duration is None or not 45 <= duration <= 310):
@@ -323,7 +327,7 @@ def _valid_quarter(item: dict[str, Any], metric: str) -> bool:
     return bool(item.get("end"))
 
 
-def _fact_score(item: dict[str, Any], metric: str, *, annual: bool) -> tuple[int, str, str]:
+def _fact_score(item: dict[str, Any], metric: str, *, annual: bool) -> tuple[str, int, str]:
     duration = _duration_days(item) or 0
     if annual or metric in CUMULATIVE_QUARTER_METRICS:
         duration_score = duration
@@ -331,7 +335,7 @@ def _fact_score(item: dict[str, Any], metric: str, *, annual: bool) -> tuple[int
         duration_score = -abs(duration - 91)
     else:
         duration_score = 0
-    return duration_score, str(item.get("filed") or ""), str(item.get("accn") or "")
+    return str(item.get("filed") or ""), duration_score, str(item.get("accn") or "")
 
 
 def _filing_url(cik: str, accession: str) -> str:
@@ -371,6 +375,15 @@ def _put_metric(
         "duration_days": _duration_days(item),
         "raw_value": value,
     }
+    bucket.setdefault("metric_sources", {})[metric] = {
+        "kind": "reported",
+        "concept": item.get("_concept"),
+        "period_start": item.get("start"),
+        "period_end": item.get("end"),
+        "filed_at": item.get("filed"),
+        "source_form": item.get("form"),
+        "source_url": _filing_url(cik, str(item.get("accn") or "")),
+    }
     if str(item.get("filed") or "") >= str(bucket.get("filed_at") or ""):
         bucket["source_form"] = str(item.get("form") or "")
         bucket["accession"] = str(item.get("accn") or "")
@@ -401,8 +414,98 @@ def _derive_metrics(period: dict[str, Any]) -> None:
     capex = metrics.get("capital_expenditure")
     if operating_cash is not None and capex is not None:
         metrics["free_cash_flow"] = operating_cash + capex
+        period.setdefault("metric_sources", {})["free_cash_flow"] = {
+            "kind": "derived_free_cash_flow",
+            "inputs": [(period.get("metric_sources") or {}).get(key)
+                       for key in ("operating_cash_flow", "capital_expenditure")],
+            "source_url": period.get("source_url"),
+        }
+        period.setdefault("derived_metrics", []).append("free_cash_flow")
     for metric in INTERNAL_METRICS:
         metrics.pop(metric, None)
+
+
+def _fiscal_calendar(
+    records: dict[str, list[tuple[int, dict[str, Any]]]],
+) -> dict[str, dict[str, Any]]:
+    # fy/fp identify the filing, not necessarily the comparative fact's year.
+    # Only a full-year flow can anchor an annual period; instants cannot.
+    spans: dict[str, dict[str, set[str]]] = {}
+    filing_ends: dict[str, str] = {}
+    annual_facts: list[dict[str, Any]] = []
+    for metric in sorted(FLOW_METRICS):
+        for _, item in records.get(metric, []):
+            if not _valid_annual(item, metric):
+                continue
+            end, start = str(item["end"]), str(item["start"])
+            spans.setdefault(end, {}).setdefault(start, set()).add(metric)
+            accession = str(item.get("accn") or "")
+            filing_ends[accession] = max(filing_ends.get(accession, ""), end)
+            annual_facts.append(item)
+    if not spans:
+        return {}
+    latest = date.fromisoformat(max(spans))
+    votes: dict[str, int] = {}
+    for item in annual_facts:
+        accession = str(item.get("accn") or "")
+        end = date.fromisoformat(item["end"])
+        try:
+            fiscal_year = int(item.get("fy"))
+        except (TypeError, ValueError):
+            continue
+        if (item["end"] != filing_ends[accession]
+                or (_filing_delay_days(item) or 0) > 300
+                or not 0 <= (latest - end).days <= 365 * 8
+                or abs(fiscal_year - end.year) > 1):
+            continue
+        votes[accession] = fiscal_year + round((latest - end).days / 365.2425)
+    latest_year = Counter(votes.values()).most_common(1)[0][0] if votes else latest.year
+    calendar = {
+        end: {
+            "period_end": end,
+            "period_start": max(starts, key=lambda start: (len(starts[start]), start)),
+            "fiscal_year": str(latest_year - round((latest - date.fromisoformat(end)).days / 365.2425)),
+        }
+        for end, starts in sorted(spans.items())
+    }
+    # Some issuers re-present a 52-week year with a date one day away. Those
+    # are alternative versions of one year, not additional annual statements.
+    latest_filed = {end: max(str(item.get("filed") or "") for item in annual_facts if item["end"] == end)
+                    for end in calendar}
+    kept: dict[str, dict[str, Any]] = {}
+    for end, period in calendar.items():
+        duplicate = next((key for key, current in kept.items()
+                          if current["fiscal_year"] == period["fiscal_year"]
+                          and abs((date.fromisoformat(key) - date.fromisoformat(end)).days) <= 7), None)
+        if duplicate is not None:
+            if latest_filed[duplicate] > latest_filed[end]:
+                continue
+            kept.pop(duplicate)
+        kept[end] = period
+    return kept
+
+
+def _quarter_position(end: str, calendar: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    point = _parse_date(end)
+    if point is None or not calendar:
+        return None
+    for annual in calendar.values():
+        start = date.fromisoformat(annual["period_start"])
+        finish = date.fromisoformat(annual["period_end"])
+        if start <= point <= finish:
+            quarter = max(1, round(((point - start).days + 1) / ((finish - start).days + 1) * 4))
+            if quarter > 4 or (quarter == 4 and point != finish):
+                return None
+            return {** annual, "quarter": f"Q{quarter}", "fiscal_start": annual["period_start"]}
+    latest = calendar[max(calendar)]
+    elapsed = (point - date.fromisoformat(latest["period_end"])).days
+    if 45 <= elapsed <= 310:
+        return {
+            "fiscal_year": str(int(latest["fiscal_year"]) + 1),
+            "quarter": f"Q{max(1, min(3, round(elapsed / 91.31)))}",
+            "fiscal_start": (date.fromisoformat(latest["period_end"]) + timedelta(days=1)).isoformat(),
+        }
+    return None
 
 
 def _extract_company_periods(
@@ -412,110 +515,112 @@ def _extract_company_periods(
     currency: str,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     facts = payload.get("facts") or {}
-    annual_buckets: dict[tuple[str, str], dict[str, Any]] = {}
-    quarter_buckets: dict[tuple[str, str, str], dict[str, Any]] = {}
-
+    records: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for taxonomy, mappings in _taxonomy_concepts(payload):
         taxonomy_facts = facts.get(taxonomy) or {}
         for metric, concepts in mappings.items():
-            annual_selected: dict[tuple[str, str], tuple[int, dict[str, Any]]] = {}
-            quarter_selected: dict[tuple[str, str, str], tuple[int, dict[str, Any]]] = {}
             for concept_priority, concept in enumerate(concepts):
-                values = _unit_values(taxonomy_facts.get(concept) or {}, metric, currency)
-                for item in values:
-                    if _valid_annual(item, metric):
-                        key = (str(item.get("fy") or str(item.get("end"))[:4]), str(item.get("end")))
-                        current = annual_selected.get(key)
-                        if (
-                            current is None
-                            or concept_priority < current[0]
-                            or (
-                                concept_priority == current[0]
-                                and _fact_score(item, metric, annual=True)
-                                > _fact_score(current[1], metric, annual=True)
-                            )
-                        ):
-                            annual_selected[key] = (concept_priority, item)
-                    if _valid_quarter(item, metric):
-                        key = (
-                            str(item.get("fy") or str(item.get("end"))[:4]),
-                            str(item.get("fp")),
-                            str(item.get("end")),
-                        )
-                        current = quarter_selected.get(key)
-                        if (
-                            current is None
-                            or concept_priority < current[0]
-                            or (
-                                concept_priority == current[0]
-                                and _fact_score(item, metric, annual=False)
-                                > _fact_score(current[1], metric, annual=False)
-                            )
-                        ):
-                            quarter_selected[key] = (concept_priority, item)
+                for item in _unit_values(taxonomy_facts.get(concept) or {}, metric, currency):
+                    try:
+                        usable = math.isfinite(float(item.get("val")))
+                    except (TypeError, ValueError):
+                        usable = False
+                    if usable and _parse_date(item.get("end")):
+                        priority = concept_priority + (100 if taxonomy == "ifrs-full" else 0)
+                        records.setdefault(metric, []).append((priority, {**item, "_concept": f"{taxonomy}:{concept}"}))
 
-            for key, (_, item) in annual_selected.items():
-                bucket = annual_buckets.setdefault(key, _period_bucket(item, cik))
-                if metric not in bucket["metrics"]:
-                    _put_metric(bucket, metric, item, float(item["val"]), cik)
-            for key, (_, item) in quarter_selected.items():
-                bucket = quarter_buckets.setdefault(key, _period_bucket(item, cik, key[1]))
-                if metric not in bucket["metrics"]:
-                    _put_metric(bucket, metric, item, float(item["val"]), cik)
+    calendar = _fiscal_calendar(records)
+    anchors: dict[str, set[str]] = {}
+    for metric in sorted(FLOW_METRICS):
+        for _, item in records.get(metric, []):
+            duration = _duration_days(item)
+            if (_valid_quarter(item, metric) and duration is not None
+                    and 45 <= duration <= 135 and _quarter_position(item["end"], calendar)):
+                anchors.setdefault(item["end"], set()).add(metric)
+    quarter_ends: dict[tuple[str, str], str] = {}
+    for end in sorted(anchors):
+        position = _quarter_position(end, calendar)
+        key = (position["fiscal_year"], position["quarter"])
+        current = quarter_ends.get(key)
+        if current is None or (len(anchors[end]), end) > (len(anchors[current]), current):
+            quarter_ends[key] = end
 
-    strongest_annual: dict[str, dict[str, Any]] = {}
-    for period in annual_buckets.values():
-        key = period["period_end"]
-        current = strongest_annual.get(key)
-        score = (len(period["metrics"]), period["filed_at"], period["fiscal_year"])
-        current_score = (
-            len(current["metrics"]), current["filed_at"], current["fiscal_year"]
-        ) if current else (-1, "", "")
-        if score > current_score:
-            strongest_annual[key] = period
-    annual = sorted(strongest_annual.values(), key=lambda item: item["period_end"])
-    quarters = sorted(
-        quarter_buckets.values(),
-        key=lambda item: (item["fiscal_year"], item["quarter"], item["period_end"]),
-    )
+    annual_buckets: dict[str, dict[str, Any]] = {}
+    quarter_buckets: dict[str, dict[str, Any]] = {}
+    for metric, values in records.items():
+        for annual_mode, ends, buckets in (
+            (True, set(calendar), annual_buckets),
+            (False, set(quarter_ends.values()), quarter_buckets),
+        ):
+            selected: dict[str, tuple[tuple[Any, ...], dict[str, Any]]] = {}
+            for priority, item in values:
+                end = item["end"]
+                if end not in ends:
+                    continue
+                valid = _valid_annual(item, metric) if annual_mode else _valid_quarter(item, metric)
+                if not valid:
+                    continue
+                position = calendar[end] if annual_mode else _quarter_position(end, calendar)
+                duration = _duration_days(item) or 0
+                if not annual_mode and metric in {"total_revenue", "net_income"}:
+                    annual_end = position.get("period_end")
+                    reference = (annual_buckets.get(annual_end, {}).get("metric_sources", {}).get(metric) or {}).get("concept")
+                    if reference and item.get("_concept") != reference:
+                        continue
+                if metric in FLOW_METRICS:
+                    expected_start = position["period_start"] if annual_mode else position["fiscal_start"]
+                    if annual_mode and item.get("start") != expected_start:
+                        continue
+                    if not annual_mode and duration > 135 and (
+                        metric == "basic_eps" or item.get("start") != expected_start
+                    ):
+                        continue
+                direct = annual_mode or metric not in FLOW_METRICS or duration <= 135
+                rank = (int(direct), -priority, *_fact_score(item, metric, annual=annual_mode))
+                if end not in selected or rank > selected[end][0]:
+                    selected[end] = (rank, item)
+            for end, (_, item) in selected.items():
+                position = calendar[end] if annual_mode else _quarter_position(end, calendar)
+                bucket = buckets.setdefault(end, _period_bucket(item, cik, position.get("quarter")))
+                bucket["fiscal_year"] = position["fiscal_year"]
+                if annual_mode:
+                    bucket["period_start"] = position["period_start"]
+                else:
+                    number = int(position["quarter"][1])
+                    previous_end = quarter_ends.get((position["fiscal_year"], f"Q{number - 1}"))
+                    bucket["period_start"] = (
+                        (date.fromisoformat(previous_end) + timedelta(days=1)).isoformat()
+                        if previous_end else position["fiscal_start"] if number == 1 else None
+                    )
+                _put_metric(bucket, metric, item, float(item["val"]), cik)
 
-    # Keep the strongest period when an issuer reports duplicate fiscal labels.
-    strongest_quarters: dict[tuple[str, str], dict[str, Any]] = {}
-    for period in quarters:
-        key = (period["fiscal_year"], period["quarter"])
-        current = strongest_quarters.get(key)
-        score = (len(period["metrics"]), period["filed_at"], period["period_end"])
-        current_score = (
-            len(current["metrics"]), current["filed_at"], current["period_end"]
-        ) if current else (-1, "", "")
-        if score > current_score:
-            strongest_quarters[key] = period
-    quarters = sorted(
-        strongest_quarters.values(),
-        key=lambda item: (item["fiscal_year"], item["quarter"]),
-    )
-
-    # Cash-flow statements commonly report year-to-date values in Q2/Q3. Turn
-    # them into discrete quarters only when the facts share the same start date.
+    annual = sorted(annual_buckets.values(), key=lambda item: item["period_end"])
+    quarters = sorted(quarter_buckets.values(), key=lambda item: item["period_end"])
     by_year: dict[str, dict[str, dict[str, Any]]] = {}
     for period in quarters:
         by_year.setdefault(period["fiscal_year"], {})[period["quarter"]] = period
     for periods in by_year.values():
-        for metric in CUMULATIVE_QUARTER_METRICS:
-            previous_raw: float | None = None
-            previous_start: str | None = None
-            for quarter in ("Q1", "Q2", "Q3"):
-                period = periods.get(quarter)
+        for metric in sorted(FLOW_METRICS - {"basic_eps"}):
+            for number in (2, 3, 4):
+                period = periods.get(f"Q{number}")
                 if not period or metric not in period["metrics"]:
                     continue
                 meta = period["_metric_meta"].get(metric) or {}
-                raw = float(meta.get("raw_value"))
-                start = str(meta.get("start") or "")
-                duration = int(meta.get("duration_days") or 0)
-                if duration > 135 and previous_raw is not None and start == previous_start:
-                    period["metrics"][metric] = raw - previous_raw
-                previous_raw = raw
-                previous_start = start
+                if int(meta.get("duration_days") or 0) <= 135:
+                    continue
+                previous = periods.get(f"Q{number - 1}") or {}
+                prior = (previous.get("_metric_meta") or {}).get(metric) or {}
+                if prior and prior.get("start") == meta.get("start"):
+                    period["metrics"][metric] = meta["raw_value"] - prior["raw_value"]
+                    source = period["metric_sources"][metric]
+                    inputs = [dict(source), (previous.get("metric_sources") or {}).get(metric)]
+                    source["kind"] = "derived_ytd_difference"
+                    source["inputs"] = inputs
+                    period.setdefault("derived_metrics", []).append(metric)
+                else:
+                    # Nine-month cash flow minus Q1 is not Q3 cash flow.
+                    period["metrics"].pop(metric, None)
+                    period["metric_sources"].pop(metric, None)
 
     for period in annual + quarters:
         _derive_metrics(period)
@@ -530,6 +635,23 @@ def normalize_companyfacts(payload: dict[str, Any], *, symbol: str, cik: str) ->
     annual, quarterly = _extract_company_periods(payload, cik=cik, currency=currency)
     if not annual:
         raise SecEdgarError(f"SEC EDGAR ไม่มีงบมาตรฐานที่ใช้ได้สำหรับ {symbol}")
+    excluded: dict[tuple[str, str], dict[str, Any]] = {}
+    latest_annual = max(period["period_end"] for period in annual)
+    for taxonomy, mappings in _taxonomy_concepts(payload):
+        for metric in ("total_revenue", "net_income", "operating_cash_flow"):
+            for concept in mappings.get(metric, ()):
+                node = payload["facts"][taxonomy].get(concept) or {}
+                for item in _unit_values(node, metric, currency):
+                    form, end = str(item.get("form") or ""), str(item.get("end") or "")
+                    if (form not in ANNUAL_FORMS | TRANSITION_FORMS or end <= latest_annual
+                            or _duration_days(item) is None or (_filing_delay_days(item) or -1) < 0):
+                        continue
+                    if not _valid_annual(item, metric):
+                        excluded[(end, form)] = {
+                            "period_start": item.get("start"), "period_end": end,
+                            "source_form": form, "duration_days": _duration_days(item),
+                            "source_url": _filing_url(cik, str(item.get("accn") or "")),
+                        }
     return {
         "symbol": symbol,
         "cik": cik,
@@ -539,6 +661,8 @@ def normalize_companyfacts(payload: dict[str, Any], *, symbol: str, cik: str) ->
         "quarterly": quarterly,
         "source": "SEC EDGAR companyfacts (10-K/10-Q XBRL)",
         "source_url": f"https://www.sec.gov/edgar/browse/?CIK={int(cik)}",
+        "normalizer_version": NORMALIZER_VERSION,
+        "excluded_periods": list(excluded.values()),
     }
 
 
@@ -577,6 +701,11 @@ def _companyfacts_for_cik(symbol: str, cik: str, timeout: int) -> dict[str, Any]
         raise
     except Exception as exc:  # noqa: BLE001
         raise SecEdgarError(f"ดึง SEC Company Facts ของ {symbol} ไม่สำเร็จ: {exc}") from exc
+    snapshot = Path(__file__).resolve().parent.parent / "storage" / "sec_companyfacts" / f"CIK{cik}.json.gz"
+    snapshot.parent.mkdir(parents=True, exist_ok=True)
+    temporary = snapshot.with_name(f".{snapshot.name}.{uuid4().hex}.tmp")
+    temporary.write_bytes(gzip.compress(json.dumps(payload, ensure_ascii=False).encode("utf-8"), compresslevel=1))
+    temporary.replace(snapshot)
     return normalize_companyfacts(payload, symbol=symbol, cik=cik)
 
 
