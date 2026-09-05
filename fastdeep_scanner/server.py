@@ -5,6 +5,8 @@ import io
 import json
 import mimetypes
 import sys
+import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
@@ -428,8 +430,29 @@ class FastDeepHandler(BaseHTTPRequestHandler):
         self._send_json({"trade": trade, "summary": journal_summary()})
 
 
+def _warm_caches() -> None:
+    """Parse the price file ahead of the first request instead of during it.
+
+    The daily update rewrites the price file, which invalidates both in-process
+    caches, so without this the first person to open the page waits out two full
+    passes over 136MB. This runs off the accept loop so the launcher's own health
+    check still answers immediately; a request that arrives mid-warm simply waits
+    on the same work it would have triggered itself.
+    """
+    started = time.perf_counter()
+    try:
+        candles, _ = load_market_data()
+        price_data_health()
+    except Exception as error:  # noqa: BLE001 - a cold cache must not kill the server
+        _safe_print(f"FastDeep Scanner: preload skipped ({error})")
+        return
+    elapsed = time.perf_counter() - started
+    _safe_print(f"FastDeep Scanner: preloaded {len(candles):,} symbols in {elapsed:.1f}s")
+
+
 def run_server(host: str = "127.0.0.1", port: int = 8765) -> None:
     server = ThreadingHTTPServer((host, port), FastDeepHandler)
+    threading.Thread(target=_warm_caches, name="fastdeep-warm", daemon=True).start()
     _safe_print(f"FastDeep Scanner running at http://{host}:{port}")
     try:
         server.serve_forever()

@@ -52,31 +52,92 @@ def _symbol_from_filename(path: Path) -> str:
     return stem.replace("_BK", ".BK").replace("_", ".").upper()
 
 
+_PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
+    "date": ("date", "timestamp", "time", "datetime"),
+    "symbol": ("symbol", "ticker", "symbol_name"),
+    "open": ("open",),
+    "high": ("high",),
+    "low": ("low",),
+    "close": ("close",),
+    "volume": ("volume",),
+    "adjusted_close": ("adjusted_close", "adj_close", "adj close"),
+    "adjusted_open": ("adjusted_open",),
+}
+
+
+def _price_column_index(header: list[str]) -> dict[str, int]:
+    """Resolve every field to a column position once per file.
+
+    The reader used to rebuild a lower-cased copy of each row for every field it
+    read - nine times per row across 1.8 million rows - which is what made a cold
+    start take twenty seconds.
+    """
+    lookup = {name.strip().lower(): position for position, name in enumerate(header)}
+    resolved: dict[str, int] = {}
+    for field, aliases in _PRICE_COLUMNS.items():
+        for alias in aliases:
+            if alias in lookup:
+                resolved[field] = lookup[alias]
+                break
+    return resolved
+
+
 def _read_price_csv(path: Path) -> dict[str, list[StockCandle]]:
     grouped: dict[str, list[StockCandle]] = {}
     fallback_symbol = _symbol_from_filename(path)
     with path.open("r", newline="", encoding="utf-8-sig") as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.reader(handle)
+        try:
+            header = next(reader)
+        except StopIteration:
+            return {}
+        index = _price_column_index(header)
+        required = {"date", "open", "high", "low", "close"}
+        if not required <= index.keys():
+            missing = ", ".join(sorted(required - index.keys()))
+            raise ValueError(f"Price file {path.name} is missing columns: {missing}")
+        date_at = index["date"]
+        open_at, high_at, low_at, close_at = (
+            index["open"], index["high"], index["low"], index["close"]
+        )
+        symbol_at = index.get("symbol")
+        volume_at = index.get("volume")
+        adjusted_close_at = index.get("adjusted_close")
+        adjusted_open_at = index.get("adjusted_open")
+        # A short row would otherwise raise IndexError partway through the file.
+        # Only the required columns gate the row; a truncated optional tail still
+        # yields a usable candle, which is what the previous reader did.
+        span = max(index[field] for field in required) + 1
+
+        def cell(row: list[str], position: int | None) -> str:
+            if position is None or position >= len(row):
+                return ""
+            return row[position].strip()
+
         for row in reader:
-            symbol = _value(row, "symbol", "ticker", "symbol_name", default=fallback_symbol).strip()
+            if len(row) < span:
+                continue
+            symbol = cell(row, symbol_at) or fallback_symbol
             if not symbol:
                 continue
-            adjusted_close = _value(row, "adjusted_close", "adj_close", "Adj Close")
-            adjusted_open = _value(row, "adjusted_open")
-            candle = StockCandle(
-                date=_parse_date(_value(row, "date", "timestamp", "time", "datetime")),
-                symbol=symbol,
-                open=float(_value(row, "open", "Open")),
-                high=float(_value(row, "high", "High")),
-                low=float(_value(row, "low", "Low")),
-                close=float(_value(row, "close", "Close")),
-                volume=float(_value(row, "volume", "Volume", default="0")),
-                adjusted_close=float(adjusted_close) if adjusted_close else None,
-                adjusted_open=float(adjusted_open) if adjusted_open else None,
+            volume = cell(row, volume_at)
+            adjusted_close = cell(row, adjusted_close_at)
+            adjusted_open = cell(row, adjusted_open_at)
+            grouped.setdefault(symbol, []).append(
+                StockCandle(
+                    date=_parse_date(row[date_at]),
+                    symbol=symbol,
+                    open=float(row[open_at]),
+                    high=float(row[high_at]),
+                    low=float(row[low_at]),
+                    close=float(row[close_at]),
+                    volume=float(volume) if volume else 0.0,
+                    adjusted_close=float(adjusted_close) if adjusted_close else None,
+                    adjusted_open=float(adjusted_open) if adjusted_open else None,
+                )
             )
-            grouped.setdefault(symbol, []).append(candle)
-    for symbol in list(grouped):
-        grouped[symbol] = sorted(grouped[symbol], key=lambda item: item.date)
+    for candles in grouped.values():
+        candles.sort(key=lambda item: item.date)
     return grouped
 
 
@@ -234,8 +295,24 @@ def _financial_history_status(payload: dict[str, Any]) -> str:
 
 def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> FundamentalSnapshot:
     path = _financial_cache_path(snapshot.symbol)
-    if not path.exists() or time.time() - path.stat().st_mtime > 8 * 24 * 3600:
+    try:
+        stat = path.stat()
+    except OSError:
         return snapshot
+    if time.time() - stat.st_mtime > 8 * 24 * 3600:
+        return snapshot
+    fields = _financial_snapshot_fields(snapshot.symbol, stat.st_mtime_ns)
+    if fields is None:
+        return snapshot
+    return replace(snapshot, **fields)
+
+
+# load_market_data touches every symbol on every request, so reading and parsing
+# all 1,458 statement files each time dominated the response. Keying on the
+# file's revision keeps a rewritten statement from serving stale numbers.
+@lru_cache(maxsize=4096)
+def _financial_snapshot_fields(symbol: str, modified_ns: int) -> dict[str, Any] | None:
+    path = _financial_cache_path(symbol)
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         annual = payload.get("annual") or []
@@ -251,8 +328,7 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
         equity = _safe_number(metrics.get("stockholders_equity"))
         shares = _shares_outstanding(metrics)
         book_value_per_share = equity / shares if shares and equity else 0.0
-        return replace(
-            snapshot,
+        return dict(
             roe=_safe_number(ratios.get("roe")),
             roa=_safe_number(ratios.get("roa")),
             debt_to_equity=_safe_number(ratios.get("debt_to_equity")),
@@ -275,7 +351,7 @@ def _snapshot_from_financial_cache(snapshot: FundamentalSnapshot) -> Fundamental
             as_of=str(latest.get("period_end") or ""),
         )
     except (OSError, json.JSONDecodeError, IndexError, TypeError):
-        return snapshot
+        return None
 
 
 def load_market_data(
