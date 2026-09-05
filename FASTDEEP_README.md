@@ -162,25 +162,25 @@ FastDeep Scanner v1 คือ MVP สำหรับ workflow ที่เริ
 อัตราแลกเปลี่ยนเก็บที่ `data/fastdeep_fx_rates.json` และรีเฟรชทุกวันพร้อมราคา:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-fx
+python -m fastdeep_scanner update-fx
 ```
 
 ## Run CLI
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner scan --market ALL --min-score 55
+python -m fastdeep_scanner scan --market ALL --min-score 55
 ```
 
 เลือกเฉพาะ pattern:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner scan --patterns breakout,retest,double_bottom
+python -m fastdeep_scanner scan --patterns breakout,retest,double_bottom
 ```
 
 ## Run Web Dashboard
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner serve --port 8765
+python -m fastdeep_scanner serve --port 8765
 ```
 
 เปิด:
@@ -199,13 +199,13 @@ http://127.0.0.1:8765
 งบจะโหลดเมื่อเลือกหุ้นและเก็บ cache ไว้ 24 ชั่วโมง จึงใช้ได้กับทุก symbol ใน universe โดยไม่ต้องรอดาวน์โหลดทั้งตลาดก่อนเปิดหน้าเว็บ:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-financials --universe data/fastdeep_universe.csv
+python -m fastdeep_scanner update-financials --universe data/fastdeep_universe.csv
 ```
 
 ตรวจ coverage จริงโดยไม่ดาวน์โหลดใหม่:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner audit-financials
+python -m fastdeep_scanner audit-financials
 ```
 
 รายงาน `data/fastdeep_financial_coverage.json` แยก `มี cache`, `รายปีครบ 5 งวด` และ `ครบ 5 ปี + Q1-Q4` ออกจากกัน การมีไฟล์ cache ไม่ได้แปลว่างบครบตามเป้าหมาย หุ้นที่มีเพียง 4 ปีหรือไตรมาสบางส่วนยังเปิดดูได้ แต่หน้าเว็บจะระบุช่องว่างไว้ตรง ๆ
@@ -215,7 +215,7 @@ http://127.0.0.1:8765
 FastDeep ใช้ SEC Company Tickers หา CIK แล้วอ่าน Company Facts/XBRL จาก 10-K และ 10-Q โดยตรง ระบบเลือก filing ต้นฉบับ/ฉบับแก้ไขที่ใกล้งวดบัญชี ตัดข้อมูลเปรียบเทียบที่ซ้ำ จัด Q1-Q3 ตามปีบัญชี และคำนวณ Q4 จากงบปีลบสามไตรมาสแรกพร้อมติดธง `derived_from_annual`
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-sec-financials --groups SP500,NASDAQ100
+python -m fastdeep_scanner update-sec-financials --groups SP500,NASDAQ100
 ```
 
 คำสั่งนี้รันต่อจาก cache เดิม จำกัดความเร็วต่ำกว่าเพดาน SEC และจะไม่เขียนทับงบเดิมเมื่อ SEC ปฏิเสธการเชื่อมต่อ สามารถกำหนด User-Agent และอีเมลติดต่อขององค์กรด้วย `FASTDEEP_SEC_USER_AGENT` และ `FASTDEEP_SEC_CONTACT` ตามนโยบาย automated access ของ SEC
@@ -241,7 +241,7 @@ FastDeep ใช้ SEC Company Tickers หา CIK แล้วอ่าน Compa
 Event study วัดผลตอบแทนหลังสัญญาณจริงในอดีต และเทียบกับ **ค่าฐาน** คือการเข้าซื้อแบบสุ่มในหุ้นชุดเดียวกันช่วงเวลาเดียวกัน ตัวเลขที่ใช้ตัดสินคือส่วนต่างจากค่าฐาน ไม่ใช่ hit rate ดิบ เพราะ hit rate สูงอาจแปลว่าตลาดขึ้นเฉย ๆ
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner backtest --timeframe W --horizons 5,10,20 --cost-bps 30 --summary-only
+python -m fastdeep_scanner backtest --timeframe W --horizons 5,10,20 --cost-bps 30 --summary-only
 ```
 
 ผลอยู่ที่ `storage/fastdeep_event_study_D.json`, `_W.json` และ `_M.json` ดูได้จากแท็บ `หลักฐานย้อนหลัง` ในหน้าเว็บ
@@ -273,7 +273,7 @@ Scanner อ่านไฟล์เหล่านี้ทุกครั้ง
 ชั้นที่ 3 ยกข้อความจากแบบ 10-K มาตรง ๆ ไม่เรียบเรียงและไม่แปล พร้อมลิงก์กลับไปยังไฟล์ต้นฉบับที่ SEC เสมอ
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-filing-profiles
+python -m fastdeep_scanner update-filing-profiles
 ```
 
 ### ชั้นที่ 3 เติมได้แค่ไหน
@@ -331,7 +331,7 @@ FASTDEEP_SEC_CONTACT=อีเมลของคุณ@example.com
 ดึงงบหุ้นสหรัฐทั้งหมด:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner update-sec-financials --groups SP500,NASDAQ100 --pause 0.15
+python -m fastdeep_scanner update-sec-financials --groups SP500,NASDAQ100 --pause 0.15
 ```
 
 ไฟล์ companyfacts ของแต่ละบริษัทมีขนาดหลายเมกะไบต์ การดึงครบทั้ง 516 ตัวจึงใช้เวลาประมาณหนึ่งชั่วโมง งานรายวันเวลา 07:00 จะข้ามตัวที่ cache ยังใหม่กว่า 7 วัน รอบถัดไปจึงเร็ว
@@ -425,7 +425,7 @@ FASTDEEP_SEC_CONTACT=อีเมลของคุณ@example.com
 ## Export Report
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner report --symbol ADVANC.BK --out storage/ADVANC_fastdeep_report.html
+python -m fastdeep_scanner report --symbol ADVANC.BK --out storage/ADVANC_fastdeep_report.html
 ```
 
 ในหน้าเว็บกด `PDF Report` แล้วกด `Save as PDF` จาก browser print dialog
@@ -449,7 +449,7 @@ ADVANC.BK,Advanced Info Service,TH,Digital Infrastructure,32,12.5,1.35,8,10,33,1
 แล้วรัน:
 
 ```powershell
-& 'C:\Users\three\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m fastdeep_scanner scan --market-data data/your_prices.csv --fundamentals data/your_fundamentals.csv
+python -m fastdeep_scanner scan --market-data data/your_prices.csv --fundamentals data/your_fundamentals.csv
 ```
 
 ## Next Phase
