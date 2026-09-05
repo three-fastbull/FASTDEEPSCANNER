@@ -543,7 +543,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
-    args.func(args)
+    result = args.func(args)
+    # Commands that report a condition rather than fail outright return an int,
+    # and setup.bat branches on it. The rest return None and raise on failure,
+    # which already produces a non-zero exit.
+    if isinstance(result, int) and result != 0:
+        raise SystemExit(result)
 
 
 if __name__ == "__main__":
