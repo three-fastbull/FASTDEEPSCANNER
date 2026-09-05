@@ -55,6 +55,10 @@ def _date(value: Any) -> date:
     text = str(value).strip().removeprefix("As of ")
     if text.endswith(".0"):
         text = text[:-2]
+    # HSI publishes September as the four-letter "Sept", which %b never matches.
+    # Trimming it keeps the one month that would otherwise silently freeze the
+    # index membership for four weeks a year.
+    text = re.sub(r"Sept\b", "Sep", text, flags=re.IGNORECASE)
     for fmt in ("%Y-%m-%d", "%d-%b-%Y", "%b %d, %Y", "%Y%m%d"):
         try:
             return datetime.strptime(text, fmt).date()

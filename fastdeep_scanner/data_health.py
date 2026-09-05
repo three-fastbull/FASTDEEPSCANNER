@@ -16,6 +16,25 @@ DEFAULT_FINANCIAL_STATUS_PATH = ROOT / "data" / "fastdeep_financial_update_statu
 DEFAULT_FINANCIAL_COVERAGE_PATH = ROOT / "data" / "fastdeep_financial_coverage.json"
 DEFAULT_SEC_STATUS_PATH = ROOT / "data" / "fastdeep_sec_update_status.json"
 DEFAULT_UNIVERSE_PATH = ROOT / "data" / "fastdeep_universe.csv"
+# The price updater rewrites its status file every batch, so a timestamp that has
+# stopped moving for this long means the process died rather than that it is slow.
+STALE_UPDATE_MINUTES = 10
+
+
+def _update_is_live(status: dict[str, Any]) -> bool:
+    """Whether a status left in "running" belongs to a process that still exists.
+
+    A killed or crashed updater leaves "running" behind forever, which pinned the
+    page to a progress banner and kept Candidate export disabled with no way back
+    short of editing the file by hand.
+    """
+    try:
+        stamped = datetime.fromisoformat(str(status.get("updated_at")))
+    except (TypeError, ValueError):
+        return False
+    if stamped.tzinfo is None:
+        stamped = stamped.astimezone()
+    return datetime.now(stamped.tzinfo) - stamped < timedelta(minutes=STALE_UPDATE_MINUTES)
 
 
 def expected_eod_date(today: date | None = None) -> date:
@@ -108,7 +127,7 @@ def price_data_health(
         failed = [item for item in failed if str(item).split(":", 1)[0] in registered]
         latest = max((dates[symbol] for symbol in registered if symbol in dates), default=None)
         is_fresh = bool(latest and latest >= expected.isoformat())
-    update_running = status.get("state") == "running"
+    update_running = status.get("state") == "running" and _update_is_live(status)
     degraded = bool(failed) or coverage < 0.97 or (fresh_count is not None and fresh_count < requested)
     if update_running:
         state = "updating"
@@ -118,10 +137,10 @@ def price_data_health(
         message = "ไม่พบหุ้นในกลุ่มที่เลือก"
     elif not is_fresh:
         state = "stale"
-        message = "ข้อมูลราคาเก่า - หยุดใช้ผลสแกนเพื่อการตัดสินใจ"
+        message = "ผู้ให้บริการยังไม่มีแท่ง EOD ของกลุ่มนี้ถึงวันสแกน - หยุดใช้ผลเพื่อการตัดสินใจ"
     elif degraded:
         state = "degraded"
-        message = "ข้อมูลราคาบางส่วนไม่ครบหรือไม่ล่าสุด - ตรวจสอบความพร้อมของกลุ่มที่เลือก"
+        message = "มีราคาครบ แต่ผู้ให้บริการยังไม่ส่งแท่ง EOD ล่าสุดบางรหัส - ตรวจรายชื่อก่อนใช้ผลสแกน"
     else:
         state = "ready"
         message = "ข้อมูลราคาพร้อมใช้"
@@ -232,7 +251,7 @@ def financial_data_health(
         complete = sum(item.get("status") == "complete" for item in items)
         coverage = {**coverage, "annual_5y_symbols": annual, "complete_symbols": complete, "partial_symbols": cached - complete, "missing_symbols": requested - cached, "cached_coverage_pct": round(cached / requested * 100, 1) if requested else 0, "annual_5y_coverage_pct": round(annual / requested * 100, 1) if requested else 0, "complete_coverage_pct": round(complete / requested * 100, 1) if requested else 0}
     return {
-        "state": "updating" if status.get("state") == "running" else ("ready" if requested and int(coverage.get("complete_symbols") or 0) == requested else "partial" if cached else "missing"),
+        "state": "updating" if status.get("state") == "running" and _update_is_live(status) else ("ready" if requested and int(coverage.get("complete_symbols") or 0) == requested else "partial" if cached else "missing"),
         "cached_symbols": cached,
         "fresh_symbols": fresh,
         "symbols_requested": requested,
