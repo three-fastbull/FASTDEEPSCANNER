@@ -262,12 +262,19 @@ function scanImageMatches(uploadShape, indexRows) {
 }
 
 function renderImageMatches(matches) {
+  // Say what is imperfect about the data alongside the matches rather than
+  // withholding them, so the reader can judge the list instead of seeing only a
+  // status line where results should be.
+  const health = state.dataHealth;
+  const caveat = health && !health.can_publish
+    ? `<p class="match-caveat">หมายเหตุ: ${escapeHtml(health.message)}</p>`
+    : "";
   if (!matches.length) {
-    elements.imageMatches.innerHTML = "<p>ไม่พบ asset ที่เทียบได้ ลองเปลี่ยนตลาด/Universe หรือแนบรูปที่เห็นกราฟชัดขึ้น</p>";
+    elements.imageMatches.innerHTML = `${caveat}<p>ไม่พบ asset ที่เทียบได้ ลองเปลี่ยนตลาด/Universe หรือแนบรูปที่เห็นกราฟชัดขึ้น</p>`;
     return;
   }
   const scanSymbols = new Set(state.results.map((result) => result.symbol));
-  elements.imageMatches.innerHTML = matches.map((match) => {
+  elements.imageMatches.innerHTML = caveat + matches.map((match) => {
     const inScan = scanSymbols.has(match.symbol) ? "อยู่ในผลสแกน" : "ยังไม่เข้า pattern filter";
     return `
       <article class="image-match-item">
@@ -909,8 +916,13 @@ elements.imageScanButton.addEventListener("click", async () => {
     elements.imageMatches.innerHTML = "<p>กรุณาแนบรูปกราฟก่อน</p>";
     return;
   }
-  if (state.dataHealth && !state.dataHealth.can_publish) {
-    elements.imageMatches.innerHTML = `<p>${state.dataHealth.message}</p>`;
+  // Shape matching reads 180 days of history and the panel says outright that it
+  // is a way to find names to study, not a signal. Gating it on can_publish -
+  // which only turns true when every symbol has the newest bar - let one stale
+  // ticker out of 1,458 disable the feature, and reported it with the price
+  // health message, which gives no hint that this was the reason.
+  if (state.dataHealth && state.dataHealth.state === "missing") {
+    elements.imageMatches.innerHTML = `<p>${escapeHtml(state.dataHealth.message)}</p>`;
     return;
   }
   elements.imageMatches.innerHTML = "<p>กำลังอ่านรูปและเทียบทรงกราฟ...</p>";

@@ -310,6 +310,17 @@ a.primary-button {
   gap: 8px;
 }
 
+.match-caveat {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid #f0b429;
+  border-radius: 4px;
+  background: #fff8e6;
+  color: #7c4a03;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .image-match-item {
   display: grid;
   grid-template-columns: 72px 1fr auto;
