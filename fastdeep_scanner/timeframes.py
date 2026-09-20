@@ -45,29 +45,58 @@ def aggregate_candles(
     if timeframe == "D":
         return ordered
 
+    # Carry the running period in plain locals and build one StockCandle when it
+    # closes. Rebuilding the dataclass on every daily bar meant 1.75 million
+    # allocations across the universe, which was the whole cost of a monthly scan.
     aggregated: list[StockCandle] = []
     current_key: tuple[int, int] | None = None
-    current: StockCandle | None = None
+    symbol = ""
+    period_open = high = low = last_close = 0.0
+    volume = 0.0
+    last_date: date | None = None
+
     for candle in ordered:
         key = _period_key(candle, timeframe)
         if key != current_key:
-            if current is not None:
-                aggregated.append(current)
+            if last_date is not None:
+                aggregated.append(
+                    StockCandle(
+                        date=last_date,
+                        symbol=symbol,
+                        open=period_open,
+                        high=high,
+                        low=low,
+                        close=last_close,
+                        volume=volume,
+                    )
+                )
             current_key = key
-            current = candle
-            continue
-        assert current is not None
-        current = StockCandle(
-            date=candle.date,
-            symbol=candle.symbol,
-            open=current.open,
-            high=max(current.high, candle.high),
-            low=min(current.low, candle.low),
-            close=candle.close,
-            volume=current.volume + candle.volume,
+            symbol = candle.symbol
+            period_open = candle.open
+            high = candle.high
+            low = candle.low
+            volume = 0.0
+        else:
+            if candle.high > high:
+                high = candle.high
+            if candle.low < low:
+                low = candle.low
+        last_close = candle.close
+        last_date = candle.date
+        volume += candle.volume
+
+    if last_date is not None:
+        aggregated.append(
+            StockCandle(
+                date=last_date,
+                symbol=symbol,
+                open=period_open,
+                high=high,
+                low=low,
+                close=last_close,
+                volume=volume,
+            )
         )
-    if current is not None:
-        aggregated.append(current)
 
     if drop_incomplete and aggregated:
         reference = as_of or date.today()

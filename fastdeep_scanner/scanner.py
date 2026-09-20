@@ -209,16 +209,20 @@ def _scan_symbol(
     expected_eod: date | None = None,
 ) -> ScanResult | None:
     timeframe = normalize_timeframe(criteria.timeframe)
-    candles = aggregate_candles(daily_candles, timeframe)
-    minimum_bars = 50 if timeframe == "M" else 90
-    if len(candles) < minimum_bars:
-        return None
+    # Market and universe are settled by fields already in hand, while folding a
+    # symbol into monthly bars is the most expensive step in the whole scan.
+    # Running the cheap tests first keeps a single-market request from paying for
+    # the 1,300 symbols it is about to discard.
     if criteria.market != "ALL" and snapshot.market.upper() != criteria.market.upper():
         return None
     if criteria.universe != "ALL":
         groups = {group.strip().upper() for group in snapshot.index_groups.split("|") if group.strip()}
         if criteria.universe.upper() not in groups:
             return None
+    candles = aggregate_candles(daily_candles, timeframe)
+    minimum_bars = 50 if timeframe == "M" else 90
+    if len(candles) < minimum_bars:
+        return None
 
     liquidity = liquidity_profile(daily_candles, snapshot.symbol, snapshot.market, rates=fx_rates)
     if float(liquidity["score"]) < criteria.min_liquidity:
