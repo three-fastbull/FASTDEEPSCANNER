@@ -82,11 +82,28 @@ if errorlevel 1 (
 )
 
 echo.
+echo   [+] ตั้งให้อัปเดตข้อมูลเองทุกวัน และสร้างไอคอนบนหน้าจอ...
+rem Without these two the install works once and then goes stale, because the
+rem daily refresh and the desktop launcher were separate scripts students missed.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Install-FastDeepDailyTask.ps1" >nul 2>&1
+if errorlevel 1 (
+  echo         ตั้งอัปเดตอัตโนมัติไม่สำเร็จ - กดอัปเดตเองได้ที่ UPDATE_FASTDEEP_PRICES_AND_OPEN.bat
+) else (
+  echo         อัปเดตอัตโนมัติทุกวัน 07:00 ขณะเปิดเครื่องอยู่
+)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Install-FastDeepShortcut.ps1" >nul 2>&1
+if errorlevel 1 (
+  echo         สร้างไอคอนไม่สำเร็จ - เปิดด้วย OPEN_FASTDEEP_SCANNER.bat แทนได้
+) else (
+  echo         สร้างไอคอน "FastDeep Scanner" บนหน้าจอแล้ว
+)
+
+echo.
 echo   ============================================
 echo      ติดตั้งเสร็จแล้ว
 echo   ============================================
 echo.
-echo   เปิดโปรแกรมด้วยไฟล์  OPEN_FASTDEEP_SCANNER.bat
+echo   ครั้งต่อไปดับเบิลคลิกไอคอน FastDeep Scanner บนหน้าจอ
 echo   หรือกด Enter เพื่อเปิดตอนนี้เลย
 echo.
 pause >nul
