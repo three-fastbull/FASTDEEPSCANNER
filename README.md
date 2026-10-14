@@ -33,7 +33,10 @@
 > อย่าแตกไว้ใน Desktop หรือ Downloads ที่ซิงก์กับ OneDrive
 > เพราะข้อมูลจะโตถึง 600 MB แล้ว OneDrive จะพยายามอัปโหลดตลอดเวลา
 
-### 3. เปิดโฟลเดอร์นั้น แล้วดับเบิลคลิก `setup.bat`
+### 3. เข้าโฟลเดอร์ `FASTDEEPSCANNER-main` แล้วดับเบิลคลิก `setup.bat`
+
+> Windows จะสร้างโฟลเดอร์ `FASTDEEPSCANNER-main` ซ้อนไว้ใน `D:\FASTDEEP` อีกชั้นเสมอ — `setup.bat` อยู่ข้างในนั้น
+> ถ้ามีหน้าต่างสีฟ้า "Windows protected your PC" ให้กด **More info** → **Run anyway**
 
 พิมพ์**อีเมลของตัวเอง**แล้วกด Enter จากนั้นรอจนขึ้น **"ติดตั้งเสร็จแล้ว"** — ทำให้เองทั้งหมด
 
