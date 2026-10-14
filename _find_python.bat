@@ -14,7 +14,13 @@ if defined FASTDEEP_PYTHON_OVERRIDE (
   )
 )
 
-rem 2. The py launcher ships with the official installer and picks the newest.
+rem 2. The private copy setup.bat unpacks into .\python, known to work.
+if exist "%~dp0python\python.exe" (
+  call :check "%~dp0python\python.exe"
+  if not errorlevel 1 goto :found
+)
+
+rem 3. The py launcher ships with the official installer and picks the newest.
 for %%V in (3.13 3.12 3.11) do (
   py -%%V -c "import sys" >nul 2>&1
   if not errorlevel 1 (
@@ -25,13 +31,13 @@ for %%V in (3.13 3.12 3.11) do (
   )
 )
 
-rem 3. Whatever "python" resolves to on PATH.
+rem 4. Whatever "python" resolves to on PATH.
 for /f "delims=" %%P in ('where python 2^>nul') do (
   call :check "%%P"
   if not errorlevel 1 goto :found
 )
 
-rem 4. The bundled runtime, so the author's own machine keeps working.
+rem 5. The author's own runtime, so that machine keeps working.
 set "BUNDLED=%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
 if exist "%BUNDLED%" (
   call :check "%BUNDLED%"

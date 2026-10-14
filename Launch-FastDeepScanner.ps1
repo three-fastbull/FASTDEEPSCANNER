@@ -19,6 +19,8 @@ function Resolve-FastDeepPython {
     $ErrorActionPreference = "SilentlyContinue"
     $candidates = @()
     if ($env:FASTDEEP_PYTHON_OVERRIDE) { $candidates += $env:FASTDEEP_PYTHON_OVERRIDE }
+    # The private copy setup.bat unpacks is tried first: it is the one known to work.
+    $candidates += Join-Path $root "python\python.exe"
     if (Get-Command py -ErrorAction SilentlyContinue) {
         foreach ($version in @("3.13", "3.12", "3.11")) {
             try {

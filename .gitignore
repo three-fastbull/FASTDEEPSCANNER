@@ -28,3 +28,5 @@ data/sec_company_tickers.json
 
 # Local shortcut to the FastDeep web server.
 FASTDEEP_SCANNER.url
+# Private interpreter unpacked by setup.bat
+/python/

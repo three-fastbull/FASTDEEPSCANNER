@@ -15,7 +15,10 @@ echo.
 echo   ใส่อีเมลมาเลยก็ได้:  setup.bat you@example.com
 echo.
 
-echo   [1/5] ค้นหา Python...
+echo   [1/5] เตรียม Python...
+echo         กำลังโหลด Python ตัวพกพามาไว้ในโฟลเดอร์นี้ (ประมาณ 11 MB)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0_get_python.ps1" >nul 2>&1
+if errorlevel 1 echo         โหลดไม่สำเร็จ - จะใช้ Python ที่มีในเครื่องแทน
 call "%~dp0_find_python.bat"
 if errorlevel 1 (
   pause
